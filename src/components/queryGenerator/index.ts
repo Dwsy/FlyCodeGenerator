@@ -1,7 +1,8 @@
 // 引入自定义模块中的 getTableShortName 方法
-import { getTableShortName } from "../util/";
-import { QueryModel, ColumnModel, RelationTableModel, JoinModel, ConditionModel, Operator, LikeMatchType, ConditionGenerator, generateSql }
-  from "../type/model/queryModel"
+import { getTableShortName } from "../../util/";
+import { QueryModel, ColumnModel, RelationTableModel, JoinModel, ConditionModel, Operator, LikeMatchType, ConditionGenerator, getOperator }
+  from "../../type/model/queryModel"
+import { DatePropertyCodes, PropertyTypeCode } from "../../type/model/propertyTypeCodeRef";
 
 
 let protocol: protocol
@@ -15,14 +16,12 @@ const columnDataMap = new Map<string, columnData>();
 
 
 
-// 定义 fquery 变量
-let fquery = "select\n{{selectColumns}}"
 
 export const init = (inTableDatas: tableData[], inProtocol: protocol) => {
   tableDatas = inTableDatas
   protocol = inProtocol
 
-  console.log("tableDatas", tableDatas)
+  // console.log("tableDatas", tableDatas)
   console.log("functionname:", protocol.functionname);
   // 遍历 tableDatas 数组
   tableDatas.forEach((data) => {
@@ -40,22 +39,28 @@ export const updateProtocol = (newProtocol: protocol) => {
   protocol = newProtocol
 }
 export function genQueryModel(outputArray: Output[]): QueryModel {
-  const queryArgumentArrayMap = new Map<string, string[]>();
+  const queryArgumentArrayMap = new Map<string, Property[]>();
   // 将 query 对象转换为 Map 对象
   protocol.input.forEach((input) => {
-    const arg = input.properties.map(p => p.name)
-    queryArgumentArrayMap.set(input.name, arg);
+    queryArgumentArrayMap.set(input.name, input.properties);
   })
 
   return gen(outputArray[0], queryArgumentArrayMap)
 }
 
 
-function gen(output: Output, queryArgumentArrayMap: Map<string, string[]>): QueryModel {
+function gen(output: Output, queryArgumentArrayMap: Map<string, Property[]>): QueryModel {
+  // 定义 fquery 变量
+  let fquery = "select\n{{selectColumns}}"
+
   const mainTableName = protocol.input[0].name;
   const columnModelArray = new Array<ColumnModel>()
   const conditionModelArray = new Array<ConditionModel>()
   const joinModelArray = new Array<JoinModel>()
+  const relationTableShortNameMap = new Map<string, string>();
+  const relationTableShortNameReverseMapReverse = new Map<string, string>();
+  const relationTableColumnMap = new Map<string, string>();
+  const needJoinRelationTableMap = new Map<string, tableData>();
 
   const queryModel: QueryModel = {
     tableName: mainTableName,
@@ -65,19 +70,13 @@ function gen(output: Output, queryArgumentArrayMap: Map<string, string[]>): Quer
     joins: joinModelArray
   }
 
-  const relationTableShortNameMap = new Map<string, string>();
-  const relationTableShortNameReverseMapReverse = new Map<string, string>();
-  const relationTableColumnMap = new Map<string, string>();
-  const needJoinRelationTableMap = new Map<string, tableData>();
 
   // 获取 output 对应的表格数据
   const outputTable = tableDataMap.get(output.objectcode);
   // 创建 relationTableMap 和 outPropertiesDataMap 两个 Map 对象
-
   // const outColumnNameArray = output.properties.map((data) => data.name)
   const outPropertiesDataMap = output.properties.map((data) => {
     const columnData = columnDataMap.get(data.propertycode);
-
     if (data.name.indexOf("__") !== -1) {
       const parts = data.name.split("__");
       if (parts.length === 2) {
@@ -88,20 +87,13 @@ function gen(output: Output, queryArgumentArrayMap: Map<string, string[]>): Quer
     }
     return columnData;
   });
-
   // 获取表格的短名称
   const tableShortName = getTableShortName(outputTable.tablename);
   // 将 outPropertiesDataMap 中的数据添加到 fquery 中
-
-
   fquery += `\n  from ${outputTable.tablename} as ${tableShortName}`;
-
-
   // 遍历 relationTableMap，将关联表格的数据添加到 fquery 中
   // 需要join的表 1.关联查询字段2.关联查询where筛选
   needJoinRelationTableMap.forEach((relationTable, columnname) => {
-    // console.log("relationTable", relationTable)
-    // console.log("columnname", columnname)
     let tableName = relationTable.tablename
     if (tableName === "pl_dictionary" || tableName === "pl_orgstruct" || tableName === "pl_region") {
       tableName = relationTable.objectmark
@@ -114,7 +106,6 @@ function gen(output: Output, queryArgumentArrayMap: Map<string, string[]>): Quer
       relationTableShortName = getTableShortName(tableName, columnname, seq);
       seq++
     }
-
     relationTableShortNameMap.set(columnname, relationTableShortName);
     relationTableShortNameReverseMapReverse.set(relationTableShortName, tableName);
     let idField = {
@@ -122,12 +113,11 @@ function gen(output: Output, queryArgumentArrayMap: Map<string, string[]>): Quer
       pl_orgstruct: "orgstructid",
       pl_region: "regionid",
     }[relationTable.tablename] || true;
-    // 遍历 relationTable.properties 数组
     if (idField) {
       for (const columnData of relationTable.properties) {
         if (columnData.propertytypecode == "1") {
           idField = columnData.columnname;
-          break; // 找到后提前结束循环
+          break;
         }
       }
     }
@@ -145,12 +135,6 @@ function gen(output: Output, queryArgumentArrayMap: Map<string, string[]>): Quer
     fquery += `\n  left join ${relationTable.tablename} as ${relationTableShortName} `;
     fquery += `on ${tableShortName}.${columnname} = ${relationTableShortName}.${idField}`;
   });
-
-
-  // console.log("relationTableShortNameMap----", relationTableShortNameMap)
-  // relationTableShortNameMap.forEach((relationTableShortName, columnname) => {
-
-  // })
   console.log(relationTableShortNameReverseMapReverse)
   // 查询列
   let selectColumns = outPropertiesDataMap
@@ -187,7 +171,6 @@ function gen(output: Output, queryArgumentArrayMap: Map<string, string[]>): Quer
     .join(",\n");
 
   fquery = fquery.replace("{{selectColumns}}", selectColumns);
-
   // 如果 query 不为 null，则将查询条件添加到 fquery 中
   if (queryArgumentArrayMap?.size > 0) {
     fquery += "\n  where 1=1\n";
@@ -196,29 +179,71 @@ function gen(output: Output, queryArgumentArrayMap: Map<string, string[]>): Quer
   // 定义模板字符串
   const template = `{#if {{if}}}\n and {{condition}}\n{#endif}\n`;
   // 遍历 queryMap，将查询条件添加到 fquery 中
-  queryArgumentArrayMap.forEach((queryArgNameArry, tableName) => {
+  queryArgumentArrayMap.forEach((properties, tableName) => {
     if (tableName === mainTableName) {
-      queryArgNameArry.forEach((argName) => {
-        // 先完成 = 操作
+      properties.forEach((property) => {
+        // 先完成 = 操作 todo
+        const argName = property.name
+        const operator = getOperator(property)
         const conditionModel: ConditionModel = {
           tableName: tableName,
           tableShortName: tableShortName,
           columnName: argName,
-          operator: Operator.Equal,
+          operator: operator,
           value: null,
           secondValue: null,
           like: null
         }
-        conditionModelArray.push(conditionModel)
-        const condition = `${tableShortName}.${argName} = { IN.${tableName}.${argName} }`;
-        const q = template.replace(
-          "{{if}}",
-          `!String.isBlank(IN.${tableName}.${argName})`
-        ).replace("{{condition}}", condition);
-        fquery += q;
+        let condition = `${tableShortName}.${argName} `
+        if (operator == Operator.Equal) {
+          conditionModelArray.push(conditionModel)
+          condition += operator
+          condition += ` { IN.${tableName}.${argName} }`;
+          const blankJudge = template.replace(
+            "{{if}}",
+            `!String.isBlank(IN.${tableName}.${argName})`
+          ).replace("{{condition}}", condition);
+          fquery += blankJudge;
+        }
+        if (operator == Operator.Like) {
+          conditionModel.like = { matchType: LikeMatchType.Contains }//todo config
+          conditionModelArray.push(conditionModel)
+          condition += operator
+          condition += ` { IN.${tableName}.${argName} }`;
+          const blankJudge = template.replace(
+            "{{if}}",
+            `!String.isBlank(IN.${tableName}.${argName})`
+          ).replace("{{condition}}", condition);
+          fquery += blankJudge;
+        }
+        if (operator == Operator.Between) {
+          conditionModelArray.push(conditionModel)
+          // SELECT * FROM my_table WHERE created_at BETWEEN '2021-01-01 00:00:00' AND '2021-01-31 23:59:59';
+
+          if (DatePropertyCodes.indexOf(Number(property.propertytypecode)) != -1) {
+            //时间类
+            condition += ` ${operator} { bengin } ${Operator.AND} { end }`
+            const blankJudge = template.replace(
+              "{{if}}",
+              `!String.isBlank(begin)&&!String.isBlank(end)`
+            ).replace("{{condition}}", condition);
+            fquery += blankJudge;
+          } else {
+            condition += ` ${operator} { value1 } ${Operator.AND} { value2 }`
+            const blankJudge = template.replace(
+              "{{if}}",
+              `!String.isBlank(value1)&&!String.isBlank(value2)`
+            ).replace("{{condition}}", condition);
+            fquery += blankJudge;
+          }
+
+
+        }
+
       });
     } else {
-      queryArgNameArry.forEach((argName) => {
+      properties.forEach((property) => {
+        const argName = property.name
         const conditionModel: ConditionModel = {
           tableName: tableName,
           tableShortName: relationTableShortNameMap.get(tableName),
@@ -242,5 +267,74 @@ function gen(output: Output, queryArgumentArrayMap: Map<string, string[]>): Quer
   queryModel.columns = columnModelArray
   queryModel.joins = joinModelArray
   queryModel.conditions = conditionModelArray
+  console.log(fquery)
   return queryModel
+}
+
+
+
+export function generateSql(queryModel: QueryModel): string {
+  // 生成 SELECT 子句
+  const selectClause = `SELECT\n  ${queryModel.columns.map((c) => {
+    if (c.queryName == null || c.queryName == undefined) {
+      return `${c.tableShortName}.${c.columnName}`
+    } else {
+      return `${c.tableShortName}.${c.columnName} as ${c.queryName}`
+    }
+  }).join(",\n  ")}`;
+
+  // 生成 FROM 子句
+  const fromClause = `FROM\n  ${queryModel.tableName} as ${queryModel.tableShortName}`;
+
+  // 生成 JOIN 子句
+  const joinClauses = queryModel.joins.map((j) => {
+    let lj: string
+    let on: string
+    if (j.relationTable.name != null || j.relationTable.name != undefined) {
+      lj = `LEFT JOIN ${j.relationTable.name} as ${j.relationTable.shortName} `
+      on = `ON ${j.relationTable.shortName}.${j.relationTable.idField} = ${j.tableShortName}.${j.columnName}`
+    } else {
+      lj = `LEFT JOIN ${j.relationTable.name} as ${j.relationTable.shortName} `
+      on = `ON ${j.relationTable.name}.${j.columnName} = ${j.tableShortName}.${j.columnName}`
+    }
+    return lj.concat(on)
+  });
+
+  // 生成 WHERE 子句
+  const whereClauses = queryModel.conditions.map((c) => {
+    // 定义模板字符串
+    let whereTemplate = `{#if {{if}}}\n and {{condition}}\n{#endif}\n`;
+    const generator = new ConditionGenerator(c);
+    if (c.operator == Operator.Equal) {
+      const juede = `!String.isBlank(IN.${c.tableName}.${c.columnName})`
+      const condition = generator.generateWhereClause();
+      whereTemplate = whereTemplate
+        .replace("{{if}}", juede)
+        .replace("{{condition}}", condition);
+    } else if (c.operator === Operator.Like) {
+      const juede = `!String.isBlank(IN.${c.tableName}.${c.columnName})`
+      let whereClause = generator.generateWhereClause()
+      whereTemplate = whereTemplate
+        .replace('{{if}}', juede)
+        .replace('{{condition}}', whereClause);
+    } else if (c.operator === Operator.Between) {
+      const isDate = DatePropertyCodes.indexOf(Number(this.condition.propertytypecode)) !== -1
+      const [lvalue, rvalue] = isDate ? ["begin", "end"] : ["min", "max"]
+
+      const juede = `!String.isBlank(${lvalue}) && !String.isBlank(${rvalue})`
+      let whereClause = generator.generateWhereClause()
+      console.log("c.propertytypecode", c.propertytypecode)
+      whereTemplate = whereTemplate
+        .replace('{{if}}', juede)
+        .replace('{{condition}}', whereClause);
+    }
+
+    return whereTemplate;
+  });
+  const whereClause = whereClauses.length > 0 ? `WHERE 1=1\n${whereClauses.join("")}` : "";
+
+  // 拼接 SQL 语句
+  const sql = `${selectClause}\n${fromClause}\n${joinClauses.join("\n")}\n${whereClause}`;
+
+  return sql;
 }

@@ -1,3 +1,5 @@
+import { DatePropertyCodes, PropertyTypeCode } from "./propertyTypeCodeRef"
+
 export interface QueryModel {
     tableName: string
     tableShortName: string
@@ -42,6 +44,7 @@ export interface ConditionModel {
     operator: Operator
     value?: string
     secondValue?: string
+    propertytypecode?: string
     like?: {
         matchType: LikeMatchType
     }
@@ -55,7 +58,10 @@ export enum Operator {
     LessThan = "<",
     LessThanOrEqual = "<=",
     Between = "BETWEEN",
+    AND = "AND",
+    IN = "IN",
     NotBetween = "NOT BETWEEN",
+    Like = "LIKE",
 }
 
 
@@ -65,6 +71,37 @@ export enum LikeMatchType {
     Contains = "Contains",
 }
 
+export function getOperator(property: Property) {
+    const propertytypecode = Number(property.propertytypecode)
+    if (propertytypecode == PropertyTypeCode.PrimaryKey) {
+        return Operator.Equal
+    }
+
+    if (propertytypecode == PropertyTypeCode.Name) {
+        return Operator.Like
+    }
+
+    if (propertytypecode == PropertyTypeCode.Text) {
+        return Operator.Like
+    }
+    if (propertytypecode == PropertyTypeCode.DateTime) {
+        return Operator.Between
+    }
+    if (propertytypecode == PropertyTypeCode.CreatedBy) {
+        return Operator.Equal
+    }
+    if (propertytypecode == PropertyTypeCode.DateTime) {
+        return Operator.Between
+    }
+    if (propertytypecode == PropertyTypeCode.CreatedTime) {
+        return Operator.Between
+    }
+    if (propertytypecode == PropertyTypeCode.ModifiedTime) {
+        return Operator.Between
+    }
+    return Operator.Equal
+
+}
 export class ConditionGenerator {
     private condition: ConditionModel;
 
@@ -97,7 +134,14 @@ export class ConditionGenerator {
     }
 
     public generateBetweenClause(): string {
-        return `${this.condition.tableShortName}.${this.condition.columnName} BETWEEN ${this.condition.value} AND ${this.condition.secondValue}`;
+
+        let whereClause = `IN.${this.condition.tableName}.${this.condition.columnName}`
+        const isDate = DatePropertyCodes.indexOf(Number(this.condition.propertytypecode)) !== -1
+        const [lvalue, rvalue] = isDate ? ["begin", "end"] : ["min", "max"]
+
+        whereClause = ` ${Operator.Between} { ${lvalue} } ${Operator.AND} { ${rvalue} }`;
+
+        return whereClause
     }
 
     public generateNotBetweenClause(): string {
@@ -105,18 +149,24 @@ export class ConditionGenerator {
     }
 
     public generateLikeClause(): string {
+        // { #if!String.isBlank(IN.tn_crm_dwy.manager__orgname) }
+        // and member.orgname  like  { '%' + IN.tn_crm_dwy.manager__orgname + '%' }
+        // { #endif }
         const value = this.condition.value;
         const matchType = this.condition.like.matchType;
         let likeValue: string
+        const { tableName, columnName } = this.condition;
+        const percent = "'%'"
         if (matchType === LikeMatchType.Contains) {
-            likeValue = `%${value}%`;
+            likeValue = `{ ${percent} + {${tableName}.${columnName}} + ${percent} }`;
         } else if (matchType === LikeMatchType.StartsWith) {
-            likeValue = `${value}%`;
+            likeValue = `{ ${percent} + {${tableName}.${columnName}} }`;
         } else if (matchType === LikeMatchType.EndsWith) {
-            likeValue = `%${value}`;
+            likeValue = `{ ${tableName}.${columnName}} + ${percent} }`;
         }
-        return `${this.condition.tableShortName}.${this.condition.columnName} LIKE '${likeValue}'`;
+        return `${this.condition.tableShortName}.${this.condition.columnName} ${Operator.Like} ${likeValue}`;
     }
+
     public generateWhereClause(): string {
         let clause = "";
         switch (this.condition.operator) {
@@ -144,6 +194,9 @@ export class ConditionGenerator {
             case Operator.NotBetween:
                 clause = this.generateNotBetweenClause();
                 break;
+            case Operator.Like:
+                clause = this.generateLikeClause();
+                break
             default:
                 break;
         }
@@ -151,54 +204,3 @@ export class ConditionGenerator {
     }
 }
 
-
-export function generateSql(queryModel: QueryModel): string {
-    // 生成 SELECT 子句
-    const selectClause = `SELECT\n  ${queryModel.columns.map((c) => {
-        if (c.queryName == null || c.queryName == undefined) {
-            console.log("log11",c)
-            return `${c.tableShortName}.${c.columnName}`
-        } else {
-            console.log("log",c)
-            return `${c.tableShortName}.${c.columnName} as ${c.queryName}`
-        }
-    }).join(",\n  ")}`;
-
-    // 生成 FROM 子句
-    const fromClause = `FROM\n  ${queryModel.tableName} as ${queryModel.tableShortName}`;
-
-    // 生成 JOIN 子句
-    const joinClauses = queryModel.joins.map((j) => {
-        let lj: string
-        let on: string
-        if (j.relationTable.name != null || j.relationTable.name != undefined) {
-            lj = `LEFT JOIN ${j.relationTable.name} as ${j.relationTable.shortName} `
-            on = `ON ${j.relationTable.shortName}.${j.relationTable.idField} = ${j.tableShortName}.${j.columnName}`
-        } else {
-            lj = `LEFT JOIN ${j.relationTable.name} as ${j.relationTable.shortName} `
-            on = `ON ${j.relationTable.name}.${j.columnName} = ${j.tableShortName}.${j.columnName}`
-        }
-        return lj.concat(on)
-    });
-
-    // 生成 WHERE 子句
-    const whereClauses = queryModel.conditions.map((c) => {
-        // 定义模板字符串
-        const whereTemplate = `{#if {{if}}}\n and {{condition}}\n{#endif}\n`;
-
-        const juede = `!String.isBlank(IN.${c.tableName}.${c.columnName})`
-        const generator = new ConditionGenerator(c);
-        const condition = generator.generateWhereClause();
-
-        const where = whereTemplate
-            .replace("{{if}}", juede)
-            .replace("{{condition}}", condition);
-        return where;
-    });
-    const whereClause = whereClauses.length > 0 ? `WHERE 1=1\n${whereClauses.join("")}` : "";
-
-    // 拼接 SQL 语句
-    const sql = `${selectClause}\n${fromClause}\n${joinClauses.join("\n")}\n${whereClause}`;
-
-    return sql;
-}

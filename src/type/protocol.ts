@@ -13,7 +13,7 @@ interface Operations {
   templateparams: Templateparams;
 }
 
-interface Properties {
+interface Property {
   name: string;
   propertyname: string;
   propertytypecode: string;
@@ -28,10 +28,10 @@ interface Input {
   objectname: string;
   datatype: string;
   marktype: string;
-  properties: Properties[];
+  properties: Property[];
 }
 
-interface Properties {
+interface Property {
   name: string;
   propertyname: string;
   propertytypecode: string;
@@ -46,7 +46,7 @@ interface Output {
   objectname: string;
   datatype: string;
   marktype: string;
-  properties: Properties[];
+  properties: Property[];
 }
 
 interface protocol {

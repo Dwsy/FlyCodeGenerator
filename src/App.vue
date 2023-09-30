@@ -3,5 +3,10 @@
 </template>
 
 <script setup lang="ts">
-import queryGenerator from './queryGenerator/index.vue'
+import { onMounted } from 'vue';
+import queryGenerator from './components/queryGenerator/index.vue'
+
+onMounted(() => {
+
+})
 </script>

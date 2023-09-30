@@ -2,9 +2,8 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { getBizObjectsData, getProtocol } from '../dataRequest/index'
-import { genQueryModel, init, updateProtocol } from '../queryGenerator/index';
-import { generateSql } from '../type/model/queryModel';
+import { getBizObjectsData, getProtocol } from '../../dataRequest/index'
+import { genQueryModel, generateSql, init, updateProtocol } from './index';
 let tableDatas: tableData[]
 let protocol: protocol
 let previousURL = window.location.href;
