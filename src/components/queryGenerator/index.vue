@@ -12,6 +12,8 @@ import { copyToClipboard } from '../../util';
 let previousURL = window.location.href;
 const flyStore = useFlyStore()
 onMounted(async () => {
+    console.log("queryGenerator mounted");
+    
     init()
     addGenQueryElement()
     checkSaveProtocol()

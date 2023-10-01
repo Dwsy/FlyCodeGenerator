@@ -52,6 +52,7 @@ onMounted(async () => {
 
   watchEffect(() => {
     console.log("Actiontype：", ActionType[flyStore.protocol.actiontype])
+    inintStatus.value = false
     const actiontype = flyStore.protocol.actiontype
     if (actiontype == ActionType.ListQuery || actiontype == ActionType.SingleQuery) {
       ActiveGenerator.value = "queryGenerator"
@@ -60,8 +61,8 @@ onMounted(async () => {
     } else if (actiontype == ActionType.DataSubmit) {
       ActiveGenerator.value = "dataSubmitGenerator"
       console.log(`ActiveGenerator.value = "dataSubmitGenerator"`);
-
     }
+    inintStatus.value = true
   })
   setInterval(checkURLChange, 1000);
 })
@@ -74,6 +75,7 @@ async function checkURLChange() {
   // 检查当前URL与上次的URL是否相同
   if (currentURL !== previousURL && currentURL.indexOf("modeledit") != -1) {
     // URL发生变化，执行您的函数
+
     console.log("// URL发生变化，执行您的函数",
       "currentURL:", currentURL, "previousURL", previousURL);
     await flyStore.updateProtocol()
