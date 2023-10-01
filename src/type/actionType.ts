@@ -1,4 +1,4 @@
-enum ActionType {
+export enum ActionType {
     ListQuery = 1,
     SingleQuery = 2,
     DataSubmit = 3,

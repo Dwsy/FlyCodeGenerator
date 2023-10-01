@@ -2,24 +2,18 @@ import { createApp } from 'vue';
 import './style.css';
 import App from './App.vue';
 import { createPinia } from 'pinia'
-// Vuetify
-import 'vuetify/styles'
-import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
+// 通用字体
+import 'vfonts/Lato.css'
+// 等宽字体
+import 'vfonts/FiraCode.css'
+import naive from 'naive-ui'
 
-const vuetify = createVuetify({
-  components,
-  directives,
-  theme: {
-    defaultTheme: 'dark',
-  }
-})
+
 const pinia = createPinia()
-const app:HTMLElement = document.createElement('div');
+const app: HTMLElement = document.createElement('div');
 app.className = 'queryGenerator';
 document.body.append(app);
 createApp(App)
-  .use(vuetify)
+  .use(naive)
   .use(pinia)
   .mount(app);

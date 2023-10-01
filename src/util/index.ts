@@ -11,3 +11,17 @@ export function getTableShortName(tableName: string, relationTableColumnName?: s
   }
   return name;
 }
+
+export const copyToClipboard = (text: string) => {
+  // 创建一个临时textarea元素以便执行复制操作
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  document.body.appendChild(textarea);
+
+  // 选择并执行复制操作
+  textarea.select();
+  document.execCommand('copy');
+
+  // 移除临时textarea元素
+  document.body.removeChild(textarea);
+}

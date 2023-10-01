@@ -1,8 +1,10 @@
-interface Templateparams {
+import { ActionType } from "./actionType";
+
+export interface Templateparams {
   flycode: string;
 }
 
-interface Operations {
+export interface Operations {
   templateref: string;
   modellogicstepname: string;
   marktype: string;
@@ -13,7 +15,7 @@ interface Operations {
   templateparams: Templateparams;
 }
 
-interface Property {
+export interface Property {
   name: string;
   propertyname: string;
   propertytypecode: string;
@@ -21,8 +23,8 @@ interface Property {
   propertycode: string;
   marktype: string;
 }
-
-interface Input {
+ 
+export interface Input {
   name: string;
   objectcode: string;
   objectname: string;
@@ -31,16 +33,9 @@ interface Input {
   properties: Property[];
 }
 
-interface Property {
-  name: string;
-  propertyname: string;
-  propertytypecode: string;
-  objectcode: string;
-  propertycode: string;
-  marktype: string;
-}
 
-interface Output {
+
+export interface Output {
   name: string;
   objectcode: string;
   objectname: string;
@@ -49,11 +44,11 @@ interface Output {
   properties: Property[];
 }
 
-interface protocol {
+export interface Protocol {
   modellogicname: string;
   execmode: string;
   status: string;
-  actiontype: string;
+  actiontype: string|ActionType;
   modelcode: string;
   actioncategory: string;
   usedatarule: string;

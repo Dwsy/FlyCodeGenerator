@@ -3,41 +3,30 @@ import { getTableShortName } from "../../util/";
 import { QueryModel, ColumnModel, RelationTableModel, JoinModel, ConditionModel, Operator, LikeMatchType, ConditionGenerator, getOperator }
   from "../../type/model/queryModel"
 import { DatePropertyCodes, PropertyTypeCode } from "../../type/model/propertyTypeCodeRef";
+import { useFlyStore } from "../../store/flyStore";
+import { watchEffect } from "vue";
+import { Output, Property, Protocol } from "../../type/protocol";
 
 
-let protocol: protocol
+let protocol: Protocol
 let tableDatas: tableData[];
 
 
-const tableDataMap = new Map<string, tableData>();
-const columnDataMap = new Map<string, columnData>();
+let tableDataMap = new Map<string, tableData>();
+let columnDataMap = new Map<string, columnData>();
+export const init = () => {
+  const flyStore = useFlyStore()
+  watchEffect(() => {
+    protocol = flyStore.protocol
+    tableDatas = flyStore.tableDatas
+    tableDataMap = flyStore.tableDataMap
+    columnDataMap = flyStore.columnDataMap
+    console.log("modellogicname:", protocol.modellogicname);
+  })
 
 
-
-
-
-
-export const init = (inTableDatas: tableData[], inProtocol: protocol) => {
-  tableDatas = inTableDatas
-  protocol = inProtocol
-
-  // console.log("tableDatas", tableDatas)
-  console.log("functionname:", protocol.functionname);
-  // 遍历 tableDatas 数组
-  tableDatas.forEach((data) => {
-    // 将 data 对象添加到 tableDataMap 中
-    tableDataMap.set(data.objectcode, data);
-    // 遍历 data.properties 数组
-    data.properties.forEach((columnData) => {
-      // 将 columnData 对象添加到 columnDataMap 中
-      columnDataMap.set(columnData.propertycode, columnData);
-    });
-  });
 }
 
-export const updateProtocol = (newProtocol: protocol) => {
-  protocol = newProtocol
-}
 export function genQueryModel(outputArray: Output[]): QueryModel {
   const queryArgumentArrayMap = new Map<string, Property[]>();
   // 将 query 对象转换为 Map 对象
@@ -323,7 +312,7 @@ export function generateSql(queryModel: QueryModel): string {
 
       const juede = `!String.isBlank(${lvalue}) && !String.isBlank(${rvalue})`
       let whereClause = generator.generateWhereClause()
-      console.log("c.propertytypecode", c.propertytypecode)
+      // console.log("c.propertytypecode", c.propertytypecode)
       whereTemplate = whereTemplate
         .replace('{{if}}', juede)
         .replace('{{condition}}', whereClause);

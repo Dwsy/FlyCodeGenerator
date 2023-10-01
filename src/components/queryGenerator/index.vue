@@ -1,69 +1,39 @@
-<template></template>
+<template>
+    <p>queryGenerator</p>
+</template>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { getBizObjectsData, getProtocol } from '../../dataRequest/index'
-import { genQueryModel, generateSql, init, updateProtocol } from './index';
-import { useFlyStore, useCounterStore } from '../../store/flyStore'
+import { genQueryModel, generateSql, init } from './index';
+import { useFlyStore } from '../../store/flyStore'
+import { copyToClipboard } from '../../util';
 // let tableDatas: tableData[]
 // let protocol: protocol
 let previousURL = window.location.href;
 const flyStore = useFlyStore()
 onMounted(async () => {
-    console.log('vue--mounted');
-    // getBizObjectsData
-    // tableDatas = (await getBizObjectsData()).resp_data
-    // protocol = (await getProtocol()).resp_data
-    //init cache 
-    await flyStore.init()
-    init(flyStore.tableDatas, flyStore.protocol)
-    const addGenQueryElementInterval = setInterval(() => {
-        // @ts-ignore
-        if (typeof window.monaco !== 'undefined') {
-            addGenQueryElement()
-            console.log("addGenQueryElement")
-            clearInterval(addGenQueryElementInterval);
-        }
-    }, 1000)
-
-    setInterval(checkURLChange, 1000);
+    init()
+    addGenQueryElement()
     checkSaveProtocol()
 })
 
 
-// 定义一个函数，用于检测URL是否发生变化
-async function checkURLChange() {
-    // 获取当前URL
-    const currentURL = window.location.href;
-
-    // 检查当前URL与上次的URL是否相同
-    if (currentURL !== previousURL && currentURL.indexOf("modeledit") != -1) {
-        // URL发生变化，执行您的函数
-        console.log("// URL发生变化，执行您的函数");
-
-        flyStore.tableDatas = (await getProtocol()).resp_data
-        addGenQueryElement();
-        // 更新previousURL以反映新的URL
-        previousURL = currentURL;
-    }
-}
 function checkSaveProtocol() {
-
+    // 监听元素的点击事件
+    const button = document.querySelector("#beSetting > div.main-content > div.tab-footer > button.ant-btn.ant-btn-primary");
+    button.addEventListener("click", async () => {
+        console.log("click")
+        await flyStore.updateProtocol()
+    });
     // 监听 Ctrl + S 键盘事件
     document.addEventListener("keydown", async (event) => {
         if (event.ctrlKey && event.key === "s") {
-            console.log("Ctrl + S pressed");
-            // 在这里执行保存操作
-            updateProtocol((await getProtocol()).resp_data)
+            await flyStore.updateProtocol()
             event.preventDefault();
         }
     });
 
-    // 监听元素的点击事件
-    const button = document.querySelector("#beSetting > div.main-content > div.tab-footer > button.ant-btn.ant-btn-primary");
-    button.addEventListener("click", async () => {
-        updateProtocol((await getProtocol()).resp_data)
-    });
+
 }
 
 function addGenQueryElement() {
@@ -80,25 +50,8 @@ function addGenQueryElement() {
     newButton.appendChild(newButtonIcon)
     newButton.appendChild(newButtonSpan)
     newButton.addEventListener("click", () => {
-        // protocol.output.forEach((output) => {
-
-        // });
         const fquery = generateSql(genQueryModel(flyStore.protocol.output))
-
-        // console.log("生成成功:", fquery);
-
-        // 创建一个临时textarea元素以便执行复制操作
-        const textarea = document.createElement("textarea");
-        textarea.value = fquery;
-        document.body.appendChild(textarea);
-
-        // 选择并执行复制操作
-        textarea.select();
-        document.execCommand('copy');
-
-        // 移除临时textarea元素
-        document.body.removeChild(textarea);
-
+        copyToClipboard(fquery)
         console.log("文本已成功复制到剪贴板");
     });
     originalButton!.parentNode!.appendChild(newButton);
