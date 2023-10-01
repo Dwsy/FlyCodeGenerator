@@ -318,7 +318,7 @@ export function generateSql(queryModel: QueryModel): string {
         .replace('{{if}}', juede)
         .replace('{{condition}}', whereClause);
     } else if (c.operator === Operator.Between) {
-      const isDate = DatePropertyCodes.indexOf(Number(this.condition.propertytypecode)) !== -1
+      const isDate = DatePropertyCodes.indexOf(Number(c.propertytypecode)) !== -1
       const [lvalue, rvalue] = isDate ? ["begin", "end"] : ["min", "max"]
 
       const juede = `!String.isBlank(${lvalue}) && !String.isBlank(${rvalue})`

@@ -4,17 +4,19 @@
 import { onMounted, ref } from 'vue';
 import { getBizObjectsData, getProtocol } from '../../dataRequest/index'
 import { genQueryModel, generateSql, init, updateProtocol } from './index';
-let tableDatas: tableData[]
-let protocol: protocol
+import { useFlyStore, useCounterStore } from '../../store/flyStore'
+// let tableDatas: tableData[]
+// let protocol: protocol
 let previousURL = window.location.href;
-
+const flyStore = useFlyStore()
 onMounted(async () => {
     console.log('vue--mounted');
     // getBizObjectsData
-    tableDatas = (await getBizObjectsData()).resp_data
-    protocol = (await getProtocol()).resp_data
+    // tableDatas = (await getBizObjectsData()).resp_data
+    // protocol = (await getProtocol()).resp_data
     //init cache 
-    init(tableDatas, protocol)
+    await flyStore.init()
+    init(flyStore.tableDatas, flyStore.protocol)
     const addGenQueryElementInterval = setInterval(() => {
         // @ts-ignore
         if (typeof window.monaco !== 'undefined') {
@@ -39,7 +41,7 @@ async function checkURLChange() {
         // URL发生变化，执行您的函数
         console.log("// URL发生变化，执行您的函数");
 
-        protocol = (await getProtocol()).resp_data
+        flyStore.tableDatas = (await getProtocol()).resp_data
         addGenQueryElement();
         // 更新previousURL以反映新的URL
         previousURL = currentURL;
@@ -73,7 +75,7 @@ function addGenQueryElement() {
     const newButton = originalButton!.cloneNode(false);
     const newButtonIcon = originalButtonIcon!.cloneNode(true) as HTMLElement;
     newButtonIcon.classList.replace('ideicon-protocol', 'ideicon-db_flycode');
-    const newButtonSpan =  document.createElement('span');
+    const newButtonSpan = document.createElement('span');
     newButtonSpan.textContent = "生成FQ"
     newButton.appendChild(newButtonIcon)
     newButton.appendChild(newButtonSpan)
@@ -81,7 +83,7 @@ function addGenQueryElement() {
         // protocol.output.forEach((output) => {
 
         // });
-        const fquery = generateSql(genQueryModel(protocol.output))
+        const fquery = generateSql(genQueryModel(flyStore.protocol.output))
 
         // console.log("生成成功:", fquery);
 

@@ -14,7 +14,6 @@ export async function getBizObjectsData() {
                 'Content-Type': 'application/json',
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36 Edg/117.0.2045.43",
                 "ctcode": 7,
-                "idetoken": "eyJhbGciOiJIUzI1NiJ9.eyJMb2dpblVzZXIiOnsiYXBwSWQiOiIxIiwidGVuYW50Q29kZSI6IjExMTMwNDEiLCJwcm9kdWN0Q29kZSI6IjEwMDAwMDAwMDAwMDAwMDAwMCIsInByb2R1Y3RWZXJzaW9uQ29kZSI6IjEwMDAwMDAwMDAwMDAwMDA2MiIsImNsaWVudFR5cGVDb2RlIjpudWxsLCJ1c2VyQ29kZSI6IjE2OTU5ODU0MjY0OTU1NzQwMTYiLCJhY2NvdW50Q29kZSI6IjE2OTU5ODU4Mjg2NzU5NTg0MTYiLCJ1c2VybmFtZSI6IumCk-aWh-WuhyIsInRva2VuSWQiOiJlNWIzMDlkMC04MmY2LTRhMmMtODI0ZS1kN2U0MTVhMzU1M2MiLCJhcHBDb2RlcyI6bnVsbCwiYXBwQ29kZSI6bnVsbCwicGxhdFJvbGVDb2RlcyI6WyIxMTg0NjcxOTM2MDY0NjU1MzYwIl0sIm1ldGFtb2RlbHR5cGUiOjIsIm9yZ0NvZGUiOiIxNTUxODEyNDk1MDA4NzMxMTM2IiwiY2VudGVyUm9sZSI6ZmFsc2V9LCJleHAiOjE3MjczOTkyMjJ9.w94lwrvpBDz3Uy39y_KE6MXLJR09OwoSaSZizjgsZiE",
                 "metamodeltype": 2,
                 "pdcode": '100000000000000000',
                 "pscode": '829609747450691584',
