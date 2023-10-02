@@ -18,6 +18,7 @@ export enum PropertyTypeCode {
     OptionSet = 19,
     RelatedObject = 200000000000,
     DictionaryObject = 10000000000,
+    BusinessObject = 100000000000,
     ComplexRelatedObject = 300000000000,
     ThisObject = 1000000000,
     CreatedBy = 8,
@@ -50,6 +51,7 @@ export const PropertyTypeName = {
     [PropertyTypeCode.Attachment]: '附件',
     [PropertyTypeCode.Location]: '定位',
     [PropertyTypeCode.OptionSet]: '选项集',
+    [PropertyTypeCode.BusinessObject]: '业务对象',
     [PropertyTypeCode.RelatedObject]: '关联对象',
     [PropertyTypeCode.DictionaryObject]: '字典对象',
     [PropertyTypeCode.ComplexRelatedObject]: '复杂关联对象',
@@ -77,7 +79,7 @@ export const DatePropertyCodes =
     ]
 
 export function getPropertyTypeName(code: PropertyTypeCode | string): string {
-    return PropertyTypeName[code] || '';
+    return PropertyTypeName[Number(code)] || '';
 }
 
 
@@ -88,3 +90,11 @@ export const test = () => {
 export function isNameOrText(code: PropertyTypeCode): boolean {
     return (code === PropertyTypeCode.Name || code === PropertyTypeCode.Text)
 }
+
+export const ignorePropertyType=[
+    PropertyTypeCode.PrimaryKey,
+    PropertyTypeCode.Location,
+    PropertyTypeCode.SortOrder,
+    PropertyTypeCode.LongText,
+    PropertyTypeCode.Image,
+]

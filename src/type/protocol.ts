@@ -22,8 +22,9 @@ export interface Property {
   objectcode: string;
   propertycode: string;
   marktype: string;
+  validation: boolean
 }
- 
+
 export interface Input {
   name: string;
   objectcode: string;
@@ -48,7 +49,7 @@ export interface Protocol {
   modellogicname: string;
   execmode: string;
   status: string;
-  actiontype: string|ActionType;
+  actiontype: string | ActionType;
   modelcode: string;
   actioncategory: string;
   usedatarule: string;

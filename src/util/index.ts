@@ -24,6 +24,7 @@ export const copyToClipboard = (text: string) => {
 
   // 移除临时textarea元素
   document.body.removeChild(textarea);
+  
 }
 
 export const addButton = (selector: string, text: string, iconClass: string, clickHandler: () => void, seq) => {

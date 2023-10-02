@@ -1,0 +1,153 @@
+var errMsg = "";
+var validateFail = false;
+
+var tableName = '';
+
+(function main() {
+    validation()
+    if (validateFail) {
+        throw new ERROR(errMsg);
+    }
+
+    if (isadd) {
+        insert()
+    } else {
+        update()
+    }
+
+
+})()
+
+function insert(data) {
+    var id = FLY.genId();
+    DB.insert(tn_crm_dwy);
+}
+
+function update(data) {
+    DB.update(tn_crm_dwy);
+}
+
+function validation(data) {
+  validateCode(IN.tn_crm_dwycode)
+  validateMarketingRegion(IN.tn_crm_dwymarketing_region)
+  validateChannelType(IN.tn_crm_dwychannel_type)
+  validateLevel(IN.tn_crm_dwylevel)
+  validateContactName(IN.tn_crm_dwycontact_name)
+  validateAdministrativeRegion(IN.tn_crm_dwyadministrative_region)
+  validateManager(IN.tn_crm_dwymanager)
+  validateName(IN.tn_crm_dwyname)
+  validateType(IN.tn_crm_dwytype)
+}
+
+function validateCode(code) {
+    var validationFailed = false
+    if (!String.isBlank(code)){
+      appendErrmsg("终端编码不能为空；")
+    }
+    /* ValidateLogicCode */
+    if (validationFailed){
+        appendErrmsg("errMsg；");
+    }
+}
+
+function validateMarketingRegion(marketing_region) {
+    var validationFailed = false
+    if (!String.isBlank(marketing_region)){
+      appendErrmsg("终端所属营销区域不能为空；")
+    }
+    /* ValidateLogicCode */
+    if (validationFailed){
+        appendErrmsg("errMsg；");
+    }
+}
+
+function validateChannelType(channel_type) {
+    var validationFailed = false
+    if (!String.isBlank(channel_type)){
+      appendErrmsg("渠道类型不能为空；")
+    }
+    /* ValidateLogicCode */
+    if (validationFailed){
+        appendErrmsg("errMsg；");
+    }
+}
+
+function validateLevel(level) {
+    var validationFailed = false
+    if (!String.isBlank(level)){
+      appendErrmsg("终端级别不能为空；")
+    }
+    /* ValidateLogicCode */
+    if (validationFailed){
+        appendErrmsg("errMsg；");
+    }
+}
+
+function validateContactName(contact_name) {
+    var validationFailed = false
+    if (!String.isBlank(contact_name)){
+      appendErrmsg("联系人姓名不能为空；")
+    }
+    /* ValidateLogicCode */
+    if (validationFailed){
+        appendErrmsg("errMsg；");
+    }
+}
+
+function validateTelephoneNumber(telephone_number) {
+    var validationFailed = false
+    if (!String.isBlank(telephone_number)){
+      appendErrmsg("联系人电话不能为空；")
+    }
+  var phoneReg = /^1[3456789]d{9}$/;
+  if (!phoneReg.test(phoneNumber)) { //联系电话正则校验
+    validationFailed = true
+  }
+    if (validationFailed){
+        appendErrmsg("联系电话格式有误；");
+    }
+}
+
+function validateAdministrativeRegion(administrative_region) {
+    var validationFailed = false
+    if (!String.isBlank(administrative_region)){
+      appendErrmsg("行政区域不能为空；")
+    }
+    /* ValidateLogicCode */
+    if (validationFailed){
+        appendErrmsg("errMsg；");
+    }
+}
+
+function validateManager(manager) {
+    var validationFailed = false
+    if (!String.isBlank(manager)){
+      appendErrmsg("终端负责人不能为空；")
+    }
+    /* ValidateLogicCode */
+    if (validationFailed){
+        appendErrmsg("errMsg；");
+    }
+}
+
+function validateName(name) {
+    var validationFailed = false
+    if (!String.isBlank(name)){
+      appendErrmsg("终端名称不能为空；")
+    }
+    /* ValidateLogicCode */
+    if (validationFailed){
+        appendErrmsg("errMsg；");
+    }
+}
+
+function validateType(type) {
+    var validationFailed = false
+    if (!String.isBlank(type)){
+      appendErrmsg("终端类型不能为空；")
+    }
+    /* ValidateLogicCode */
+    if (validationFailed){
+        appendErrmsg("errMsg；");
+    }
+}
