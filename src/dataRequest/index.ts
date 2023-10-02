@@ -8,7 +8,7 @@ export async function getBizObjectsData() {
             console.error('User token not found in sessionStorage');
             return;
         }
-        const {data} = await axios.post('http://121.37.206.131:18001/bizserv/biz/getBizObjects', {}, {
+        const { data } = await axios.post('http://121.37.206.131:18001/bizserv/biz/getBizObjects', {}, {
             headers: {
                 'Idetoken': userToken,
                 'Content-Type': 'application/json',
@@ -51,35 +51,32 @@ export async function getBizObjectsData() {
 }
 
 export async function getProtocol() {
-    let modellogiccode = document.URL.match(/\/([^\/]+)\/?$/)[1];
-    try {
-        // 获取用户 Token 从 sessionStorage 中
-        const userToken = sessionStorage.getItem('userToken');
-        if (!userToken) {
-            console.error('User token not found in sessionStorage');
-            return;
-        }
-        const {data} = await axios.post('http://121.37.206.131:18001/bizserv/bizmodel/getModelLogic', {
-            "modellogiccode": modellogiccode
-        }, {
-            headers: {
-                'Idetoken': userToken,
-                'Content-Type': 'application/json'
+    const temp = document.URL.split("/")
+    if (temp.length == 6) {
+        let modellogiccode = temp[5]
+        try {
+            // 获取用户 Token 从 sessionStorage 中
+            const userToken = sessionStorage.getItem('userToken');
+            if (!userToken) {
+                console.error('User token not found in sessionStorage');
+                return;
             }
-        })
+            const { data } = await axios.post('http://121.37.206.131:18001/bizserv/bizmodel/getModelLogic', {
+                "modellogiccode": modellogiccode
+            }, {
+                headers: {
+                    'Idetoken': userToken,
+                    'Content-Type': 'application/json'
+                }
+            })
 
-        return data
-        // .then(function (response) {
-        //     console.log(response.data)
-        //     let protocolData = response.data.resp_data;
-        //     protocolDataMap.set(modellogiccode, protocolData)
-        // })
-        // .catch(function (error) {
-        //     console.log(error);
-        // });
+            return data
+        }
+        catch (error) {
+            console.error('axios error:', error);
+        }
     }
-    catch (error) {
-        console.error('axios error:', error);
-    }
+
+
 }
 

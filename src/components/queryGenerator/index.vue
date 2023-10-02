@@ -7,10 +7,11 @@ import { onMounted, ref } from 'vue';
 import { genQueryModel, generateSql, init } from './index';
 import { useFlyStore } from '../../store/flyStore'
 import { copyToClipboard } from '../../util';
-// let tableDatas: tableData[]
-// let protocol: protocol
-let previousURL = window.location.href;
+import { useMessage } from "naive-ui";
+
+const message = useMessage()
 const flyStore = useFlyStore()
+
 onMounted(async () => {
     console.log("queryGenerator mounted");
     
@@ -48,13 +49,13 @@ function addGenQueryElement() {
     const newButtonIcon = originalButtonIcon!.cloneNode(true) as HTMLElement;
     newButtonIcon.classList.replace('ideicon-protocol', 'ideicon-db_flycode');
     const newButtonSpan = document.createElement('span');
-    newButtonSpan.textContent = "生成FQ"
+    newButtonSpan.textContent = "生成SQL"
     newButton.appendChild(newButtonIcon)
     newButton.appendChild(newButtonSpan)
     newButton.addEventListener("click", () => {
         const fquery = generateSql(genQueryModel(flyStore.protocol.output))
         copyToClipboard(fquery)
-        console.log("文本已成功复制到剪贴板");
+        message.success("FlyQuery生成成功已复制到剪切板。")
     });
     originalButton!.parentNode!.appendChild(newButton);
 

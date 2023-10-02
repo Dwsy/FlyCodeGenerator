@@ -124,7 +124,7 @@ function gen(output: Output, queryArgumentArrayMap: Map<string, Property[]>): Qu
     fquery += `\n  left join ${relationTable.tablename} as ${relationTableShortName} `;
     fquery += `on ${tableShortName}.${columnname} = ${relationTableShortName}.${idField}`;
   });
-  console.log(relationTableShortNameReverseMapReverse)
+  // console.log(relationTableShortNameReverseMapReverse)
   // 查询列
   let selectColumns = outPropertiesDataMap
     .map((data) => {
@@ -141,7 +141,7 @@ function gen(output: Output, queryArgumentArrayMap: Map<string, Property[]>): Qu
         return `  ${tableShortName}.${data.columnname}`;
       } else {
         const [relationTableName, relationColumnName] = queryname.split("__");
-        console.log("queryname", queryname)
+        // console.log("queryname", queryname)
         const relationTableShortName = relationTableShortNameMap.get(relationTableName);
         const columnModel: ColumnModel = {
           tableShortName: relationTableShortName,
@@ -256,7 +256,7 @@ function gen(output: Output, queryArgumentArrayMap: Map<string, Property[]>): Qu
   queryModel.columns = columnModelArray
   queryModel.joins = joinModelArray
   queryModel.conditions = conditionModelArray
-  console.log(fquery)
+  // console.log(fquery)
   return queryModel
 }
 

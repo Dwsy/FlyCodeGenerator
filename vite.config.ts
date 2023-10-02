@@ -14,13 +14,15 @@ export default defineConfig({
       userscript: {
         icon: 'https://vitejs.dev/logo.svg',
         namespace: 'npm/vite-plugin-monkey',
-        match: ['http://ide.wxchina.com:9000/#/modeledit/*'],
+        match: ['http://ide.wxchina.com:9000/*'],
+        "run-at": 'document-start'
       },
       build: {
         externalGlobals: {
           vue: cdn.jsdelivr('Vue', 'dist/vue.global.prod.js'),
         },
       },
+
     }),
   ],
 });
