@@ -1,6 +1,6 @@
 const head = `var errMsg = "";
 var validateFail = false;
-
+var s = select * from user;
 var tableName = '';
 
 `

@@ -91,10 +91,155 @@ export function isNameOrText(code: PropertyTypeCode): boolean {
     return (code === PropertyTypeCode.Name || code === PropertyTypeCode.Text)
 }
 
-export const ignorePropertyType=[
+export const ignorePropertyType = [
     PropertyTypeCode.PrimaryKey,
     PropertyTypeCode.Location,
     PropertyTypeCode.SortOrder,
     PropertyTypeCode.LongText,
     PropertyTypeCode.Image,
 ]
+
+
+export function getPropertyTypeEmoji(propertyTypeCode: PropertyTypeCode): string {
+    switch (propertyTypeCode) {
+        case PropertyTypeCode.PrimaryKey:
+            return '🔑';
+        case PropertyTypeCode.Name:
+            return '📛';
+        case PropertyTypeCode.Text:
+            return '📝';
+        case PropertyTypeCode.Memo:
+            return '📝📝';
+        case PropertyTypeCode.LongText:
+            return '📝📝📝';
+        case PropertyTypeCode.Integer:
+            return '🔢';
+        case PropertyTypeCode.LongInteger:
+            return '🔢🔢';
+        case PropertyTypeCode.Decimal:
+            return '💰';
+        case PropertyTypeCode.DateTime:
+            return '📅🕰️';
+        case PropertyTypeCode.TimeRange:
+            return '🕰️🕰️';
+        case PropertyTypeCode.Date:
+            return '📅';
+        case PropertyTypeCode.Status:
+            return '🟢🔴';
+        case PropertyTypeCode.Image:
+            return '🖼️';
+        case PropertyTypeCode.Attachment:
+            return '📎';
+        case PropertyTypeCode.Location:
+            return '🌐';
+        case PropertyTypeCode.OptionSet:
+            return '🔘';
+        case PropertyTypeCode.RelatedObject:
+            return '🔗';
+        case PropertyTypeCode.DictionaryObject:
+            return '📖';
+        case PropertyTypeCode.BusinessObject:
+            return '🔗';
+        case PropertyTypeCode.ComplexRelatedObject:
+            return '🔗🔗';
+        case PropertyTypeCode.ThisObject:
+            return '👈';
+        case PropertyTypeCode.CreatedBy:
+            return '🤷';
+        case PropertyTypeCode.ModifiedBy:
+            return '🤷';
+        case PropertyTypeCode.CreatedTime:
+            return '🤷🕰️';
+        case PropertyTypeCode.ModifiedTime:
+            return '🤷🕰️';
+        case PropertyTypeCode.Pinyin:
+            return '🔤';
+        case PropertyTypeCode.IsDefault:
+            return '🌟';
+        case PropertyTypeCode.PhoneNumber:
+            return '📱';
+        case PropertyTypeCode.TelephoneNumber:
+            return '📞';
+        case PropertyTypeCode.Email:
+            return '📮';
+        case PropertyTypeCode.PostalCode:
+            return '📭';
+        case PropertyTypeCode.SortOrder:
+            return '🔢';
+        default:
+            return '';
+    }
+}
+
+
+export function getRandomEmoji() {
+    const emojis: string[][] = [
+        ['😆', '🤔'],
+        ['😀', '😁'],
+        ['😂', '🤣'],
+        ['😃', '😄'],
+        ['😅', '😆'],
+        ['😉', '😊'],
+        ['😋', '😌'],
+        ['😍', '😘'],
+        ['😎', '🕶️'],
+        ['😏', '😒'],
+        ['😓', '😔'],
+        ['😖', '😞'],
+        ['😟', '😠'],
+        ['😡', '🤬'],
+        ['😢', '😥'],
+        ['🙇', '🙇'],
+        ['😭', '😮‍💨'],
+        ['😯', '😰'],
+        ['😱', '🥵'],
+        ['🥶', '😲'],
+        ['😳', '🤯'],
+        ['🥴', '🤢'],
+        ['🤮', '🤧'],
+        ['🥺', '🥱'],
+        ['🤫', '🤐'],
+        ['🤗', '🤔'],
+        ['🙄', '😬'],
+        ['🤥', '🤫'],
+        ['🤡', '👻'],
+        ['💩', '👽'],
+        ['😀', '🤪'],
+        ['😂', '😆'],
+        ['😎', '🤓'],
+        ['😜', '😝'],
+        ['😘', '😗'],
+        ['😴', '🥱'],
+        ['😷', '🤕'],
+        ['🤖', '👾'],
+        ['👻', '💀'],
+        ['🤠', '🤡'],
+    ];
+    const randomIndex = Math.floor(Math.random() * emojis.length);
+    return emojis[randomIndex];
+}
+
+export function getRandomEmojiByUnicode(): string {
+    const ranges = [
+      [0x1f600, 0x1f64f], // 常用的 emoji
+      [0x1f300, 0x1f5ff], // 符号和杂项符号
+      [0x1f680, 0x1f6ff], // 交通和地图符号
+      [0x1f900, 0x1f9ff], // 表情符号
+      [0x2600, 0x26ff], // 杂项符号
+    ];
+  
+    const usedEmojis: string[] = [];
+    let randomCodePoint: number;
+    let emoji: string;
+  
+    do {
+      const randomRange = ranges[Math.floor(Math.random() * ranges.length)];
+      const [start, end] = randomRange;
+      const codePointRange = end - start + 1;
+      randomCodePoint = start + Math.floor(Math.random() * codePointRange);
+      emoji = String.fromCodePoint(randomCodePoint);
+    } while (usedEmojis.includes(emoji));
+  
+    usedEmojis.push(emoji);
+    return emoji;
+  }

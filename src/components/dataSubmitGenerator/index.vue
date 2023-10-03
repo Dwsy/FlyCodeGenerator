@@ -1,5 +1,6 @@
 <template>
     <div>
+        <div id="code"></div>
         <n-modal v-model:show="showModal" preset="card" title="Flycode生成配置" style="width: 700px" :bordered="false">
             <n-card>
                 <n-tabs type="line" animated size="large">
@@ -7,15 +8,15 @@
                         <div v-for="input in flyStore.protocol.input">
                             <NList v-for="property in input.properties" :show-divider="true">
                                 <NListItem style="padding: 8px 0;">
-                                    <n-switch v-model:value="property.validation" size="large">
+                                    <n-switch class="validationSwitch" v-model:value="property.validation" size="large">
                                         <template #icon>
-                                            {{ property.validation ? "😆" : "🤔" }}
+                                            {{ getRandomEmojiByUnicode(property) }}
                                         </template>
                                     </n-switch>
                                     <span style="margin-left: 8px;">
                                         {{ property.propertyname }} ({{ property.name }})-{{
                                             getPropertyTypeName(property.propertytypecode) }}
-                                        {{ Number(property.propertytypecode) == PropertyTypeCode.PhoneNumber ? "📱" : "" }}
+                                        {{ getPropertyTypeEmoji(Number(property.propertytypecode)) }}
                                     </span>
                                 </NListItem>
                             </NList>
@@ -30,12 +31,20 @@
                     </n-tab-pane>
                 </n-tabs>
                 <div style="float: right;">
-                    <NButton style="margin-right: 15px;">确定</NButton>
-                    <NButton style="margin-right: 15px;" @click="test()">Test</NButton>
+                    <NButton style="margin-right: 15px;" @click="test()">生成Flycode</NButton>
+                    <NButton style="margin-right: 15px;" @click="previewCode()">预览</NButton>
                     <NButton>取消</NButton>
                 </div>
 
             </n-card>
+        </n-modal>
+        <n-modal v-model:show="showCode" preset="card" title="Flycode" style="width: 700px" :bordered="false">
+
+            <div class="flycode-d">
+                <pre id="flyCode" data-lang="javascript" style="height: 690px">{{ flycode }}</pre>
+            </div>
+
+
         </n-modal>
     </div>
 </template>
@@ -48,8 +57,14 @@ import { PropertyTypeCode, getPropertyTypeName, ignorePropertyType } from "../..
 import { useMessage } from "naive-ui";
 import { GM_setClipboard } from '$';
 import { updateTemplet } from '../../data/updateFlycodeTemplet'
+import { nextTick } from "vue";
+import { watch } from "vue";
+import { getPropertyTypeEmoji, getRandomEmojiByUnicode } from "../../type/model/propertyTypeCodeRef";
 const flyStore = useFlyStore()
+
 const showModal = ref(false)
+const showCode = ref(false)
+const flycode = ref('')
 const message = useMessage()
 onMounted(() => {
     console.log("updateGenerator");
@@ -103,7 +118,7 @@ class ValidateBuilder {
     }
 
     getCallFunctionName(tableName) {
-        return `validate${toCamelCase(this.propertyName)}(IN.${tableName}${this.propertyName})`
+        return `validate${toCamelCase(this.propertyName)}(IN.${tableName}.${this.propertyName})`
     }
 
     build(): string {
@@ -111,6 +126,7 @@ class ValidateBuilder {
     var validationFailed = false
     if (!String.isBlank(${this.propertyName})){
       appendErrmsg("${this.propertyZhName}不能为空；")
+      validationFailed = true
     }
 ${this.validateLogic}
     if (validationFailed){
@@ -128,12 +144,21 @@ const validatePhoneSnippet = `  var phoneReg = /^1[3456789]\d{9}$/;
     validationFailed = true
   }`
 
+watch(showModal, async () => {
+
+    await nextTick()
+    document.querySelectorAll('.validationSwitch').forEach((el: HTMLButtonElement) => {
+        el.addEventListener('mouseenter', () => {
+            el.click();
+        });
+    });
+});
 
 function CodeGeneratorConfig() {
 
 }
 
-function test() {
+function test(previewCode = false) {
     const input = flyStore.protocol.input
     let validateFunctions: string[] = new Array()
     let validateFunctionNames: string[] = new Array()
@@ -175,12 +200,42 @@ function test() {
         .concat(validateFunctions.join("\n"))
 
     GM_setClipboard(code, "text")
-    message.success("生成成功!")
+    flycode.value = code
+    if (!previewCode) {
+        message.success("生成成功!")
+        showModal.value = false
+    }
+
 }
+
+const previewCode = async () => {
+    showCode.value = true
+
+    test(true)
+
+    await nextTick()
+    // @ts-ignore
+    monaco.editor.colorizeElement(document.getElementById("flyCode"), {
+        theme: "vs-dark",
+        lineNumbers: "on",
+    });
+
+
+}
+
+
 </script>
 
 <style>
 .n-list-item__divider {
     background-color: #4e4e4e66 !important;
+}
+
+.flycode-d {
+
+    height: 70%;
+    overflow: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 </style>
