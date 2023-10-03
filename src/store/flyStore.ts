@@ -1,5 +1,5 @@
 import { defineStore } from "pinia"
-import { computed, ref, watch, watchEffect } from "vue"
+import { computed, nextTick, ref, watch, watchEffect } from "vue"
 import { getBizObjectsData, getProtocol } from "../dataRequest"
 import { Protocol } from "../type/protocol"
 import { ActionType } from "../type/actionType";
@@ -32,11 +32,12 @@ export const useFlyStore = defineStore('flyStore', () => {
 
 
     }
-    watch(protocol, () => {
+    watch(protocol, async () => {
         console.log(` watch(protocol, () => {`, protocol.value, appMounted.value, initStatus.value)
         if (appMounted.value) {
             console.log("if (appMounted.value) {")
             initStatus.value = false
+            await nextTick()
             refresh()
             initStatus.value = true
         } else {

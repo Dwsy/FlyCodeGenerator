@@ -72,3 +72,18 @@ function move_nullkey(obj) {
     }
     return obj;
 }
+
+// // 根据终端负责人名称查询对应终端负责人id
+// function get_presentativeid_byorgname(orgname){
+//     var data = select orgstructid
+//                from pl_orgstruct
+//                 where status = 1 
+//                 and orgname = {orgname}
+//                 NORULE; 
+//     if(data.length>0){
+//         return data[0].orgstructid;
+//     }else{
+//         return null;
+//     }
+// }
+

@@ -22,7 +22,8 @@ export interface Property {
   objectcode: string;
   propertycode: string;
   marktype: string;
-  validation: boolean
+  validation?: boolean;
+  required?: boolean;
 }
 
 export interface Input {

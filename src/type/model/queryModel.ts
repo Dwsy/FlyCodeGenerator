@@ -1,3 +1,4 @@
+import { Property } from "../protocol"
 import { DatePropertyCodes, PropertyTypeCode } from "./propertyTypeCodeRef"
 
 export interface QueryModel {

@@ -6,34 +6,87 @@
                 <n-tabs type="line" animated size="large">
                     <n-tab-pane name="validation" tab="参数校验">
                         <div v-for="input in flyStore.protocol.input">
-                            <NList v-for="property in input.properties" :show-divider="true">
-                                <NListItem style="padding: 8px 0;">
-                                    <n-switch class="validationSwitch" v-model:value="property.validation" size="large">
-                                        <template #icon>
-                                            {{ getRandomEmojiByUnicode(property) }}
-                                        </template>
-                                    </n-switch>
-                                    <span style="margin-left: 8px;">
-                                        {{ property.propertyname }} ({{ property.name }})-{{
-                                            getPropertyTypeName(property.propertytypecode) }}
-                                        {{ getPropertyTypeEmoji(Number(property.propertytypecode)) }}
-                                    </span>
+                            <NList :show-divider="true">
+                                <NListItem>
+                                    <div>
+                                        <NCheckbox v-model:checked="SelectAllProperty" @update-checked="(value, e) => {
+                                            SelectAllPropertyFunc(value)
+                                        }">
+                                            {{ !SelectAllProperty ? "全选" : "全不选" }}
+                                        </NCheckbox>
+                                        <NCheckbox style="float: right;" v-model:checked="SelectAllrequired"
+                                            @update-checked="(value, e) => {
+                                                SelectAllrequiredFunc(value)
+                                            }">
+                                            {{ !SelectAllrequired ? "全选" : "全不选" }}
+                                        </NCheckbox>
+                                    </div>
                                 </NListItem>
+                                <div v-for="property in input.properties">
+                                    <NListItem style="padding: 8px 0;">
+                                        <div>
+                                            <n-switch class="validationSwitch" v-model:value="property.validation"
+                                                size="large">
+                                                <template #icon>
+                                                    {{ getRandomEmojiByUnicode() }}
+                                                </template>
+                                            </n-switch>
+                                            <span style="margin-left: 8px;">
+                                                {{ property.propertyname }} ({{ property.name }})-{{
+                                                    getPropertyTypeName(property.propertytypecode) }}
+                                                {{ getPropertyTypeEmoji(Number(property.propertytypecode)) }}
+                                            </span>
+                                            <n-checkbox v-model:checked="property.required" @update-checked="(value, e) => {
+                                                requiredCheck(value, property)
+                                            }" style="float: right">
+                                                必填
+                                            </n-checkbox>
+                                        </div>
+                                    </NListItem>
+                                </div>
+
                             </NList>
                         </div>
 
                     </n-tab-pane>
-                    <n-tab-pane name="the beatles" tab="the Beatles">
-                        Hey Jude
+                    <n-tab-pane name="validationConfig" tab="校验配置">
+                        <div>
+                            <NList>
+                                <NListItem>
+                                    <n-switch class="validationSwitch" v-model:value="enableValidateBusinessObjectId"
+                                        size="large">
+                                        <template #icon>
+                                            {{ getRandomEmojiByUnicode() }}
+                                        </template>
+                                    </n-switch>
+                                    <span style="margin-left: 8px;">
+                                        启用业务对象存在校验
+                                    </span>
+                                </NListItem>
+                                <NListItem>
+                                    <n-switch class="validationSwitch" v-model:value="enableValidateDictId" size="large">
+                                        <template #icon>
+                                            {{ getRandomEmojiByUnicode() }}
+                                        </template>
+                                    </n-switch>
+                                    <span style="margin-left: 8px;">
+                                        启用字典存在校验
+                                    </span>
+                                </NListItem>
+                            </NList>
+
+
+                        </div>
                     </n-tab-pane>
                     <n-tab-pane name="jay chou" tab="周杰伦">
                         七里香
                     </n-tab-pane>
                 </n-tabs>
-                <div style="float: right;">
-                    <NButton style="margin-right: 15px;" @click="test()">生成Flycode</NButton>
-                    <NButton style="margin-right: 15px;" @click="previewCode()">预览</NButton>
-                    <NButton>取消</NButton>
+                <div style="float: right;margin-top: 15px;">
+
+                    <NButton style="margin-right: 15px;" @click="previewCode()" tertiary type="info">预览代码</NButton>
+
+                    <NButton @click="test()" strong secondary type="primary">生成代码</NButton>
                 </div>
 
             </n-card>
@@ -60,12 +113,17 @@ import { updateTemplet } from '../../data/updateFlycodeTemplet'
 import { nextTick } from "vue";
 import { watch } from "vue";
 import { getPropertyTypeEmoji, getRandomEmojiByUnicode } from "../../type/model/propertyTypeCodeRef";
+import { Input, Property } from "../../type/protocol";
+import { ValidateBuilder } from ".";
 const flyStore = useFlyStore()
-
 const showModal = ref(false)
 const showCode = ref(false)
 const flycode = ref('')
 const message = useMessage()
+const enableValidateDictId = ref(false)
+const enableValidateBusinessObjectId = ref(false)
+const SelectAllProperty = ref(false)
+const SelectAllrequired = ref(false)
 onMounted(() => {
     console.log("updateGenerator");
     console.log(updateTemplet.head)
@@ -84,58 +142,7 @@ onMounted(() => {
     }, 1)
 })
 
-class ValidateBuilder {
-    private propertyZhName: string;
-    private propertyName: string;
-    private validateLogic: string;
-    private errMsg: string;
 
-    constructor(propertyName?: string) {
-        if (propertyName != undefined) {
-            this.propertyName = propertyName;
-        }
-    }
-
-    setPropertyZhName(propertyZhName: string) {
-        this.propertyZhName = propertyZhName;
-        return this;
-    }
-
-    setPropertyName(propertyName: string) {
-        this.propertyName = propertyName;
-        return this;
-    }
-
-
-    setValidateLogic(validateLogic: string = `    /* ValidateLogicCode */`) {
-        this.validateLogic = validateLogic
-        return this;
-    }
-
-    setErrMsg(errMsg: string = `errMsg`) {
-        this.errMsg = errMsg
-        return this;
-    }
-
-    getCallFunctionName(tableName) {
-        return `validate${toCamelCase(this.propertyName)}(IN.${tableName}.${this.propertyName})`
-    }
-
-    build(): string {
-        return `function validate${toCamelCase(this.propertyName)}(${this.propertyName}) {
-    var validationFailed = false
-    if (!String.isBlank(${this.propertyName})){
-      appendErrmsg("${this.propertyZhName}不能为空；")
-      validationFailed = true
-    }
-${this.validateLogic}
-    if (validationFailed){
-        appendErrmsg("${this.errMsg}；");
-    }
-}
-`
-    }
-}
 
 
 
@@ -159,7 +166,7 @@ function CodeGeneratorConfig() {
 }
 
 function test(previewCode = false) {
-    const input = flyStore.protocol.input
+    const input: Input[] = flyStore.protocol.input
     let validateFunctions: string[] = new Array()
     let validateFunctionNames: string[] = new Array()
     const validateLogic = new ValidateBuilder()
@@ -181,6 +188,11 @@ function test(previewCode = false) {
                     validateFunction = validateLogic
                         .setPropertyName(property.name)
                         .setPropertyZhName(property.propertyname)
+                        .setPropertyTypeCode(property.propertytypecode)
+                        .setDictidExistValidate(enableValidateDictId.value)
+                        .setBusinessObjectExistValidate(enableValidateBusinessObjectId.value)
+                        .setPropertyCode(property.propertycode)
+                        .setRequired(property.required)
                         .setValidateLogic()
                         .setErrMsg()
                         .build();
@@ -198,11 +210,10 @@ function test(previewCode = false) {
         .concat(updateTemplet.update)
         .concat(callValidationFunctions)
         .concat(validateFunctions.join("\n"))
-
     GM_setClipboard(code, "text")
     flycode.value = code
     if (!previewCode) {
-        message.success("生成成功!")
+        message.success("生成成功!" + getRandomEmojiByUnicode())
         showModal.value = false
     }
 
@@ -223,6 +234,29 @@ const previewCode = async () => {
 
 }
 
+const requiredCheck = (value, property: Property) => {
+    if (value && !property.validation) {
+        property.validation = true
+    }
+}
+
+const SelectAllPropertyFunc = (value: boolean) => {
+    flyStore.protocol.input.forEach((input) => {
+        input.properties.forEach((property) => {
+            property.validation = value
+        })
+    })
+}
+const SelectAllrequiredFunc = (value: boolean) => {
+    flyStore.protocol.input.forEach((input) => {
+        input.properties.forEach((property) => {
+            property.required = value
+            if (!property.validation && value) {
+                property.validation = value
+            }
+        })
+    })
+}
 
 </script>
 
