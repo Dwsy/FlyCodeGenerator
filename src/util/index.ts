@@ -1,3 +1,5 @@
+import { useFlyStore } from "../store/flyStore";
+
 export function getTableShortName(tableName: string, relationTableColumnName?: string, seq?) {
   const words = tableName.split("_");
   const firstLetters = words.map((word) => word.charAt(0));
@@ -24,7 +26,7 @@ export const copyToClipboard = (text: string) => {
 
   // 移除临时textarea元素
   document.body.removeChild(textarea);
-  
+
 }
 
 export const addButton = (selector: string, text: string, iconClass: string, clickHandler: () => void, seq) => {
@@ -63,5 +65,25 @@ export function toCamelCase(str: string): string {
     return str;
   }
   return str.replace(/_([a-z])/g, (match, p1) => p1.toUpperCase())
-            .replace(/^([a-z])/g, (match, p1) => p1.toUpperCase());
+    .replace(/^([a-z])/g, (match, p1) => p1.toUpperCase());
+}
+
+export function getPrimaryKey(propertyCode: string) {
+  const flyStore = useFlyStore()
+
+  const tableData = flyStore.tableDataMap.get(propertyCode)
+  let primaryKey = {
+    pl_dictionary: "dictionaryid",
+    pl_orgstruct: "orgstructid",
+    pl_region: "regionid",
+  }[tableData.tablename]
+  if (!primaryKey) {
+    for (const columnData of tableData.properties) {
+      if (columnData.propertytypecode == "1") {
+        primaryKey = columnData.columnname;
+        break;
+      }
+    }
+  }
+  return primaryKey
 }

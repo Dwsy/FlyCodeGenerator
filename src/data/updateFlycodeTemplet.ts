@@ -7,9 +7,6 @@ var tableName = '';
 
 const main = `(function main() {
     validation()
-    if (validateFail) {
-        throw new ERROR(errMsg);
-    }
 
     var isInsert = isInsertFunc()
 
@@ -26,21 +23,31 @@ const main = `(function main() {
 
 const insert = `function insert() {
     var id = FLY.genId();
-    {{CustomCode}}
-    DB.insert({{data}});
+    var {{tableName}} = BO.new('{{tableName}}');
+    tableName.{{primaryKey}} = id;
+    {{CustomInsertCode}}
+    DB.insert({{tableName}});
 }
 
 `
 
 const update = `function update() {
-    {{CustomCode}}
-    DB.update({{data}});
+    var temp = select * from {{tableName}} where {{primaryKey}} = { IN.{{tableName}}.{{primaryKey}} }
+    if (temp.length == 0){
+        throw new ERROR("待更新数据不存在")
+    }
+    var {{tableName}} = temp[0]
+    {{CustomUpdateCode}}
+    DB.update({{tableName}});
 }
 
 `
 
 const validation = `function validation() {
-  {{callFunctions}}
+    {{callFunctions}}
+    if (validateFail) {
+        throw new ERROR(errMsg);
+    }
 }
 
 `
@@ -99,6 +106,7 @@ export const updateTemplet = {
     insert,
     update,
     validation,
+    isInsertFunc,
     appendErrmsg,
     validateDictidExistFunc,
     validateBusinessObjectExistTemplet

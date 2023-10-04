@@ -6,6 +6,7 @@ import { DatePropertyCodes, PropertyTypeCode } from "../../type/model/propertyTy
 import { useFlyStore } from "../../store/flyStore";
 import { watchEffect } from "vue";
 import { Output, Property, Protocol } from "../../type/protocol";
+import { message } from "../../util/message";
 
 
 let protocol: Protocol
@@ -34,6 +35,10 @@ export function genQueryModel(outputArray: Output[]): QueryModel {
     queryArgumentArrayMap.set(input.name, input.properties);
   })
 
+  if (outputArray.length == 0) {
+    message.error("未设置输出参数")
+    return
+  }
   return gen(outputArray[0], queryArgumentArrayMap)
 }
 
@@ -63,7 +68,7 @@ function gen(output: Output, queryArgumentArrayMap: Map<string, Property[]>): Qu
   // 获取 output 对应的表格数据
   const outputTable = tableDataMap.get(output.objectcode);
   // 创建 relationTableMap 和 outPropertiesDataMap 两个 Map 对象
-  // const outColumnNameArray = output.properties.map((data) => data.name)
+
   const outPropertiesDataMap = output.properties.map((data) => {
     const columnData = columnDataMap.get(data.propertycode);
     if (data.name.indexOf("__") !== -1) {

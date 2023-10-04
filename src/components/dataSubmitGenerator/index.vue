@@ -22,13 +22,15 @@
                                         </NCheckbox>
                                     </div>
                                 </NListItem>
-                                <div v-for="property in input.properties">
+                                <div v-for="(property, index) in input.properties">
                                     <NListItem style="padding: 8px 0;">
                                         <div>
                                             <n-switch class="validationSwitch" v-model:value="property.validation"
                                                 size="large">
                                                 <template #icon>
-                                                    {{ getRandomEmojiByUnicode() }}
+                                                    {{ property.validation ? getRandomEmoji(index)[1] :
+                                                        getRandomEmoji(index)[0]
+                                                    }}
                                                 </template>
                                             </n-switch>
                                             <span style="margin-left: 8px;">
@@ -78,15 +80,15 @@
 
                         </div>
                     </n-tab-pane>
-                    <n-tab-pane name="jay chou" tab="周杰伦">
-                        七里香
+                    <n-tab-pane name="L" tab="L">
+
                     </n-tab-pane>
                 </n-tabs>
                 <div style="float: right;margin-top: 15px;">
 
                     <NButton style="margin-right: 15px;" @click="previewCode()" tertiary type="info">预览代码</NButton>
 
-                    <NButton @click="test()" strong secondary type="primary">生成代码</NButton>
+                    <NButton @click="gen()" strong secondary type="primary">生成代码</NButton>
                 </div>
 
             </n-card>
@@ -107,14 +109,14 @@ import { onMounted, ref } from "vue";
 import { addButton, toCamelCase } from "../../util";
 import { useFlyStore } from "../../store/flyStore";
 import { PropertyTypeCode, getPropertyTypeName, ignorePropertyType } from "../../type/model/propertyTypeCodeRef";
-import { useMessage } from "naive-ui";
+import { codeDark, useMessage } from "naive-ui";
 import { GM_setClipboard } from '$';
 import { updateTemplet } from '../../data/updateFlycodeTemplet'
 import { nextTick } from "vue";
 import { watch } from "vue";
-import { getPropertyTypeEmoji, getRandomEmojiByUnicode } from "../../type/model/propertyTypeCodeRef";
+import { getPropertyTypeEmoji, getRandomEmojiByUnicode, getRandomEmoji } from "../../type/model/propertyTypeCodeRef";
 import { Input, Property } from "../../type/protocol";
-import { ValidateBuilder } from ".";
+import { generatorCode } from "./index";
 const flyStore = useFlyStore()
 const showModal = ref(false)
 const showCode = ref(false)
@@ -146,10 +148,6 @@ onMounted(() => {
 
 
 
-const validatePhoneSnippet = `  var phoneReg = /^1[3456789]\d{9}$/;
-  if (!phoneReg.test(phoneNumber)) { //联系电话正则校验
-    validationFailed = true
-  }`
 
 watch(showModal, async () => {
 
@@ -165,65 +163,18 @@ function CodeGeneratorConfig() {
 
 }
 
-function test(previewCode = false) {
-    const input: Input[] = flyStore.protocol.input
-    let validateFunctions: string[] = new Array()
-    let validateFunctionNames: string[] = new Array()
-    const validateLogic = new ValidateBuilder()
-    input.forEach((item) => {
-        item.properties.forEach((property) => {
-            // console.log(flyStore.columnDataMap.get(property.propertycode));
-            let validateFunction: string
-            if (property.validation) {
-                if (Number(property.propertytypecode) === PropertyTypeCode.PhoneNumber) {
-                    validateFunction = validateLogic
-                        .setPropertyName(property.name)
-                        .setPropertyZhName(property.propertyname)
-                        .setValidateLogic(validatePhoneSnippet)
-                        .setErrMsg(`联系电话格式有误`)
-                        .build();
-                    validateFunctions.push(validateFunction)
-                    console.log(validateFunction);
-                } else {
-                    validateFunction = validateLogic
-                        .setPropertyName(property.name)
-                        .setPropertyZhName(property.propertyname)
-                        .setPropertyTypeCode(property.propertytypecode)
-                        .setDictidExistValidate(enableValidateDictId.value)
-                        .setBusinessObjectExistValidate(enableValidateBusinessObjectId.value)
-                        .setPropertyCode(property.propertycode)
-                        .setRequired(property.required)
-                        .setValidateLogic()
-                        .setErrMsg()
-                        .build();
-                    validateFunctions.push(validateFunction)
-                    validateFunctionNames.push(validateLogic.getCallFunctionName(item.name))
-                    console.log(validateFunction);
-                }
-            }
-        })
-    })
-    const callValidationFunctions = updateTemplet.validation.replace("{{callFunctions}}", validateFunctionNames.join("\n  "))
-    const code = updateTemplet.head
-        .concat(updateTemplet.main)
-        .concat(updateTemplet.insert)
-        .concat(updateTemplet.update)
-        .concat(callValidationFunctions)
-        .concat(validateFunctions.join("\n"))
-        .concat(updateTemplet.appendErrmsg)
-    GM_setClipboard(code, "text")
-    flycode.value = code
-    if (!previewCode) {
-        message.success("生成成功!" + getRandomEmojiByUnicode())
-        showModal.value = false
-    }
+const gen = () => {
+    generatorCode(enableValidateDictId.value, enableValidateBusinessObjectId.value)
 
+    message.success("生成成功!" + getRandomEmojiByUnicode())
+    showModal.value = false
 }
 
 const previewCode = async () => {
     showCode.value = true
 
-    test(true)
+    flycode.value = generatorCode()
+
 
     await nextTick()
     // @ts-ignore

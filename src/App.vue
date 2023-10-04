@@ -1,16 +1,18 @@
 <template>
   <n-message-provider>
     <n-config-provider :theme="theme">
+
       <div v-if="flyStore.initStatus">
         <component :is="Generator[flyStore.ActiveGenerator]"></component>
       </div>
+
     </n-config-provider>
   </n-message-provider>
 </template>
 
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import { darkTheme, lightTheme } from 'naive-ui'
+import { darkTheme, lightTheme, useMessage } from 'naive-ui'
 import queryGenerator from './components/queryGenerator/index.vue'
 import dataSubmitGenerator from './components/dataSubmitGenerator/index.vue'
 import { ref, watchEffect, watch } from 'vue'
@@ -29,6 +31,8 @@ const flyStore = useFlyStore()
 let previousURL = window.location.href;
 onMounted(async () => {
   console.log('vue--mounted');
+
+
   await flyStore.init()
   const waitMonaco = setInterval(async () => {
     // @ts-ignore
@@ -51,7 +55,7 @@ onMounted(async () => {
   }, 1000)
   let lightThemeInit = false
   // @ts-ignore
-  window.lightTheme = (lightThemeInit:boolean) => {
+  window.lightTheme = (lightThemeInit: boolean) => {
     document.querySelectorAll(".secondary-tab-card-special.dark-image .main-content > .tab-content > .ant-tabs-bar .ant-tabs-tab")?.forEach((e: HTMLElement) => {
       e.style.background = "#E1E1E1"
     })

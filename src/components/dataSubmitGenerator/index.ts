@@ -1,8 +1,10 @@
 import { useMessage } from "naive-ui";
 import { updateTemplet } from "../../data/updateFlycodeTemplet";
-import { PropertyTypeCode } from "../../type/model/propertyTypeCodeRef";
-import { toCamelCase } from "../../util";
+import { PropertyTypeCode, getRandomEmojiByUnicode } from "../../type/model/propertyTypeCodeRef";
+import { getPrimaryKey, toCamelCase } from "../../util";
 import { useFlyStore } from "../../store/flyStore";
+import { Input } from "../../type/protocol";
+import { GM_setClipboard } from "$";
 export class ValidateBuilder {
     private propertyZhName: string;
     private propertyName: string;
@@ -122,7 +124,6 @@ ${this.validateLogic}
         if (this.required) {
             code = code.replace("{{RequiredVerification}}", `if (String.isBlank(${this.propertyName})) {
         appendErrmsg("${this.propertyZhName}不能为空；")
-        validationFailed = true
     }
 `)
         } else {
@@ -158,3 +159,95 @@ ${this.validateLogic}
         return code
     }
 }
+
+
+
+export function generatorCode
+    (enableValidateDictId = false, enableValidateBusinessObjectId = false) {
+    const flyStore = useFlyStore()
+    const input: Input[] = flyStore.protocol.input
+    let validateFunctions: string[] = new Array()
+    let validateFunctionNames: string[] = new Array()
+    const validateLogic = new ValidateBuilder()
+    input.forEach((item) => {
+        item.properties.forEach((property) => {
+            // console.log(flyStore.columnDataMap.get(property.propertycode));
+            let validateFunction: string
+            if (property.validation) {
+                if (Number(property.propertytypecode) === PropertyTypeCode.PhoneNumber) {
+                    validateFunction = validateLogic
+                        .setPropertyName(property.name)
+                        .setPropertyZhName(property.propertyname)
+                        .setValidateLogic(validatePhoneSnippet)
+                        .setErrMsg(`联系电话格式有误`)
+                        .build();
+                    validateFunctions.push(validateFunction)
+                    console.log(validateFunction);
+                } else {
+                    validateFunction = validateLogic
+                        .setPropertyName(property.name)
+                        .setPropertyZhName(property.propertyname)
+                        .setPropertyTypeCode(property.propertytypecode)
+                        .setDictidExistValidate(enableValidateDictId)
+                        .setBusinessObjectExistValidate(enableValidateBusinessObjectId)
+                        .setPropertyCode(property.propertycode)
+                        .setRequired(property.required)
+                        .setValidateLogic()
+                        .setErrMsg()
+                        .build();
+                    validateFunctions.push(validateFunction)
+                    validateFunctionNames.push(validateLogic.getCallFunctionName(item.name))
+                    console.log(validateFunction);
+                }
+            }
+        })
+    })
+    const callValidationFunctions = updateTemplet.validation.replace("{{callFunctions}}", validateFunctionNames.join("\n    "))
+    let insertFunc = updateTemplet.insert
+    let updateFunc = updateTemplet.update
+    const tableName = input[0].name
+    const PrimaryKey = getPrimaryKey(input[0].objectcode)
+    const CustomInsertCode = () => {
+
+        return ''
+    }
+    insertFunc = insertFunc
+        .replaceAll("{{tableName}}", tableName)
+        .replaceAll("{{primaryKey}}", PrimaryKey)
+        .replace("{{CustomInsertCode}}", CustomInsertCode())
+
+    const CustomUpdateCode = () => {
+        let replaceValueTemplet = `${tableName}.{{propertyName}} = IN.${tableName}.{{propertyName}}`
+        const codeLens = new Array<string>()
+        input[0].properties.forEach((property) => {
+            codeLens.push(replaceValueTemplet.replaceAll("{{propertyName}}", property.name))
+        })
+        return codeLens.join(`\n    `)
+    }
+    updateFunc = updateFunc
+        .replaceAll("{{tableName}}", tableName)
+        .replaceAll("{{primaryKey}}", PrimaryKey)
+        .replace("{{CustomUpdateCode}}", CustomUpdateCode())
+
+    const code = updateTemplet.head
+        .concat(updateTemplet.main)
+        .concat(insertFunc)
+        .concat(updateFunc)
+        .concat(callValidationFunctions)
+        .concat(validateFunctions.join("\n"))
+        .concat(updateTemplet.appendErrmsg)
+        .concat(updateTemplet.isInsertFunc
+            .replace("{{tableName}}", tableName)
+            .replace("{{primaryKey}}", PrimaryKey))
+    GM_setClipboard(code, "text")
+
+
+    return code
+
+}
+
+
+const validatePhoneSnippet = `  var phoneReg = /^1[3456789]\d{9}$/;
+  if (!phoneReg.test(phoneNumber)) { //联系电话正则校验
+    validationFailed = true
+  }`
