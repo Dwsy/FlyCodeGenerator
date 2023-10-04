@@ -16,7 +16,7 @@ export const useFlyStore = defineStore('flyStore', () => {
     async function init() {
         tableDatas.value = (await getBizObjectsData())?.resp_data
         if (document.URL.indexOf("modeledit") != -1 && document.URL.split("/").length == 6) {
-            protocol.value = (await getProtocol()).resp_data
+            protocol.value = (await getProtocol())?.resp_data
         }
 
         // 遍历 tableDatas 数组

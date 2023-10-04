@@ -26,7 +26,10 @@
                                     <NListItem style="padding: 8px 0;">
                                         <div>
                                             <n-switch class="validationSwitch" v-model:value="property.validation"
-                                                size="large">
+                                                @update-value="(b) => {
+                                                    b ? vCount++ : vCount--
+                                                    vCount == input.properties.length ? SelectAllProperty = true : SelectAllProperty = false
+                                                }" size="large">
                                                 <template #icon>
                                                     {{ property.validation ? getRandomEmoji(index)[1] :
                                                         getRandomEmoji(index)[0]
@@ -38,8 +41,9 @@
                                                     getPropertyTypeName(property.propertytypecode) }}
                                                 {{ getPropertyTypeEmoji(Number(property.propertytypecode)) }}
                                             </span>
-                                            <n-checkbox v-model:checked="property.required" @update-checked="(value, e) => {
-                                                requiredCheck(value, property)
+                                            <n-checkbox v-model:checked="property.required" @update-checked="(b, e) => {
+                                                syncVR(input.properties)
+                                                requiredCheck(b, property)
                                             }" style="float: right">
                                                 必填
                                             </n-checkbox>
@@ -117,6 +121,7 @@ import { watch } from "vue";
 import { getPropertyTypeEmoji, getRandomEmojiByUnicode, getRandomEmoji } from "../../type/model/propertyTypeCodeRef";
 import { Input, Property } from "../../type/protocol";
 import { generatorCode } from "./index";
+import { VValidation } from "vuetify/lib/components/index.mjs";
 const flyStore = useFlyStore()
 const showModal = ref(false)
 const showCode = ref(false)
@@ -126,18 +131,21 @@ const enableValidateDictId = ref(false)
 const enableValidateBusinessObjectId = ref(false)
 const SelectAllProperty = ref(false)
 const SelectAllrequired = ref(false)
+const vCount = ref(0)
+const rCount = ref(1)
 onMounted(() => {
     console.log("updateGenerator");
-    console.log(updateTemplet.head)
-
+    let tempSum = 0
     flyStore.protocol.input.forEach((input) => {
         input.properties.forEach((property) => {
             if (ignorePropertyType.indexOf(Number(property.propertytypecode)) == -1) {
                 property.validation = true
+                tempSum++
             }
 
         })
     })
+    vCount.value += tempSum
     addButton(null, "生成Flycode", "ideicon-share", () => {
         showModal.value = true
         console.log("生成Flycode");
@@ -192,7 +200,17 @@ const requiredCheck = (value, property: Property) => {
     }
 }
 
+const syncVR = (properties) => {
+    vCount.value == properties.filter((property) => {
+        if (property.validation) {
+            return property.validation == property.required
+        }
+    }).length ? SelectAllrequired.value = true : SelectAllrequired.value = false
+
+}
+
 const SelectAllPropertyFunc = (value: boolean) => {
+    // SelectAllrequired.value = value
     flyStore.protocol.input.forEach((input) => {
         input.properties.forEach((property) => {
             property.validation = value
