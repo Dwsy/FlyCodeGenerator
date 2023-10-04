@@ -11,7 +11,9 @@ const main = `(function main() {
         throw new ERROR(errMsg);
     }
 
-    if (isadd) {
+    var isInsert = isInsertFunc()
+
+    if (isInsert) {
         insert()
     } else {
         update()
@@ -22,20 +24,22 @@ const main = `(function main() {
 
 `
 
-const insert = `function insert(data) {
+const insert = `function insert() {
     var id = FLY.genId();
-    DB.insert(tn_crm_dwy);
+    {{CustomCode}}
+    DB.insert({{data}});
 }
 
 `
 
-const update = `function update(data) {
-    DB.update(tn_crm_dwy);
+const update = `function update() {
+    {{CustomCode}}
+    DB.update({{data}});
 }
 
 `
 
-const validation = `function validation(data) {
+const validation = `function validation() {
   {{callFunctions}}
 }
 
@@ -63,6 +67,31 @@ const validateBusinessObjectExistTemplet = `\n    var temp = select count(*) fro
     }
 `
 
+const appendErrmsg = `
+/**
+* 将错误信息添加到全局错误消息中。
+* @param {string} message - 要添加的错误消息。
+*/
+function appendErrmsg(message) {
+   errMsg += message
+   validateFail = true
+}
+`
+
+const isInsertFunc = `
+/**
+ * 判断是否为插入操作
+ * @returns {boolean}
+ */
+function isInsertFunc() {
+    var isInsert = false
+    if (!String.isBlank(IN.{{tableName}}.{{primaryKey}})) {
+        isInsert = true
+    }
+    return isInsert
+}
+`
+
 
 export const updateTemplet = {
     head,
@@ -70,16 +99,7 @@ export const updateTemplet = {
     insert,
     update,
     validation,
+    appendErrmsg,
     validateDictidExistFunc,
     validateBusinessObjectExistTemplet
-}
-
-interface UpdateTemplet {
-    head: string
-    main: string
-    insert: string
-    update: string
-    validation: string
-    validateDictidExistFunc: string
-    validateBusinessObjectExistTemplet: string
 }

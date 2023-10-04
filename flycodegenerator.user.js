@@ -27,7 +27,7 @@
     return value;
   };
   var require_main_001 = __commonJS({
-    "main-78b6f852.js"(exports, module) {
+    "main-b28ea0ef.js"(exports, module) {
       let onceCbs = [];
       const paramsMap = /* @__PURE__ */ new WeakMap();
       function flushOnceCallbacks() {
@@ -70227,7 +70227,8 @@ ${style2}
         const appMounted = vue.ref(false);
         const ActiveGenerator = vue.ref();
         async function init2() {
-          tableDatas.value = (await getBizObjectsData()).resp_data;
+          var _a;
+          tableDatas.value = (_a = await getBizObjectsData()) == null ? void 0 : _a.resp_data;
           if (document.URL.indexOf("modeledit") != -1 && document.URL.split("/").length == 6) {
             protocol2.value = (await getProtocol()).resp_data;
           }
@@ -71140,17 +71141,20 @@ ${this.validateLogic}
             console.log("vue--mounted");
             await flyStore.init();
             const waitMonaco = setInterval(async () => {
-              if (typeof window.monaco !== "undefined") {
+              if (typeof (window == null ? void 0 : window.monaco) !== "undefined") {
                 const button = document.querySelector("#beSetting > div.main-content > div.tab-operation > button:nth-child(2) > i");
                 if (button != null) {
                   console.log(/* @__PURE__ */ new Date(), "FlyCodeGenerator初始化.....");
                   flyStore.initStatus = true;
+                  await vue.nextTick();
                   flyStore.appMounted = true;
                   checkURLChangeThenUpdateProtocol();
                   clearInterval(waitMonaco);
+                } else {
+                  console.log("等待领域页面加载。。。");
                 }
               } else {
-                console.log("等待。。。");
+                console.log("等待monaco。。。");
               }
             }, 1e3);
             let lightThemeInit = false;
@@ -71173,7 +71177,7 @@ ${this.validateLogic}
             });
             setTimeout(() => {
               document.querySelector("#app > div > div.content > div.envi-style").append(span);
-            }, 1e3);
+            }, 2e3);
           });
           function checkURLChangeThenUpdateProtocol() {
             setInterval(() => {
@@ -71190,12 +71194,12 @@ ${this.validateLogic}
                   previousURL
                 );
                 const temp = previousURL.split("/");
-                const temp1 = currentURL.split("/");
-                if (temp.indexOf("modeledit") != -1) {
+                const temp1 = currentURL.split(" /");
+                if (currentURL.indexOf("modeledit") != -1) {
                   if (temp.length == temp1.length) {
-                    await flyStore.updateProtocol(0);
+                    await flyStore.updateProtocol(500);
                   } else {
-                    await flyStore.updateProtocol(0);
+                    await flyStore.updateProtocol(500);
                   }
                 }
                 previousURL = currentURL;

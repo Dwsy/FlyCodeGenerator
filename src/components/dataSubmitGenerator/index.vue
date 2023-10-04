@@ -210,6 +210,7 @@ function test(previewCode = false) {
         .concat(updateTemplet.update)
         .concat(callValidationFunctions)
         .concat(validateFunctions.join("\n"))
+        .concat(updateTemplet.appendErrmsg)
     GM_setClipboard(code, "text")
     flycode.value = code
     if (!previewCode) {

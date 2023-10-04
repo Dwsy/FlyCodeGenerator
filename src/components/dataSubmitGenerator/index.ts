@@ -120,7 +120,7 @@ ${this.validateLogic}
 
 
         if (this.required) {
-            code = code.replace("{{RequiredVerification}}", `if (!String.isBlank(${this.propertyName})) {
+            code = code.replace("{{RequiredVerification}}", `if (String.isBlank(${this.propertyName})) {
         appendErrmsg("${this.propertyZhName}不能为空；")
         validationFailed = true
     }

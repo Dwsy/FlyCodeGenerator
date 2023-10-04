@@ -32,7 +32,7 @@ onMounted(async () => {
   await flyStore.init()
   const waitMonaco = setInterval(async () => {
     // @ts-ignore
-    if (typeof window?.monaco !== 'undefined') {
+    if (typeof monaco !== 'undefined') {
       const button = document.querySelector("#beSetting > div.main-content > div.tab-operation > button:nth-child(2) > i")
       if (button != null) {
         console.log(new Date(), "FlyCodeGenerator初始化.....")
@@ -51,11 +51,11 @@ onMounted(async () => {
   }, 1000)
   let lightThemeInit = false
   // @ts-ignore
-  window.lightTheme = (lightThemeInit) => {
-    document.querySelectorAll(".secondary-tab-card-special.dark-image .main-content > .tab-content > .ant-tabs-bar .ant-tabs-tab").forEach((e: HTMLElement) => {
+  window.lightTheme = (lightThemeInit:boolean) => {
+    document.querySelectorAll(".secondary-tab-card-special.dark-image .main-content > .tab-content > .ant-tabs-bar .ant-tabs-tab")?.forEach((e: HTMLElement) => {
       e.style.background = "#E1E1E1"
     })
-    document.querySelectorAll("#beSetting > div.main-content > div.tab-content.ant-tabs.ant-tabs-top.ant-tabs-line > div.ant-tabs-bar.ant-tabs-top-bar > div > div > div > div > div> div").forEach((e: HTMLElement) => {
+    document.querySelectorAll("#beSetting > div.main-content > div.tab-content.ant-tabs.ant-tabs-top.ant-tabs-line > div.ant-tabs-bar.ant-tabs-top-bar > div > div > div > div > div> div")?.forEach((e: HTMLElement) => {
       e.style.background = "#E1E1E1"
     })
     // @ts-ignore
