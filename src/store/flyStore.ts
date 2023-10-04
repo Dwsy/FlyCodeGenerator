@@ -14,7 +14,7 @@ export const useFlyStore = defineStore('flyStore', () => {
     const ActiveGenerator = ref()
 
     async function init() {
-        tableDatas.value = (await getBizObjectsData()).resp_data
+        tableDatas.value = (await getBizObjectsData())?.resp_data
         if (document.URL.indexOf("modeledit") != -1 && document.URL.split("/").length == 6) {
             protocol.value = (await getProtocol()).resp_data
         }

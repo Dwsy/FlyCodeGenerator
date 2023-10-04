@@ -17,6 +17,7 @@ import { ref, watchEffect, watch } from 'vue'
 import type { GlobalTheme } from 'naive-ui'
 import { useFlyStore } from './store/flyStore';
 import { ActionType } from './type/actionType'
+import { nextTick } from 'vue';
 
 const Generator = {
   queryGenerator,
@@ -31,17 +32,20 @@ onMounted(async () => {
   await flyStore.init()
   const waitMonaco = setInterval(async () => {
     // @ts-ignore
-    if (typeof window.monaco !== 'undefined') {
+    if (typeof window?.monaco !== 'undefined') {
       const button = document.querySelector("#beSetting > div.main-content > div.tab-operation > button:nth-child(2) > i")
       if (button != null) {
         console.log(new Date(), "FlyCodeGenerator初始化.....")
         flyStore.initStatus = true
+        await nextTick()
         flyStore.appMounted = true
         checkURLChangeThenUpdateProtocol()
         clearInterval(waitMonaco);
+      } else {
+        console.log("等待领域页面加载。。。");
       }
     } else {
-      console.log("等待。。。");
+      console.log("等待monaco。。。");
 
     }
   }, 1000)
@@ -62,11 +66,11 @@ onMounted(async () => {
   }
   const span = document.createElement("span")
   span.textContent = "L"
-  span.addEventListener("click",()=>{
+  span.addEventListener("click", () => {
     // @ts-ignore
     window.lightTheme(lightThemeInit)
   })
-  setTimeout(()=>{document.querySelector("#app > div > div.content > div.envi-style").append(span)},1000)
+  setTimeout(() => { document.querySelector("#app > div > div.content > div.envi-style").append(span) }, 2000)
 
 })
 
@@ -94,12 +98,12 @@ function checkURLChangeThenUpdateProtocol() {
       console.log("// URL发生变化，执行您的函数",
         "currentURL:", currentURL, "previousURL", previousURL);
       const temp = previousURL.split("/")
-      const temp1 = currentURL.split("/")
-      if (temp.indexOf("modeledit") != -1) {
+      const temp1 = currentURL.split(" /")
+      if (currentURL.indexOf("modeledit") != -1) {
         if (temp.length == temp1.length) {
-          await flyStore.updateProtocol(0)
+          await flyStore.updateProtocol(500)
         } else {
-          await flyStore.updateProtocol(0)
+          await flyStore.updateProtocol(500)
         }
       }
 
