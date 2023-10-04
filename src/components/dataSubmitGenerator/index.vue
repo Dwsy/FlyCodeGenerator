@@ -202,9 +202,8 @@ const SelectAllPropertyFunc = (value: boolean) => {
 const SelectAllrequiredFunc = (value: boolean) => {
     flyStore.protocol.input.forEach((input) => {
         input.properties.forEach((property) => {
-            property.required = value
-            if (!property.validation && value) {
-                property.validation = value
+            if (property.validation) {
+                property.required = value
             }
         })
     })

@@ -1,7 +1,5 @@
 const head = `var errMsg = "";
 var validateFail = false;
-var s = select * from user;
-var tableName = '';
 
 `
 
@@ -23,19 +21,19 @@ const main = `(function main() {
 
 const insert = `function insert() {
     var id = FLY.genId();
-    var {{tableName}} = BO.new('{{tableName}}');
-    tableName.{{primaryKey}} = id;
+    IN.{{tableName}}.{{primaryKey}} = id;
     {{CustomInsertCode}}
-    DB.insert({{tableName}});
+    DB.insert(IN.{{tableName}});
 }
 
 `
 
 const update = `function update() {
-    var temp = select * from {{tableName}} where {{primaryKey}} = { IN.{{tableName}}.{{primaryKey}} }
+    var temp = select * from {{tableName}} where {{primaryKey}} = { IN.{{tableName}}.{{primaryKey}} } NORULE;
     if (temp.length == 0){
         throw new ERROR("待更新数据不存在")
     }
+
     var {{tableName}} = temp[0]
     {{CustomUpdateCode}}
     DB.update({{tableName}});
@@ -59,18 +57,17 @@ const validateDictidExistFunc = `/**
 * @returns {void}
 */
 function validateDictidExist(dictionaryid, dictName) {
-    var temp = select count(*)
-    from pl_dictionary where dictionaryid = { dictionaryid };
-    if (temp[0].count == 1) {
-        appenErrmsg("字典" + dictName + "不存在；")
+    var temp = select count(*) from pl_dictionary where dictionaryid = { dictionaryid } NORULE;
+    if (temp[0].count == 0) {
+        appendErrmsg("字典" + dictName + "不存在；")
     }
 }
 
 `
 
-const validateBusinessObjectExistTemplet = `\n    var temp = select count(*) from {{tableName}} where {{primaryKey}} = {{businessObjectId}};
-    if (temp[0].count == 1) {
-        appenErrmsg("业务对象" + {{objectZhName}} + "不存在；")
+const validateBusinessObjectExistTemplet = `\n    var temp = select count(*) from {{tableName}} where {{primaryKey}} = {{{businessObjectId}}} NORULE;;
+    if (temp[0].count == 0) {
+        appendErrmsg("业务对象" + {{objectZhName}} + "不存在；")
     }
 `
 
@@ -80,8 +77,8 @@ const appendErrmsg = `
 * @param {string} message - 要添加的错误消息。
 */
 function appendErrmsg(message) {
-   errMsg += message
-   validateFail = true
+    errMsg += message
+    validateFail = true
 }
 `
 
@@ -92,7 +89,7 @@ const isInsertFunc = `
  */
 function isInsertFunc() {
     var isInsert = false
-    if (!String.isBlank(IN.{{tableName}}.{{primaryKey}})) {
+    if (String.isBlank(IN.{{tableName}}.{{primaryKey}})) {
         isInsert = true
     }
     return isInsert

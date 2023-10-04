@@ -142,7 +142,7 @@ ${this.validateLogic}
             this.setPrimaryKeyAndTableName()
             if (!this.primaryKey) {
                 this.message.error("未设置主键")
-                return ""
+                return ``
             }
             const validateBusinessObjectExistCode =
                 updateTemplet.validateBusinessObjectExistTemplet
@@ -236,6 +236,7 @@ export function generatorCode
         .concat(callValidationFunctions)
         .concat(validateFunctions.join("\n"))
         .concat(updateTemplet.appendErrmsg)
+        .concat(updateTemplet.validateDictidExistFunc)
         .concat(updateTemplet.isInsertFunc
             .replace("{{tableName}}", tableName)
             .replace("{{primaryKey}}", PrimaryKey))
