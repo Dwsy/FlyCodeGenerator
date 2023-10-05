@@ -8,7 +8,6 @@ import 'vfonts/Lato.css'
 import 'vfonts/FiraCode.css'
 import naive from 'naive-ui'
 
-
 const pinia = createPinia()
 const app: HTMLElement = document.createElement('div');
 app.className = 'queryGenerator';
@@ -17,3 +16,5 @@ createApp(App)
   .use(naive)
   .use(pinia)
   .mount(app);
+
+

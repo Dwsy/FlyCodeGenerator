@@ -140,7 +140,7 @@ export class ConditionGenerator {
         const isDate = DatePropertyCodes.indexOf(Number(this.condition.propertytypecode)) !== -1
         const [lvalue, rvalue] = isDate ? ["begin", "end"] : ["min", "max"]
 
-        whereClause = ` ${Operator.Between} { ${lvalue} } ${Operator.AND} { ${rvalue} }`;
+        whereClause = whereClause + ` ${Operator.Between} { ${lvalue} } ${Operator.AND} { ${rvalue} }`;
 
         return whereClause
     }

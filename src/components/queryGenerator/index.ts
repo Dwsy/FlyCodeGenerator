@@ -166,7 +166,7 @@ function gen(output: Output, queryArgumentArrayMap: Map<string, Property[]>): Qu
 
   fquery = fquery.replace("{{selectColumns}}", selectColumns);
   // 如果 query 不为 null，则将查询条件添加到 fquery 中
-  if (queryArgumentArrayMap?.size > 0) {
+  if (queryArgumentArrayMap?.size > 0) {//todo 自定义处理
     fquery += "\n  where 1=1\n";
   }
 
@@ -176,6 +176,7 @@ function gen(output: Output, queryArgumentArrayMap: Map<string, Property[]>): Qu
   queryArgumentArrayMap.forEach((properties, tableName) => {
     if (tableName === mainTableName) {
       properties.forEach((property) => {
+        if (property.propertytypecode == "3") return
         // 先完成 = 操作 todo
         const argName = property.name
         const operator = getOperator(property)
@@ -328,7 +329,7 @@ export function generateSql(queryModel: QueryModel): string {
   const whereClause = whereClauses.length > 0 ? `WHERE 1=1\n${whereClauses.join("")}` : "";
 
   // 拼接 SQL 语句
-  const sql = `${selectClause}\n${fromClause}\n${joinClauses.join("\n")}\n${whereClause}`;
+  const sql = `${selectClause}\n${fromClause}\n${joinClauses.join("\n")}\n${whereClause} NORULE;`;
 
   return sql;
 }

@@ -13,18 +13,15 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
 import { darkTheme, lightTheme, useMessage } from 'naive-ui'
-import queryGenerator from './components/queryGenerator/index.vue'
-import dataSubmitGenerator from './components/dataSubmitGenerator/index.vue'
+import { Generator } from './components'
+
 import { ref, watchEffect, watch } from 'vue'
 import type { GlobalTheme } from 'naive-ui'
 import { useFlyStore } from './store/flyStore';
 import { ActionType } from './type/actionType'
 import { nextTick } from 'vue';
 
-const Generator = {
-  queryGenerator,
-  dataSubmitGenerator
-}
+
 const theme = ref<GlobalTheme | null>(darkTheme)
 const flyStore = useFlyStore()
 
@@ -83,13 +80,7 @@ function checkURLChangeThenUpdateProtocol() {
   const urlInterval = setInterval(() => {
     _()
   }, 1000)
-  // document.querySelector("#app > div > div.content > div:nth-child(2) > div > div.ant-tabs-bar.ant-tabs-top-bar.ant-tabs-card-bar > div > div > div > div > div:nth-child(1) > div > div > div").addEventListener("click", () => {
-  //   console.log("click tab1")
-  // })
-  // document.querySelector("#app > div > div.content > div:nth-child(2) > div > div.ant-tabs-bar.ant-tabs-top-bar.ant-tabs-card-bar > div > div > div > div").addEventListener("click", () => {
-  //   _()
-  //   console.log("click tabe")
-  // })
+
 
   const _ = async () => {
     // 获取当前URL

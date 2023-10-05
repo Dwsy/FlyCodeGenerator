@@ -29,7 +29,16 @@ export const copyToClipboard = (text: string) => {
 
 }
 
-export const addButton = (selector: string, text: string, iconClass: string, clickHandler: () => void, seq) => {
+/**
+ * 添加一个按钮到指定的选择器中
+ * @param {string} selector - 指定的选择器
+ * @param {string} text - 按钮的文本
+ * @param {string} iconClass - 按钮的图标 CSS 类名
+ * @param {Function} clickHandler - 按钮的点击事件处理函数
+ * @param {number} seq - 按钮的序号
+ * @param {string} [hoverText] - 按钮的悬停文本
+ */
+export const addButton = (selector: string, text: string, iconClass: string, clickHandler: () => void, seq, hoverText?: string) => {
   if (selector == undefined) {
     selector = "#beSetting > div.main-content > div.tab-operation > button:nth-child(2)"
   }
@@ -50,6 +59,7 @@ export const addButton = (selector: string, text: string, iconClass: string, cli
   newButton.appendChild(newButtonIcon);
   newButton.appendChild(newButtonSpan);
   newButton.addEventListener("click", clickHandler);
+  hoverText ? newButton.title = hoverText : newButton.title = 'dwsy'
   originalButton.parentNode!.appendChild(newButton);
 }
 

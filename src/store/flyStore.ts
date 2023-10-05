@@ -3,6 +3,7 @@ import { computed, nextTick, ref, watch, watchEffect } from "vue"
 import { getBizObjectsData, getProtocol } from "../dataRequest"
 import { Protocol } from "../type/protocol"
 import { ActionType } from "../type/actionType";
+import { GeneratorName } from "../components";
 
 export const useFlyStore = defineStore('flyStore', () => {
     const tableDatas = ref<tableData[]>()
@@ -51,18 +52,40 @@ export const useFlyStore = defineStore('flyStore', () => {
     }
 
 
-
+    const insertOrUpdateNameArray = ["新增", "修改", "编辑", "创建", "更新", "添加", "保存"]
+    const deletedDataNameArray = ["删除"]
     const refresh = () => {
         const actionType = protocol.value.actiontype
+        const actioncategory = protocol.value.actioncategory
+        const Import = actionType == ActionType.Import
+        const Export = actionType == ActionType.Export
         if (actionType == ActionType.ListQuery || actionType == ActionType.SingleQuery) {
-            ActiveGenerator.value = "queryGenerator"
+            ActiveGenerator.value = GeneratorName.queryGenerator
             console.log(`ActiveGenerator.value = "queryGenerator"`);
 
         } else if (actionType == ActionType.DataSubmit) {
-            ActiveGenerator.value = "dataSubmitGenerator"
-            console.log(`ActiveGenerator.value = "dataSubmitGenerator"`);
+            const modellogicname = protocol.value.modellogicname
+            if (deletedDataNameArray.some((name) => modellogicname.includes(name))) {
+                ActiveGenerator.value = GeneratorName.deletedGenerator
+
+            } else if (insertOrUpdateNameArray.some((name) => modellogicname.includes(name))) {
+                ActiveGenerator.value = GeneratorName.dataSubmitGenerator
+
+            }
+
+        } else if (actionType == ActionType.BatchSubmit) {
+            // todo
+        } else if (Import && actioncategory == "1") {//Excel导入
+            ActiveGenerator.value = GeneratorName.ExcelImport
+        } else if (Export && actioncategory == "1") {//Excel导出
+            ActiveGenerator.value = GeneratorName.ExcelExport
+        } else if (Import && actioncategory == "6") {//flycode导入
+            ActiveGenerator.value = GeneratorName.flycodeImport
+        } else if (Export && actioncategory == "7") {//flycode导出
+            ActiveGenerator.value = GeneratorName.flycodeExport
         }
     }
+
 
 
     return {

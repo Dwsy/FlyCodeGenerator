@@ -1,0 +1,140 @@
+//1. 绑定数据
+var _xlscolBind = [
+    {
+        "field": "code",
+        "column": "终端编码"
+    },
+    {
+        "field": "name",
+        "column": "终端名称"
+    },{
+        "field": "marketing_region",
+        "column": "终端所属区域"
+    },{
+        "field": "level",
+        "column": "终端级别"
+
+    },{
+        "field": "channel_type",
+        "column": "渠道类型"
+    },{
+        "field": "type",
+        "column": "终端类型"
+    },{
+        "field": "administrative_region",
+        "column": "行政区域"
+
+    },{
+        "field": "manager",
+        "column": "终端负责人"
+    },{
+        "field": "contact_name",
+        "column": "联系人姓名"
+    },{
+        "field": "telephone_number",
+        "column": "联系人电话"
+
+    },{
+        "field": "detailed_addresses",
+        "column": "详细地址"
+    },{
+        "field": "head_photo",
+        "column": "门头照片"
+    }];
+
+ 
+var param = IN.test_client_manager;
+
+var query_by_day = IN.tn_crm_dwy.query_by_day;
+var query_by_week = IN.tn_crm_dwy.query_by_week;
+var query_by_month = IN.tn_crm_dwy.query_by_month;
+var query_by_range = String.isBlank(IN.tn_crm_dwy.query_by_range)?null:JSON.parse(IN.tn_crm_dwy.query_by_range);
+var start=null;
+var end=null;
+
+if (!String.isBlank(query_by_day)) { //按天查询
+    var date = new Date(query_by_day);
+    start = date.getDayBegin();
+    end = date.getDayEnd();
+} else if (!String.isBlank(query_by_week)) { //按周查询
+    var date = new Date(query_by_week);
+    start = date.getWeekBegin();
+    end = date.getWeekEnd();
+} else if (!String.isBlank(query_by_month)) { //按月查询
+    var date = new Date(query_by_month);
+    start = date.getMonthBegin();
+    end = date.getMonthEnd();
+}
+if (!String.isBlank(query_by_range)) { //按时间段查询
+    var query_by_range_start=Date.parseDate(query_by_range.start);
+    var query_by_range_end=Date.parseDate(query_by_range.end);;
+    start = new Date(query_by_range_start).getDayBegin();
+    end = new Date(query_by_range_end).getDayEnd();
+}
+// sql语句
+FLY.log("excute sql")
+
+
+
+
+var temp = SELECT 
+    t1.id,
+    t1.code,
+    t1.name,
+    pl_orgstruct.orgname AS marketing_region,
+    ctd.dicvalue AS channel_type,
+CASE
+    WHEN t1."level" = 1 THEN
+        '黄金' 
+    WHEN t1."level" = 2 THEN
+        '白金' 
+    WHEN t1."level" = 3 THEN
+        '钻石' ELSE'未知' 
+END AS level,
+    t1.contact_name,
+    t1.telephone_number,
+    t1.detailed_addresses,
+    pl_region.regionname AS administrative_region,
+    member.orgname AS manager,
+    t1.head_photo,
+    td.dicvalue AS type
+FROM
+    tn_crm_dwy t1
+    LEFT JOIN pl_region ON t1.administrative_region = pl_region.regionid
+    LEFT JOIN pl_orgstruct ON t1.marketing_region = pl_orgstruct.orgstructid
+    LEFT JOIN pl_dictionary td ON t1.type = td.dictionaryid
+    LEFT JOIN pl_dictionary ctd ON t1.channel_type = ctd.dictionaryid
+    LEFT JOIN pl_orgstruct member ON t1.manager = member.orgstructid
+WHERE 1=1
+    {#if !String.isBlank(IN.tn_crm_dwy.code)}
+     and t1.code like  { '%' + IN.tn_crm_dwy.code + '%' }
+    {#endif}
+    {#if !String.isBlank(IN.tn_crm_dwy.name)}
+     and t1.name like  { '%' + IN.tn_crm_dwy.name + '%' }
+    {#endif}
+    {#if !String.isBlank(IN.tn_crm_dwy.marketing_region)}
+     and t1.marketing_region = {IN.tn_crm_dwy.marketing_region}
+    {#endif}
+    {#if !String.isBlank(IN.tn_crm_dwy.channel_type)}
+     and t1.channel_type = {IN.tn_crm_dwy.channel_type}
+    {#endif}
+    {#if !String.isBlank(IN.tn_crm_dwy.type)}
+     and t1.type = {IN.tn_crm_dwy.type}
+    {#endif}
+    {#if !String.isBlank(IN.tn_crm_dwy.level)}
+     and t1.level = {IN.tn_crm_dwy.level}
+    {#endif}
+    {#if !String.isBlank(IN.tn_crm_dwy.manager__orgname)}
+     and member.orgname  like  { '%' + IN.tn_crm_dwy.manager__orgname + '%' }
+    {#endif}
+    {#if !String.isBlank(IN.tn_crm_dwy.manager)}
+     and t1.manager   = {IN.tn_crm_dwy.manager}
+    {#endif}
+    {#if start != null && end != null}
+     and t1.create_time between { start } and { end }
+    {#endif}
+    
+    paging
+    norule;
+FLY.log(temp)
+OUT.xlsdata = temp;

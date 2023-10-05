@@ -1,5 +1,5 @@
 <template>
-    <p>queryGenerator</p>
+
 </template>
 
 <script setup lang="ts">
