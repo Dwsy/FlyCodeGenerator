@@ -13,7 +13,8 @@
     "pinia": "^2.1.6",
     "pretty-format": "^29.7.0",
     "vue": "^3.3.4",
-    "vuetify": "^3.3.19"
+    "vuetify": "^3.3.19",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.2.3",

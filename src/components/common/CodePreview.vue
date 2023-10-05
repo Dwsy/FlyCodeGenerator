@@ -13,6 +13,7 @@ const props = defineProps<Props>()
 
 onMounted(async () => {
     await nextTick(() => {
+        // @ts-ignore
         monaco.editor.colorizeElement(document.getElementById("flyCode"), {
             theme: "vs-dark",
             lineNumbers: "on",

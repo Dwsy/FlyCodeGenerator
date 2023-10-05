@@ -107,9 +107,6 @@ function createColumns({ play }: { play: (row: Bind) => void }): DataTableColumn
 }
 
 
-function rowkey(row: Bind) {
-    row.field
-}
 
 
 const codeGenerator = (preview: boolean) => {
