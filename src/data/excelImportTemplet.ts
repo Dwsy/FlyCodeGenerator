@@ -38,7 +38,7 @@ const paramobj = `var _paramobj = {
 const dataBind = `var _bind_{{tableName}} = {{bindMap}}
 `
 
-const validation = `function validation() {
+const callValidation = `function validation() {
     {{callFunctions}}
     if (validateFail) {
         throw new ERROR(errMsg);
@@ -47,25 +47,55 @@ const validation = `function validation() {
 
 `
 
-const validateDictValueExistFunc = `/**
-* 根据字典值查询字典ID
-* @param {number} dicvalue - 字典值
-* @param {string} dictName - 字典名称
-* @returns {void}
-*/
-function validateDictidExist(dicvalue, dictName) {
-    var temp = select count(*) from pl_dictionary where dictionaryid = { dictionaryid } NORULE;
-    if (temp[0].count == 0) {
-        appendErrmsg(dictName + "字典值：" + dictivalue + "不存在；")
+const callReverseQuery = `function validation() {
+    {{callFunctions}}
+    if (validateFail) {
+        throw new ERROR(errMsg);
     }
 }
 
 `
 
-const validateBusinessObjectExistTemplet = `\n    var temp = select count(*) from {{tableName}} where {{primaryKey}} = {{{businessObjectId}}} NORULE;;
-    if (temp[0].count == 0) {
-        appendErrmsg("业务对象" + {{objectZhName}} + "不存在；")
+const getDictIdByDicvalue = `/**
+* 根据字典值获取 {{dictTableName}} 的 dictionaryid
+* @param {string} dicvalue - 字典值
+* @returns {number} {{dictTableName}} 的 dictionaryid
+*/
+function get{{CamelTableName}}DictIdByDicvalue(dicvalue) {
+    {{required}}
+    var temp = select dictionaryid from {{dictTableName}} where dicvalue = { dicvalue } NORULE;
+    if (temp.length != 0) {
+        return temp[0].dictionaryid
+    }else{
+        appendErrmsg("字典值({{dictTableZhName}})：" + dictivalue + "不存在；")
     }
+}
+
+`
+
+const requiredDictCode = `if (String.isBlank(dicvalue)) {
+        appendErrmsg("({{dictTableZhName}})：不能为空")
+    }`
+
+const requiredBusinessObjectValueCode = `if (String.isBlank({{columnName}})) {
+        appendErrmsg("({{BusinessObjectTableZhName}})：不能为空")
+    }`
+
+const getBusinessObjectIdByValue = `/**
+* 根据 {{columnName}} 获取 {{tableName}} 的 {{primaryKey}}
+* @param {string} - {{tableName}} 的 {{columnName}} 的值
+* @returns {number} {{tableName}} 的 {{primaryKey}}
+*/
+function get{{CamelTableName}}IdBy{{CamelColumnName}}({{columnName}}) {
+    {{required}}
+    var temp = select {{primaryKey}} from {{tableName}} where {{columnName}} = { {{columnName}} } NORULE;
+    if (temp.length != 0) {
+        return temp[0].dictionaryid
+    }else{
+        appendErrmsg("业务对象({{BusinessObjectTableZhName}})：" + value  + "不存在；")
+    }
+}
+
 `
 
 const appendErrmsg = `
@@ -100,9 +130,11 @@ export const excelImportTemplet = {
     xlsconf,
     paramobj,
     dataBind,
-    validation,
-    validateDictidExistFunc,
-    validateBusinessObjectExistTemplet,
+    callValidation,
+    getBusinessObjectIdByValue,
+    getDictIdByDicvalue,
     appendErrmsg,
-    isInsertFunc
+    isInsertFunc,
+    requiredDictCode,
+    requiredBusinessObjectValueCode
 }

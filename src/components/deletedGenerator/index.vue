@@ -1,5 +1,6 @@
 <template>
     <div>
+
         <n-modal v-model:show="showModal" preset="card" title="Flycode生成配置" style="width: 700px" :bordered="false">
             <n-card>
                 <n-tabs type="line" animated size="large">
@@ -31,12 +32,16 @@
     </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="tsx">
 import { onMounted, ref } from 'vue';
 import { addButton } from '../../util';
 import { useFlyStore } from '../../store/flyStore';
+import { render } from 'vue';
+import p from 'naive-ui/es/typography/src/p';
+import { FunctionalComponent } from 'vue';
 const showModal = ref(false)
 const flyStore = useFlyStore()
+
 onMounted(() => {
     addButton(null, "生成Flycode", "ideicon-share", () => {
         console.log("生成Flycode");
