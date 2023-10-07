@@ -8,6 +8,6 @@ export interface Bind {
 
 
 
-export const excelExportTemplet = {
+export const excelExportTemplate = {
     xlscolBind
 }

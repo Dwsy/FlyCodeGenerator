@@ -97,7 +97,7 @@ function isInsertFunc() {
 `
 
 
-export const updateTemplet = {
+export const updateTemplate = {
     head,
     main,
     insert,

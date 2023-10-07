@@ -13,7 +13,7 @@
                 <n-upload :file-list="fileList" title="点击或者拖动文件到该区域来上传" :custom-request="(options: UploadCustomRequestOptions) => {
                     readExcelFile(options.file.file)
                 }" accept="application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
-                    <n-upload-dragger style="height: ">
+                    <n-upload-dragger >
                         <n-text style="font-size: 16px">
                             点击或者拖动Excel模版文件到该区域来上传
                         </n-text>
@@ -36,9 +36,7 @@
 import { h, onMounted, ref } from "vue";
 import {
   addButton,
-  getPrimaryKey,
-  levenshteinDistance,
-  toCamelCase,
+
 } from "../../util";
 import { read, utils } from "xlsx";
 import {
@@ -53,25 +51,18 @@ import {
   useMessage,
 } from "naive-ui";
 import { watch } from "vue";
-import clear from "naive-ui/es/_internal/clear";
 import { useFlyStore } from "../../store/flyStore";
 import { Property } from "../../type/protocol";
-import { Bind, excelExportTemplet } from "../../data/excelExportTemplet";
 import { Operator } from "../../type/model/queryModel";
 import {
-  PropertyTypeCode,
   getPropertyTypeEmoji,
   getPropertyTypeName,
   getRandomEmoji,
   getRandomEmojiByUnicode,
 } from "../../type/model/propertyTypeCodeRef";
-import { SelectBaseOption } from "naive-ui/es/select/src/interface";
 import { message } from "../../util/message";
 import { GM, GM_setClipboard } from "$";
-import { excelImportTemplet } from "../../data/excelImportTemplet";
 import CodePreview from "../common/CodePreview.vue";
-import p from "naive-ui/es/typography/src/p";
-import { nextTick } from "vue";
 import { autoMapFunc, generateCodeFunc, readExcelFileFunc } from ".";
 const flyStore = useFlyStore();
 const OperatorSelectOptions = ref([]);
@@ -136,7 +127,7 @@ function createColumns(): DataTableColumns<MapPair> {
     {
       title: "数据类型",
       key: "property.propertytypecode",
-      render(row, index) {
+      render(row:MapPair, index:number) {
         return h(
           <span>
             {`${getPropertyTypeName(
@@ -150,7 +141,7 @@ function createColumns(): DataTableColumns<MapPair> {
     {
       title: "Excel列名",
       key: "column",
-      render(row, index) {
+      render(row:MapPair, index:number) {
         return h(NInput, {
           value: row.column,
           onUpdateValue(v) {
@@ -168,7 +159,7 @@ function createColumns(): DataTableColumns<MapPair> {
     {
       title: "反查操作符",
       key: "queryOperator",
-      render(row, index) {
+      render(row:MapPair, index:number) {
         return h(NSelect, {
           value: row.queryOperator,
           options: OperatorSelectOptions.value,
@@ -182,7 +173,7 @@ function createColumns(): DataTableColumns<MapPair> {
     {
       title: "必填",
       key: "property.required",
-      render(row: MapPair, index) {
+      render(row: MapPair, index:number) {
         return h(
           <NSwitch v-model:value={row.property.required} size="large">
             {{

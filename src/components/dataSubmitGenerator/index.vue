@@ -115,13 +115,14 @@ import { useFlyStore } from "../../store/flyStore";
 import { PropertyTypeCode, getPropertyTypeName, ignorePropertyType } from "../../type/model/propertyTypeCodeRef";
 import { codeDark, useMessage } from "naive-ui";
 import { GM_setClipboard } from '$';
-import { updateTemplet } from '../../data/updateFlycodeTemplet'
+import { updateTemplate } from '../../data/updateFlycodeTemplet'
 import { nextTick } from "vue";
 import { watch } from "vue";
 import { getPropertyTypeEmoji, getRandomEmojiByUnicode, getRandomEmoji } from "../../type/model/propertyTypeCodeRef";
 import { Input, Property } from "../../type/protocol";
 import { generatorCode } from "./index";
 import { VValidation } from "vuetify/lib/components/index.mjs";
+
 const flyStore = useFlyStore()
 const showModal = ref(false)
 const showCode = ref(false)

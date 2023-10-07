@@ -1,11 +1,13 @@
-import { RowKey } from "naive-ui/es/data-table/src/interface";
-import { excelImportTemplet } from "../../data/excelImportTemplet";
-import { useFlyStore } from "../../store/flyStore";
-import { PropertyTypeCode } from "../../type/model/propertyTypeCodeRef";
-import { Operator } from "../../type/model/queryModel";
-import { Property } from "../../type/protocol";
-import { getPrimaryKey, levenshteinDistance, toCamelCase } from "../../util";
-import { read } from "xlsx";
+import {RowKey} from "naive-ui/es/data-table/src/interface";
+import {useFlyStore} from "../../store/flyStore";
+import {PropertyTypeCode} from "../../type/model/propertyTypeCodeRef";
+import {Operator} from "../../type/model/queryModel";
+import {Property} from "../../type/protocol";
+import {getPrimaryKey, levenshteinDistance, toCamelCase} from "../../util";
+import {read} from "xlsx";
+import {excelExportTemplate} from "../../data/excelExportTemplate";
+import {excelImportTemplate} from "../../data/excelImportTemplate";
+import {message} from "../../util/message";
 
 type MapPair = {
     field: string;
@@ -17,12 +19,17 @@ type MapPair = {
 };
 export const generateCodeFunc = (mapPair: MapPair[], checkedRowKeys: RowKey[]) => {
     const flyStore = useFlyStore()
-    let code = excelImportTemplet.head;
-
-    code = code.concat(excelImportTemplet.main);
-    code = code.concat(excelImportTemplet.xlsconf);
-    code = code.concat(excelImportTemplet.paramobj);
-    let dataBind = excelImportTemplet.dataBind.replace(
+    const templet = excelImportTemplate
+    let code = templet.head;
+    const tableName = flyStore.protocol?.input[0]?.name;
+    if (!tableName) {
+        message.error("请先配置输出协议");
+        return;
+    }
+    code = code.concat(templet.main);
+    code = code.concat(templet.xlsconf);
+    code = code.concat(templet.paramobj);
+    let dataBind = templet.dataBind.replace(
         "{{tableName}}",
         flyStore.protocol.input[0].name
     );
@@ -40,6 +47,8 @@ export const generateCodeFunc = (mapPair: MapPair[], checkedRowKeys: RowKey[]) =
 
     const getDictIdByDicvalueArray = [];
     const getBusinessObjectIdByValueArray = [];
+    const callGetDictIdByDicvalueArray = [];
+    const callGetBusinessObjectIdByValueArray = [];
     const checkMapPair = mapPair
         .filter((pair) => {
             return pair.column != "---";
@@ -60,20 +69,22 @@ export const generateCodeFunc = (mapPair: MapPair[], checkedRowKeys: RowKey[]) =
                 flyStore.columnDataMap.get(pair.property.propertycode)
                     .relationobjectcode
             ).objectmark;
-            let getDictIdByDicvalue = excelImportTemplet.getDictIdByDicvalue;
-            if (pair.property.required) {
-                const requiredDictCode = excelImportTemplet.requiredDictCode;
-                getDictIdByDicvalue = getDictIdByDicvalue.replace(
-                    "{{required}}",
-                    requiredDictCode
-                );
-            }
+            let getDictIdByDicvalue = templet.getDictIdByDicvalue;
+            // if (pair.property.required) {
+            //     const requiredDictCode = templet.requiredDictCode;
+            //     getDictIdByDicvalue = getDictIdByDicvalue.replace(
+            //         "{{required}}",
+            //         requiredDictCode
+            //     );
+            // }
             getDictIdByDicvalue = getDictIdByDicvalue
                 .replaceAll("{{CamelColumnName}}", toCamelCase(pair.reverseQueryField))
                 .replaceAll("{{dictTableName}}", dictTableName)
+                .replaceAll("{{tableName}}", tableName)
                 .replaceAll("{{CamelTableName}}", toCamelCase(dictTableName))
                 .replaceAll("{{dictTableZhName}}", pair.property.propertyname);
-
+            let callFunc = `${tableName}_bo =\n        get${toCamelCase(dictTableName)}DictIdByDicvalue(IN.${tableName}.${pair.property.name})`
+            callGetDictIdByDicvalueArray.push(callFunc)
             getDictIdByDicvalueArray.push(getDictIdByDicvalue);
         });
 
@@ -93,14 +104,8 @@ export const generateCodeFunc = (mapPair: MapPair[], checkedRowKeys: RowKey[]) =
             ).objectmark;
 
             let getBusinessObjectIdByValue =
-                excelImportTemplet.getBusinessObjectIdByValue;
-            if (pair.property.required) {
-                const requiredCode = excelImportTemplet.requiredBusinessObjectValueCode;
-                getBusinessObjectIdByValue = getBusinessObjectIdByValue.replace(
-                    "{{required}}",
-                    requiredCode
-                );
-            }
+                templet.getBusinessObjectIdByValue;
+
             getBusinessObjectIdByValue = getBusinessObjectIdByValue
                 .replaceAll("{{CamelTableName}}", toCamelCase(tableName))
                 .replaceAll("{{CamelColumnName}}", toCamelCase(pair.reverseQueryField))
@@ -111,18 +116,135 @@ export const generateCodeFunc = (mapPair: MapPair[], checkedRowKeys: RowKey[]) =
                     "{{BusinessObjectTableZhName}}",
                     pair.property.propertyname
                 );
+
             getBusinessObjectIdByValueArray.push(getBusinessObjectIdByValue);
+            let callFunc =
+                `${flyStore.protocol?.input[0]?.name}_bo =\n        get${toCamelCase(tableName)}IdBy${toCamelCase(pair.reverseQueryField)}(IN.${tableName}.${pair.property.name})`
+            callGetBusinessObjectIdByValueArray.push(callFunc)
         });
+
+    const callReverseQueryFuncs = callGetDictIdByDicvalueArray.concat(callGetBusinessObjectIdByValueArray).join("\n    ")
+
+    const callValidationFuncs = []
+    const ValidationFuncs = []
+    checkMapPair.forEach((pair) => {
+
+        if (pair.property.required) {
+            let callValidation = templet.validationFunc
+                .replace("{{column}}", toCamelCase(pair.field))
+                .replace("{{text}}", pair.property.propertyname)
+            switch (PropertyTypeCode[pair.property.propertytypecode]) {
+                case PropertyTypeCode.PrimaryKey:
+                    break;
+                case PropertyTypeCode.Name:
+                    break;
+                case PropertyTypeCode.Text:
+                    break;
+                case PropertyTypeCode.Memo:
+                    break;
+                case PropertyTypeCode.LongText:
+                    break;
+                case PropertyTypeCode.Integer:
+                    break;
+                case PropertyTypeCode.LongInteger:
+                    break;
+                case PropertyTypeCode.Decimal:
+                    break;
+                case PropertyTypeCode.DateTime:
+                    break;
+                case PropertyTypeCode.TimeRange:
+                    break;
+                case PropertyTypeCode.Date:
+                    break;
+                case PropertyTypeCode.Status:
+                    break;
+                case PropertyTypeCode.Image:
+                    break;
+                case PropertyTypeCode.Attachment:
+                    break;
+                case PropertyTypeCode.Location:
+                    break;
+                case PropertyTypeCode.OptionSet:
+                    break;
+                case PropertyTypeCode.RelatedObject:
+                    break;
+                case PropertyTypeCode.DictionaryObject:
+                    break;
+                case PropertyTypeCode.BusinessObject:
+                    break;
+                case PropertyTypeCode.ComplexRelatedObject:
+                    break;
+                case PropertyTypeCode.ThisObject:
+                    break;
+                case PropertyTypeCode.CreatedBy:
+                    break;
+                case PropertyTypeCode.ModifiedBy:
+                    break;
+                case PropertyTypeCode.CreatedTime:
+                    break;
+                case PropertyTypeCode.ModifiedTime:
+                    break;
+                case PropertyTypeCode.Pinyin:
+                    break;
+                case PropertyTypeCode.IsDefault:
+                    break;
+                case PropertyTypeCode.PhoneNumber:
+                    break;
+                case PropertyTypeCode.TelephoneNumber:
+                    break;
+                case PropertyTypeCode.Email:
+                    break;
+                case PropertyTypeCode.PostalCode:
+                    break;
+                case PropertyTypeCode.SortOrder:
+                    break;
+                default:
+                    callValidation.replace("{{requiredCode}}", ``)
+            }
+            callValidation.replace("{{requiredCode}}", ``)
+            ValidationFuncs.push(callValidation)
+            callValidationFuncs.push(`validation${toCamelCase(pair.field)}(IN.${tableName}.${pair.field})`)
+        }
+
+    })
+
+
+    checkMapPair
+        .filter((pair) => {
+            return (
+                Number(pair.property.propertytypecode) ==
+                PropertyTypeCode.Location
+            );
+        })
+        .forEach((pair) => {
+            const tableName = flyStore.protocol.input[0].name
+            templet.transferAddress
+                .replace("{{CamelCaseColumnName}}", toCamelCase(pair.reverseQueryField))
+
+        })
     console.log(getDictIdByDicvalueArray);
 
     console.log(getBusinessObjectIdByValueArray);
 
-    code = code.concat(excelImportTemplet.callValidation);
+
+
+    code = code.concat(templet.callValidation
+        .replace("{{tableName}}", tableName)
+        .replace("{{callFunctions}}", callValidationFuncs.join("\n    ")));
+
+
+    code = code.concat(templet.callReverseQuery
+        .replace("{{tableName}}", tableName)
+        .replace("{{callFunctions}}", callReverseQueryFuncs));
+
+    code = code.concat(ValidationFuncs.join("\n"));
+
     code = code.concat(getDictIdByDicvalueArray.join("\n"));
     code = code.concat(getBusinessObjectIdByValueArray.join("\n"));
-    code = code.concat(excelImportTemplet.isInsertFunc);
-    code = code.concat(excelImportTemplet.appendErrmsg);
 
+
+    code = code.concat(templet.isInsertFunc);
+    code = code.concat(templet.appendErrmsg);
 
 
     return code
@@ -214,18 +336,18 @@ export const autoMapFunc = (excelColumnName: string[], sheetLine: []) => {
 
 
 /**
-* 读取 Excel 文件
-* @param {File} file - 要读取的 Excel 文件
-*/
+ * 读取 Excel 文件
+ * @param {File} file - 要读取的 Excel 文件
+ */
 export function readExcelFileFunc(file: File) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
 
         reader.onload = (event: any) => {
             const data = new Uint8Array(event.target.result);
-            const workbook = read(data, { type: "array" });
+            const workbook = read(data, {type: "array"});
             const sheetNames = workbook.SheetNames.map((sheetName) => {
-                return { label: sheetName, value: sheetName };
+                return {label: sheetName, value: sheetName};
             });
             resolve({
                 sheetNames,

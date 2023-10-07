@@ -160,7 +160,7 @@ function transferAddressBy{{CamelCaseColumnName}}(addr,fieldName) {
 `
 
 
-export const excelImportTemplet = {
+export const excelImportTemplate = {
     head,
     main,
     xlsconf,

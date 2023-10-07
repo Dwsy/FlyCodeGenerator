@@ -1,5 +1,5 @@
 import { useMessage } from "naive-ui";
-import { updateTemplet } from "../../data/updateFlycodeTemplet";
+import { updateTemplate } from "../../data/updateFlycodeTemplet";
 import { PropertyTypeCode, getRandomEmojiByUnicode } from "../../type/model/propertyTypeCodeRef";
 import { getPrimaryKey, toCamelCase } from "../../util";
 import { useFlyStore } from "../../store/flyStore";
@@ -145,7 +145,7 @@ ${this.validateLogic}
                 return ``
             }
             const validateBusinessObjectExistCode =
-                updateTemplet.validateBusinessObjectExistTemplet
+                updateTemplate.validateBusinessObjectExistTemplet
                     .replace("{{tableName}}", this.tableName)
                     .replace("{{primaryKey}}", this.primaryKey)
                     .replace("{{businessObjectId}}", this.propertyName)
@@ -202,9 +202,9 @@ export function generatorCode
             }
         })
     })
-    const callValidationFunctions = updateTemplet.validation.replace("{{callFunctions}}", validateFunctionNames.join("\n    "))
-    let insertFunc = updateTemplet.insert
-    let updateFunc = updateTemplet.update
+    const callValidationFunctions = updateTemplate.validation.replace("{{callFunctions}}", validateFunctionNames.join("\n    "))
+    let insertFunc = updateTemplate.insert
+    let updateFunc = updateTemplate.update
     const tableName = input[0].name
     const PrimaryKey = getPrimaryKey(input[0].objectcode)
     const CustomInsertCode = () => {
@@ -229,15 +229,15 @@ export function generatorCode
         .replaceAll("{{primaryKey}}", PrimaryKey)
         .replace("{{CustomUpdateCode}}", CustomUpdateCode())
 
-    const code = updateTemplet.head
-        .concat(updateTemplet.main)
+    const code = updateTemplate.head
+        .concat(updateTemplate.main)
         .concat(insertFunc)
         .concat(updateFunc)
         .concat(callValidationFunctions)
         .concat(validateFunctions.join("\n"))
-        .concat(updateTemplet.appendErrmsg)
-        .concat(updateTemplet.validateDictidExistFunc)
-        .concat(updateTemplet.isInsertFunc
+        .concat(updateTemplate.appendErrmsg)
+        .concat(updateTemplate.validateDictidExistFunc)
+        .concat(updateTemplate.isInsertFunc
             .replace("{{tableName}}", tableName)
             .replace("{{primaryKey}}", PrimaryKey))
     GM_setClipboard(code, "text")

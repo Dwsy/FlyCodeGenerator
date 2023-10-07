@@ -23,7 +23,7 @@
 
                     <NButton style="margin-right: 15px;" @click="previewCode" tertiary type="info">预览代码</NButton>
 
-                    <NButton @click="" strong secondary type="primary">生成代码</NButton>
+                    <NButton @click="codeGenerator()" strong secondary type="primary">生成代码</NButton>
                 </div>
 
             </n-card>
@@ -40,12 +40,13 @@ import { h, onMounted, ref } from 'vue';
 import { addButton } from '../../util';
 import { useFlyStore } from '../../store/flyStore';
 import { Input, Property } from '../../type/protocol';
-import { Bind, excelExportTemplet } from '../../data/excelExportTemplet';
+import { Bind, excelExportTemplate } from '../../data/excelExportTemplate';
 import CodePreview from '../common/CodePreview.vue'
 import { DataTableColumns, DataTableRowKey, NButton, NInput } from 'naive-ui';
 import { format as prettyFormat } from 'pretty-format'; // ES2015 modules
 import { genQueryModel, generateSql, init } from '../queryGenerator';
 import { GM_setClipboard } from '$';
+import { message } from '../../util/message';
 const showModal = ref()
 const showCode = ref()
 const flyCode = ref('')
@@ -109,7 +110,7 @@ function createColumns({ play }: { play: (row: Bind) => void }): DataTableColumn
 
 
 
-const codeGenerator = (preview: boolean) => {
+const codeGenerator = (preview?: boolean) => {
     console.log(checkedRowKeysRef.value)
     const bindDataArray = rowData.value.filter((data) => checkedRowKeysRef.value.includes(data.propertycode))
 
@@ -124,6 +125,7 @@ const codeGenerator = (preview: boolean) => {
     console.log(code)
     if (!preview) {
         GM_setClipboard(code, "text")
+        message.success()
     }
     //todo 字典以及系统对象自动获取关联查询值
     return code
