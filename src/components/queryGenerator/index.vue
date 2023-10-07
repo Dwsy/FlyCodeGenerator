@@ -1,20 +1,29 @@
 <template>
+    <n-modal v-model:show="showCode" preset="card" title="Flycode" style="width: 900px" :bordered="false">
 
+        <div class="flycode-d">
+            <pre id="flyCode" data-lang="sql" style="height: 690px">{{ fquery }}</pre>
+        </div>
+
+
+    </n-modal>
 </template>
 
-<script setup lang="ts">
-import { onMounted, ref } from 'vue';
+<script setup lang="tsx">
+import { h, nextTick, onMounted, ref } from 'vue';
 import { genQueryModel, generateSql, init } from './index';
 import { useFlyStore } from '../../store/flyStore'
 import { copyToClipboard } from '../../util';
-import { useMessage } from "naive-ui";
+import { NButton, useMessage } from "naive-ui";
+import { render } from 'naive-ui/es/_utils';
+import { getRandomEmojiByUnicode } from '../../type/model/propertyTypeCodeRef';
 
 const message = useMessage()
 const flyStore = useFlyStore()
 
 onMounted(async () => {
     console.log("queryGenerator mounted");
-    
+
     init()
     addGenQueryElement()
     checkSaveProtocol()
@@ -38,7 +47,8 @@ function checkSaveProtocol() {
 
 
 }
-
+const fquery = ref('')
+const showCode = ref()
 function addGenQueryElement() {
     if (document.querySelector("#beSetting > div.main-content > div.tab-operation > button:nth-child(3)") != null) {
         return
@@ -53,9 +63,25 @@ function addGenQueryElement() {
     newButton.appendChild(newButtonIcon)
     newButton.appendChild(newButtonSpan)
     newButton.addEventListener("click", () => {
-        const fquery = generateSql(genQueryModel(flyStore.protocol.output))
-        copyToClipboard(fquery)
-        message.success("FlyQuery生成成功已复制到剪切板。")
+        fquery.value = generateSql(genQueryModel(flyStore.protocol.output))
+        copyToClipboard(fquery.value)
+        message.success(() => {
+            return h(
+                <>
+                    <span>{`FlyQuery生成成功已复制到剪切板。${getRandomEmojiByUnicode()}`}</span>
+                    <NButton type="success" onClick={async () => {
+                        showCode.value = !showCode.value
+                        await nextTick(() => {
+                            // @ts-ignore
+                            monaco.editor.colorizeElement(document.getElementById("flyCode"), {
+                                theme: "vs-dark",
+                                lineNumbers: "on",
+                            });
+                        })
+                    }}>预览代码</NButton>
+                </>
+            )
+        })
     });
     originalButton!.parentNode!.appendChild(newButton);
 

@@ -240,7 +240,7 @@ export function generatorCode
         .concat(updateTemplate.isInsertFunc
             .replace("{{tableName}}", tableName)
             .replace("{{primaryKey}}", PrimaryKey))
-    GM_setClipboard(code, "text")
+
 
 
     return code

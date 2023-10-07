@@ -68,7 +68,9 @@ onMounted(async () => {
   const span = document.createElement("span")
   span.textContent = "L"
   span.addEventListener("click", () => {
+    theme.value = lightTheme
     // @ts-ignore
+
     window.lightTheme(lightThemeInit)
   })
   setTimeout(() => { document.querySelector("#app > div > div.content > div.envi-style").append(span) }, 2000)

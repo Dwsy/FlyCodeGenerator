@@ -1,43 +1,40 @@
 <template>
-    <NModal v-model:show="showModal" preset="card" title="Excel导入" style="width: 1500px" :bordered="false">
-        <n-data-table :columns="columns" :data="mapPair" striped :row-key="rowKey" @update:checked-row-keys="handleCheck"
-            v-if="showTable" :default-checked-row-keys="allSelect" size="small" style="height: 600px" flex-height />
-        <div>
-            <div style="float: right; margin-top: 25px" v-if="showTable">
-                <NButton style="margin-right: 15px" @click="generateCode(true)" tertiary type="info">预览代码</NButton>
+  <NModal v-model:show="showModal" preset="card" title="Excel导入" style="width: 1500px" :bordered="false">
+    <n-data-table :columns="columns" :data="mapPair" striped :row-key="rowKey" @update:checked-row-keys="handleCheck"
+      v-if="showTable" :default-checked-row-keys="allSelect" size="small" style="height: 600px" flex-height />
+    <div>
+      <div style="float: right; margin-top: 25px" v-if="showTable">
+        <NButton style="margin-right: 15px" @click="generateCode(true)" tertiary type="info">预览代码</NButton>
 
-                <NButton @click="generateCode()" strong secondary type="primary">生成代码</NButton>
-            </div>
+        <NButton @click="generateCode()" strong secondary type="primary">生成代码</NButton>
+      </div>
 
-            <div style="float: left; margin-top: 5px; width: 70%; margin-left: 10%">
-                <n-upload :file-list="fileList" title="点击或者拖动文件到该区域来上传" :custom-request="(options: UploadCustomRequestOptions) => {
-                    readExcelFile(options.file.file)
-                }" accept="application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
-                    <n-upload-dragger >
-                        <n-text style="font-size: 16px">
-                            点击或者拖动Excel模版文件到该区域来上传
-                        </n-text>
-                    </n-upload-dragger>
-                </n-upload>
-            </div>
-        </div>
-    </NModal>
+      <div style="float: left; margin-top: 5px; width: 70%; margin-left: 10%">
+        <n-upload :file-list="fileList" title="点击或者拖动文件到该区域来上传" :custom-request="(options: UploadCustomRequestOptions) => {
+          readExcelFile(options.file.file)
+        }" accept="application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+          <n-upload-dragger>
+            <n-text style="font-size: 16px">
+              点击或者拖动Excel模版文件到该区域来上传
+            </n-text>
+          </n-upload-dragger>
+        </n-upload>
+      </div>
+    </div>
+  </NModal>
 
-    <NModal v-model:show="selectSheetModal" preset="card" title="选择表" style="width: 400px">
-        <n-select v-model:value="selectSheet" placeholder="SelectSheet" :options="sheetNames" />
-    </NModal>
+  <NModal v-model:show="selectSheetModal" preset="card" title="选择表" style="width: 400px">
+    <n-select v-model:value="selectSheet" placeholder="SelectSheet" :options="sheetNames" />
+  </NModal>
 
-    <n-modal v-model:show="showCode" preset="card" title="Flycode" style="width: 700px" :bordered="false">
-        <CodePreview :fly-code="flyCode" :showCode="showCode"></CodePreview>
-    </n-modal>
+  <n-modal v-model:show="showCode" preset="card" title="Flycode" style="width: 900px" :bordered="false">
+    <CodePreview :fly-code="flyCode" :showCode="showCode"></CodePreview>
+  </n-modal>
 </template>
 
 <script setup lang="tsx">
 import { h, onMounted, ref } from "vue";
-import {
-  addButton,
-
-} from "../../util";
+import { addButton } from "../../util";
 import { read, utils } from "xlsx";
 import {
   DataTableColumns,
@@ -84,7 +81,7 @@ onMounted(() => {
     "ideicon-share",
     () => {
       console.log("生成Flycode");
-      showModal.value = !showModal.value;
+      showModalFunc();
     },
     1
   );
@@ -103,7 +100,9 @@ const Message = useMessage();
 const showCode = ref();
 const flyCode = ref();
 const sheetLine = ref();
-
+const showModalFunc = () => {
+  showModal.value = !showModal.value;
+};
 function rowKey(row: MapPair) {
   return row.property.propertycode;
 }
@@ -127,7 +126,7 @@ function createColumns(): DataTableColumns<MapPair> {
     {
       title: "数据类型",
       key: "property.propertytypecode",
-      render(row:MapPair, index:number) {
+      render(row: MapPair, index: number) {
         return h(
           <span>
             {`${getPropertyTypeName(
@@ -141,7 +140,7 @@ function createColumns(): DataTableColumns<MapPair> {
     {
       title: "Excel列名",
       key: "column",
-      render(row:MapPair, index:number) {
+      render(row: MapPair, index: number) {
         return h(NInput, {
           value: row.column,
           onUpdateValue(v) {
@@ -159,7 +158,7 @@ function createColumns(): DataTableColumns<MapPair> {
     {
       title: "反查操作符",
       key: "queryOperator",
-      render(row:MapPair, index:number) {
+      render(row: MapPair, index: number) {
         return h(NSelect, {
           value: row.queryOperator,
           options: OperatorSelectOptions.value,
@@ -173,7 +172,7 @@ function createColumns(): DataTableColumns<MapPair> {
     {
       title: "必填",
       key: "property.required",
-      render(row: MapPair, index:number) {
+      render(row: MapPair, index: number) {
         return h(
           <NSwitch v-model:value={row.property.required} size="large">
             {{
@@ -217,7 +216,6 @@ const generateCode = (previewCode?: boolean) => {
   }
 };
 
-
 watch(selectSheet, async () => {
   console.log(
     "Sheets.value[selectSheet.value]",
@@ -235,13 +233,12 @@ watch(selectSheet, async () => {
 });
 
 const autoMap = async (excelColumnName: string[]) => {
-  const pair  =autoMapFunc(excelColumnName,sheetLine.value)
+  const pair = autoMapFunc(excelColumnName, sheetLine.value);
 
-  allSelect.value=pair.allSelect
+  allSelect.value = pair.allSelect;
   mapPair.value = pair.tempMapPair;
   checkedRowKeysRef.value = allSelect.value;
   showTable.value = true;
-
 };
 
 /**
@@ -249,14 +246,14 @@ const autoMap = async (excelColumnName: string[]) => {
  * @param {File} file - 要读取的 Excel 文件
  */
 function readExcelFile(file: File) {
-    readExcelFileFunc(file).then((data:any) => {
-        console.log(data)
-        console.log("readExcelFileFunc");
-        sheetNames.value=data.sheetNames
-        Sheets.value=data.Sheets
-        Message.success("解析成功");
-        selectSheetModal.value=true
-    });
+  readExcelFileFunc(file).then((data: any) => {
+    console.log(data);
+    console.log("readExcelFileFunc");
+    sheetNames.value = data.sheetNames;
+    Sheets.value = data.Sheets;
+    Message.success("解析成功");
+    selectSheetModal.value = true;
+  });
 }
 </script>
 

@@ -7,21 +7,23 @@ var validateFail = false;
 
 `
 const main = `(function main() {
-    var bo = createBO()
-    validation()
-    reverseQuery(bo)
-
     var isInsert = isInsertFunc()
 
+    var {{boName}} = createBO(isInsert)
+    
+    validation()
 
+    reverseQuery({{boName}})
 
-    if (isInsert) {
-        insert()
-    } else {
-        update()
+    if(validateFail) {
+        throw new ERROR(errMsg)
     }
 
-
+    if(isInsert) {
+        insert({{boName}})
+    } else {
+        update({{boName}})
+    }
 })()
 
 `
@@ -32,11 +34,13 @@ const xlsconf = `var _xlsconf = {
     // true表示顺序导入， false表示不顺序导入（默认）
     "isOrderExtract": "true"
 };
+
 `
 
 const paramobj = `var _paramobj = {
     "_dupstrategy": "1" //重复行导入策略： 1：覆盖；2：追加；3：忽略
 };
+
 `
 
 const dataBind = `var _bind_{{tableName}} = {{bindMap}}
@@ -48,7 +52,23 @@ function createBO(isInsert){
     if (isInsert)
     {{setValueCode}}
     return BO
-}`
+}
+
+`
+
+const insert = `function insert(bo) {
+    //{{CustomUpdateCode}}
+    DB.insert(bo);
+}
+
+`
+
+const update = `function update(bo) {
+    //{{CustomUpdateCode}}
+    DB.update(bo);
+}
+
+`
 
 
 const validationFunc = `function validation{{column}}(data) {
@@ -137,10 +157,8 @@ const isInsertFunc = `
  * @returns {boolean}
  */
 function isInsertFunc() {
-    var isInsert = false
-    if (String.isBlank(IN.{{tableName}}.{{primaryKey}})) {
-        isInsert = true
-    }
+    var isInsert = true
+    // 自己写 嘿嘿
     return isInsert
 }
 `
@@ -175,5 +193,8 @@ export const excelImportTemplate = {
     isInsertFunc,
     requiredCode,
     transferAddress,
+    createBo,
+    insert,
+    update
 
 }

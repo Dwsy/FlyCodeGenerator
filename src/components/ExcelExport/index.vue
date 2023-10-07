@@ -28,7 +28,7 @@
 
             </n-card>
         </n-modal>
-        <n-modal v-model:show="showCode" preset="card" title="Flycode" style="width: 700px" :bordered="false">
+        <n-modal v-model:show="showCode" preset="card" title="Flycode" style="width: 900px" :bordered="false">
             <CodePreview :fly-code="flyCode" :showCode="showCode"></CodePreview>
         </n-modal>
 
@@ -47,6 +47,7 @@ import { format as prettyFormat } from 'pretty-format'; // ES2015 modules
 import { genQueryModel, generateSql, init } from '../queryGenerator';
 import { GM_setClipboard } from '$';
 import { message } from '../../util/message';
+import { getRandomEmojiByUnicode } from '../../type/model/propertyTypeCodeRef';
 const showModal = ref()
 const showCode = ref()
 const flyCode = ref('')
@@ -62,7 +63,7 @@ const columns = createColumns({
 onMounted(() => {
     addButton(null, "生成Flycode", "ideicon-share", () => {
         console.log("生成Flycode");
-        showModal.value = true
+        showModalFunc()
     }, 1)
 
     rowData.value = flyStore.protocol.output[0].properties
@@ -75,6 +76,11 @@ onMounted(() => {
         })
 
 })
+
+
+const showModalFunc = () => {
+    showModal.value = !showModal.value
+}
 function rowKey(row: Bind) {
     return row.propertycode
 }
@@ -116,7 +122,7 @@ const codeGenerator = (preview?: boolean) => {
 
 
 
-    let code = `var _xlscolBind = ${JSON.stringify(bindDataArray)}\n`
+    let code = `var _xlscolBind = ${JSON.stringify(bindDataArray, null, 4)}\n`
     init()
     const fquery = generateSql(genQueryModel(flyStore.protocol.output))
     code = code.concat(`var temp = ${fquery}`)
@@ -125,7 +131,8 @@ const codeGenerator = (preview?: boolean) => {
     console.log(code)
     if (!preview) {
         GM_setClipboard(code, "text")
-        message.success()
+        message.success("代码生成成功" + getRandomEmojiByUnicode())
+        showModal.value = !showModal.value
     }
     //todo 字典以及系统对象自动获取关联查询值
     return code

@@ -1,13 +1,13 @@
-import {RowKey} from "naive-ui/es/data-table/src/interface";
-import {useFlyStore} from "../../store/flyStore";
-import {PropertyTypeCode} from "../../type/model/propertyTypeCodeRef";
-import {Operator} from "../../type/model/queryModel";
-import {Property} from "../../type/protocol";
-import {getPrimaryKey, levenshteinDistance, toCamelCase} from "../../util";
-import {read} from "xlsx";
-import {excelExportTemplate} from "../../data/excelExportTemplate";
-import {excelImportTemplate} from "../../data/excelImportTemplate";
-import {message} from "../../util/message";
+import { RowKey } from "naive-ui/es/data-table/src/interface";
+import { useFlyStore } from "../../store/flyStore";
+import { PropertyTypeCode } from "../../type/model/propertyTypeCodeRef";
+import { Operator } from "../../type/model/queryModel";
+import { Property } from "../../type/protocol";
+import { getPrimaryKey, levenshteinDistance, toCamelCase } from "../../util";
+import { read } from "xlsx";
+import { excelExportTemplate } from "../../data/excelExportTemplate";
+import { excelImportTemplate } from "../../data/excelImportTemplate";
+import { message } from "../../util/message";
 
 type MapPair = {
     field: string;
@@ -26,7 +26,13 @@ export const generateCodeFunc = (mapPair: MapPair[], checkedRowKeys: RowKey[]) =
         message.error("请先配置输出协议");
         return;
     }
-    code = code.concat(templet.main);
+    code = code.concat(templet.main.replaceAll("{{boName}}", `${tableName}_bo`));
+
+    code = code.concat(templet.isInsertFunc);
+    code = code.concat(templet.createBo
+        .replace("{{setValueCode}}", ``)
+        .replaceAll("{{tableName}}", tableName));
+
     code = code.concat(templet.xlsconf);
     code = code.concat(templet.paramobj);
     let dataBind = templet.dataBind.replace(
@@ -199,9 +205,9 @@ export const generateCodeFunc = (mapPair: MapPair[], checkedRowKeys: RowKey[]) =
                 case PropertyTypeCode.SortOrder:
                     break;
                 default:
-                    callValidation.replace("{{requiredCode}}", ``)
+                    callValidation = callValidation.replace("{{requiredCode}}", ``)
             }
-            callValidation.replace("{{requiredCode}}", ``)
+            callValidation = callValidation.replace("{{requiredCode}}", ``)
             ValidationFuncs.push(callValidation)
             callValidationFuncs.push(`validation${toCamelCase(pair.field)}(IN.${tableName}.${pair.field})`)
         }
@@ -226,8 +232,6 @@ export const generateCodeFunc = (mapPair: MapPair[], checkedRowKeys: RowKey[]) =
 
     console.log(getBusinessObjectIdByValueArray);
 
-
-
     code = code.concat(templet.callValidation
         .replace("{{tableName}}", tableName)
         .replace("{{callFunctions}}", callValidationFuncs.join("\n    ")));
@@ -243,7 +247,7 @@ export const generateCodeFunc = (mapPair: MapPair[], checkedRowKeys: RowKey[]) =
     code = code.concat(getBusinessObjectIdByValueArray.join("\n"));
 
 
-    code = code.concat(templet.isInsertFunc);
+
     code = code.concat(templet.appendErrmsg);
 
 
@@ -345,9 +349,9 @@ export function readExcelFileFunc(file: File) {
 
         reader.onload = (event: any) => {
             const data = new Uint8Array(event.target.result);
-            const workbook = read(data, {type: "array"});
+            const workbook = read(data, { type: "array" });
             const sheetNames = workbook.SheetNames.map((sheetName) => {
-                return {label: sheetName, value: sheetName};
+                return { label: sheetName, value: sheetName };
             });
             resolve({
                 sheetNames,

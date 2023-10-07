@@ -97,7 +97,7 @@
 
             </n-card>
         </n-modal>
-        <n-modal v-model:show="showCode" preset="card" title="Flycode" style="width: 700px" :bordered="false">
+        <n-modal v-model:show="showCode" preset="card" title="Flycode" style="width: 900px" :bordered="false">
 
             <div class="flycode-d">
                 <pre id="flyCode" data-lang="javascript" style="height: 690px">{{ flycode }}</pre>
@@ -121,7 +121,6 @@ import { watch } from "vue";
 import { getPropertyTypeEmoji, getRandomEmojiByUnicode, getRandomEmoji } from "../../type/model/propertyTypeCodeRef";
 import { Input, Property } from "../../type/protocol";
 import { generatorCode } from "./index";
-import { VValidation } from "vuetify/lib/components/index.mjs";
 
 const flyStore = useFlyStore()
 const showModal = ref(false)
@@ -148,14 +147,16 @@ onMounted(() => {
     })
     vCount.value += tempSum
     addButton(null, "生成Flycode", "ideicon-share", () => {
-        showModal.value = true
+        showModalFunc()
         console.log("生成Flycode");
     }, 1)
 })
 
 
 
-
+const showModalFunc = () => {
+    showModal.value = !showModal.value
+}
 
 
 watch(showModal, async () => {
@@ -168,13 +169,10 @@ watch(showModal, async () => {
     });
 });
 
-function CodeGeneratorConfig() {
-
-}
 
 const gen = () => {
-    generatorCode(enableValidateDictId.value, enableValidateBusinessObjectId.value)
-
+    const code = generatorCode(enableValidateDictId.value, enableValidateBusinessObjectId.value)
+    GM_setClipboard(code, "text")
     message.success("生成成功!" + getRandomEmojiByUnicode())
     showModal.value = false
 }
