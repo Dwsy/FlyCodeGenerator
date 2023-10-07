@@ -7,9 +7,13 @@ var validateFail = false;
 
 `
 const main = `(function main() {
+    var bo = createBO()
     validation()
+    reverseQuery(bo)
 
     var isInsert = isInsertFunc()
+
+
 
     if (isInsert) {
         insert()
@@ -38,7 +42,28 @@ const paramobj = `var _paramobj = {
 const dataBind = `var _bind_{{tableName}} = {{bindMap}}
 `
 
-const callValidation = `function validation() {
+const createBo = `
+function createBO(isInsert){
+    var {{tableName}} = BO.new("{{tableName}}")
+    if (isInsert)
+    {{setValueCode}}
+    return BO
+}`
+
+
+const validationFunc = `function validation{{column}}(data) {
+    if (String.isBlank(data)) {
+        appendErrmsg("({{text}})：不能为空")
+    }
+    {{requiredCode}}
+    if (validateFail) {
+        throw new ERROR(errMsg);
+    }
+}
+
+`
+
+const callValidation = `function validation({{tableName}}_bo) {
     {{callFunctions}}
     if (validateFail) {
         throw new ERROR(errMsg);
@@ -47,7 +72,8 @@ const callValidation = `function validation() {
 
 `
 
-const callReverseQuery = `function validation() {
+
+const callReverseQuery = `function reverseQuery({{tableName}}_bo) {
     {{callFunctions}}
     if (validateFail) {
         throw new ERROR(errMsg);
@@ -61,8 +87,7 @@ const getDictIdByDicvalue = `/**
 * @param {string} dicvalue - 字典值
 * @returns {number} {{dictTableName}} 的 dictionaryid
 */
-function get{{CamelTableName}}DictIdByDicvalue(dicvalue) {
-    {{required}}
+function get{{CamelTableName}}DictIdByDicvalue(dicvalue,{{tableName}}_bo) {
     var temp = select dictionaryid from {{dictTableName}} where dicvalue = { dicvalue } NORULE;
     if (temp.length != 0) {
         return temp[0].dictionaryid
@@ -73,20 +98,17 @@ function get{{CamelTableName}}DictIdByDicvalue(dicvalue) {
 
 `
 
-const requiredDictCode = `if (String.isBlank(dicvalue)) {
-        appendErrmsg("({{dictTableZhName}})：不能为空")
+const requiredCode = `if (String.isBlank(dicvalue)) {
+        appendErrmsg("({{text}})：不能为空")
     }`
 
-const requiredBusinessObjectValueCode = `if (String.isBlank({{columnName}})) {
-        appendErrmsg("({{BusinessObjectTableZhName}})：不能为空")
-    }`
 
 const getBusinessObjectIdByValue = `/**
 * 根据 {{columnName}} 获取 {{tableName}} 的 {{primaryKey}}
 * @param {string} - {{tableName}} 的 {{columnName}} 的值
 * @returns {number} {{tableName}} 的 {{primaryKey}}
 */
-function get{{CamelTableName}}IdBy{{CamelColumnName}}({{columnName}}) {
+function get{{CamelTableName}}IdBy{{CamelColumnName}}({{columnName}},{{tableName}}_bo) {
     {{required}}
     var temp = select {{primaryKey}} from {{tableName}} where {{columnName}} = { {{columnName}} } NORULE;
     if (temp.length != 0) {
@@ -123,6 +145,20 @@ function isInsertFunc() {
 }
 `
 
+const transferAddress = `
+function transferAddressBy{{CamelCaseColumnName}}(addr,fieldName) {
+    if (String.isBlank(addr)) {
+        appendErrmsg(fieldName + "不为空")
+    }
+    var transferAddress = MAPUTIL.transferAddress(addr, true)
+    if (transferAddress.latitude == null) {
+        appendErrmsg("地址转换失败请重新输入")
+    } else {
+        return JSON.stringify(transferAddress);
+    }
+}
+`
+
 
 export const excelImportTemplet = {
     head,
@@ -130,11 +166,14 @@ export const excelImportTemplet = {
     xlsconf,
     paramobj,
     dataBind,
-    callValidation,
+    validationFunc,
+    callReverseQuery,
     getBusinessObjectIdByValue,
     getDictIdByDicvalue,
+    callValidation,
     appendErrmsg,
     isInsertFunc,
-    requiredDictCode,
-    requiredBusinessObjectValueCode
+    requiredCode,
+    transferAddress,
+
 }
