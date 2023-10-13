@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "mergedts": "cd ./src/flycodeDts/ && node merge.js"
   },
   "dependencies": {
     "axios": "^1.5.1",

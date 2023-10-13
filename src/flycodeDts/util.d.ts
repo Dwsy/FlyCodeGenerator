@@ -1,12 +1,12 @@
 // 3.1.5. 工具库
-declare namespace FLY {
+declare class FLY {
     /**
      * 3.1.5.1. 打印日志
      * 打印日志仅用于 IDE 调试 Flycode 使用，可在 IDE 输出调试日志。
      * @param message 日志信息
      */
 
-    function log(message: string): void;
+    static log(message: string): void;
 
 
     /**
@@ -15,7 +15,7 @@ declare namespace FLY {
      * @returns 全局唯一的长整数数值
      */
 
-    function genId(): number;
+    static genId(): number;
 
 
     /**
@@ -25,7 +25,7 @@ declare namespace FLY {
      * @returns 自增序列的最后一个值
      */
 
-    function nextval(key: string): number;
+    static nextval(key: string): number;
 
 
     /**
@@ -36,7 +36,7 @@ declare namespace FLY {
      * @returns 地址转换结果对象，包括状态、描述和经纬度
      */
 
-    function geocode(address: string): { state: string; des: string; location: string };
+    static geocode(address: string): { state: string; des: string; location: string };
 
 
     /**
@@ -46,7 +46,7 @@ declare namespace FLY {
      * @returns 去除空格后的对象
      */
 
-    function trimObjAttrValue(obj: Record<string, string>): Record<string, string>;
+    static trimObjAttrValue(obj: Record<string, string>): Record<string, string>;
 
 
     /**
@@ -58,7 +58,7 @@ declare namespace FLY {
      * @returns 截取后的字符串
      */
 
-    function substringLastAt(str: string, separator: string, fromEnd: number): string;
+    static substringLastAt(str: string, separator: string, fromEnd: number): string;
 
 
     /**
@@ -67,7 +67,7 @@ declare namespace FLY {
      * @returns 是否为空
      */
 
-    function isBlank(str: string): boolean;
+    static isBlank(str: string): boolean;
 
 
     /**
@@ -78,7 +78,7 @@ declare namespace FLY {
      * @returns 保留小数后的数值
      */
 
-    function toRoundDecimal(num: number, precision: number): number;
+    static toRoundDecimal(num: number, precision: number): number;
 
 
     /**
@@ -88,7 +88,7 @@ declare namespace FLY {
      * @returns 保留小数后的数值
      */
 
-    function toFloorDecimal(num: number, precision: number): number;
+    static toFloorDecimal(num: number, precision: number): number;
 
 
     /**
@@ -99,7 +99,7 @@ declare namespace FLY {
      * @returns 字典Key
      */
 
-    function getDicKeyByCode(objectName: string, code: string): string;
+    static getDicKeyByCode(objectName: string, code: string): string;
 }
 
 /**
@@ -109,7 +109,7 @@ declare namespace FLY {
  * @param operationType 操作类型
  * @param logMessage 操作日志信息
  */
-declare namespace LOG {
-    function recordLog(moduleName: string, operationType: string, logMessage: string): void;
+declare class LOG {
+    static recordLog(moduleName: string, operationType: string, logMessage: string): void;
 
 }

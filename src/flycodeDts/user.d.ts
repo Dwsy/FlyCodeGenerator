@@ -3,7 +3,7 @@
 /**
  * SESSION 对象为 flycode 内置对象，可获取到当前登录人的一些信息。
  */
-declare namespace SESSION {
+declare class SESSION {
     /**
      * 组织编码
      */
@@ -75,65 +75,65 @@ declare namespace SESSION {
     const subpdcodes: string[];
 }
 
-// 以下是 System 对象的补充信息
-declare namespace System {
-    /**
-     * 获取用户信息
-     */
-    function user(): {
-        accountCode: string;
-        userinfoName: string;
-        userinfoID: string;
-        tenantName: string;
-        tenantCode: string;
-        orgName: string;
-        orgCode: string;
-        positionID: string;
-        positionName: string;
-        mbCode: string;
-        refpositionID: string;
-        appCode: string;
-        appCodes: string[];
-        categoryCode: string;
-        subpdCodes: string[];
-    };
+// // 以下是 System 对象的补充信息 前后端flycode会混
+// declare class System {
+//     // /**
+//     //  * 获取用户信息
+//     //  */
+//     // static user(): {
+//     //     accountCode: string;
+//     //     userinfoName: string;
+//     //     userinfoID: string;
+//     //     tenantName: string;
+//     //     tenantCode: string;
+//     //     orgName: string;
+//     //     orgCode: string;
+//     //     positionID: string;
+//     //     positionName: string;
+//     //     mbCode: string;
+//     //     refpositionID: string;
+//     //     appCode: string;
+//     //     appCodes: string[];
+//     //     categoryCode: string;
+//     //     subpdCodes: string[];
+//     // };
 
-    /**
-     * 获取当前用户登录信息
-     */
-    function context(): {
-        isOffline: boolean;
-        token: string;
-        httpAddress: string;
-        versionName: string;
-        versionCode: string;
-    };
+//     // /**
+//     //  * 获取当前用户登录信息
+//     //  */
+//     // static context(): {
+//     //     isOffline: boolean;
+//     //     token: string;
+//     //     httpAddress: string;
+//     //     versionName: string;
+//     //     versionCode: string;
+//     // };
 
-    /**
-     * 获取一个的 uniqueid
-     */
-    function uniqueid(): string;
+//     /**
+//      * 获取一个的 uniqueid
+//      */
+//     static uniqueid(): string;
 
-    /**
-     * 获取服务端当前时间
-     */
-    function date(): Date;
+//     /**
+//      * 获取服务端当前时间
+//      */
+//     static date(): Date;
 
-    /**
-     * 获取功能权限
-     */
-    function functionCodes(): string[];
+//     /**
+//      * 获取功能权限
+//      */
+//     static staticCodes(): string[];
 
-    /**
-     * 功能权限检测
-     * @param codes 功能权限编码列表
-     */
-    function functionCheck(codes: string[]): boolean;
+//     /**
+//      * 功能权限检测
+//      * @param codes 功能权限编码列表
+//      */
+//     static staticCheck(codes: string[]): boolean;
 
-    /**
-     * 控制日志输出
-     * @param message 日志消息
-     */
-    function consloe(message: string): void;
-}
+//     /**
+//      * 控制日志输出
+//      * @param message 日志消息
+//      */
+//     static consloe(message: string): void;
+// }
 

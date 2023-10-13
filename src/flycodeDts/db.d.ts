@@ -1,16 +1,16 @@
 // 3.1.2. DB 数据库操作
-declare namespace DB {
+declare class DB {
     /**
      * 将业务对象或数组添加到业务数据库。如果业务对象类型为数组，则会批量操作。
      * @param obj 业务对象或数组
      */
-    function insert(obj: any | any[]): void;
+    static insert(obj: any | any[]): void;
 
     /**
      * 将业务对象或数组更新到业务数据库。如果业务对象类型为数组，则会批量操作。
      * @param obj 业务对象或数组
      */
-    function update(obj: any | any[]): void;
+    static update(obj: any | any[]): void;
 
     /**
      * 根据传入的字段作为条件更新业务对象。如果业务对象类型为数组，则会批量操作。
@@ -18,14 +18,14 @@ declare namespace DB {
      * @param obj 业务对象或数组
      * @param fieldsAndConditions 字段和条件的键值对，例如："业务对象.字段A" 或 "业务对象.字段B:yyyy-MM-dd"
      */
-    function update(obj: any | any[], ...fieldsAndConditions: string[]): void;
+    static update(obj: any | any[], ...fieldsAndConditions: string[]): void;
 
     /**
      * 根据业务对象的ID，从业务数据库中移除数据（逻辑删除）。
      * 如果业务对象类型为数组，则会批量操作。
      * @param obj 业务对象或数组
      */
-    function delete1(obj: any | any[]): void;
+    static delete(obj: any | any[]): void;
 
     /**
      * 根据ID唯一性规则自动识别业务对象的新增和更新到业务数据库，不做批量处理。
@@ -33,7 +33,7 @@ declare namespace DB {
      * @param obj 业务对象
      * @param fieldsAndConditions 字段和条件的键值对，例如："业务对象.字段A" 或 "业务对象.字段B:yyyy-MM-dd"
      */
-    function save(obj: any, ...fieldsAndConditions: string[]): void;
+    static save(obj: any, ...fieldsAndConditions: string[]): void;
 
     /**
      * 根据删除条件对象进行物理删除，然后插入业务对象/数组。
@@ -41,12 +41,12 @@ declare namespace DB {
      * @param obj 业务对象或数组
      * @param deleteCondition 删除条件对象
      */
-    function replace(obj: any | any[], deleteCondition: any): void;
+    static replace(obj: any | any[], deleteCondition: any): void;
 
     /**
      * 根据传入的业务对象去寻找依赖它的对象。
      * 返回值格式：{"result": 布尔值, "refBy": "对象英文名", "refName": "对象中文名"}
      * @param obj 业务对象
      */
-    function findObjectRef(obj: any): { result: boolean, refBy: string, refName: string };
+    static findObjectRef(obj: any): { result: boolean, refBy: string, refName: string };
 }
