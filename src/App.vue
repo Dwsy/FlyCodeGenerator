@@ -41,8 +41,10 @@ onMounted(async () => {
   const waitMonaco = setInterval(async () => {
     // @ts-ignore
     if (typeof monaco !== 'undefined') {
-
-
+      if (addDtsEnable) {
+        addTs()
+        console.log("添加DTS", new Date())
+      }
       const button = document.querySelector("#beSetting > div.main-content > div.tab-operation > button:nth-child(2) > i")
       if (button != null) {
         if (codeGeneratorEnable) {
@@ -52,10 +54,6 @@ onMounted(async () => {
           flyStore.appMounted = true
           checkURLChangeThenUpdateProtocol()
           console.log("FlyCodeGenerator初始化.....", new Date())
-        }
-        if (addDtsEnable) {
-          addTs()
-          console.log("添加DTS", new Date())
         }
 
         clearInterval(waitMonaco);

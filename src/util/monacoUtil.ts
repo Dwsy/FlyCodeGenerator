@@ -9,3 +9,11 @@ export function getMonacoModel() {
 }
 
 
+export function getMonacoInit() {
+    // @ts-ignore
+    const Models = monaco?.editor?.getModels()
+    return !!Models
+}
+
+
+
