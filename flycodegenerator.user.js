@@ -32,7 +32,7 @@
     return value;
   };
   var require_main_001 = __commonJS({
-    "main-d17c8bda.js"(exports, module) {
+    "main-f4cb4560.js"(exports, module) {
       let onceCbs = [];
       const paramsMap = /* @__PURE__ */ new WeakMap();
       function flushOnceCallbacks() {
@@ -101981,6 +101981,10 @@ declare type ArrayCtrlGetter = {
             const addDtsEnable2 = _GM_getValue("addDtsEnable", false);
             const waitMonaco = setInterval(async () => {
               if (typeof monaco !== "undefined") {
+                if (addDtsEnable2) {
+                  addTs();
+                  console.log("添加DTS", /* @__PURE__ */ new Date());
+                }
                 const button = document.querySelector("#beSetting > div.main-content > div.tab-operation > button:nth-child(2) > i");
                 if (button != null) {
                   if (codeGeneratorEnable2) {
@@ -101989,10 +101993,6 @@ declare type ArrayCtrlGetter = {
                     flyStore.appMounted = true;
                     checkURLChangeThenUpdateProtocol();
                     console.log("FlyCodeGenerator初始化.....", /* @__PURE__ */ new Date());
-                  }
-                  if (addDtsEnable2) {
-                    addTs();
-                    console.log("添加DTS", /* @__PURE__ */ new Date());
                   }
                   clearInterval(waitMonaco);
                 } else {
