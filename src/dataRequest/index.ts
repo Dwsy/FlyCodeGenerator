@@ -1,31 +1,60 @@
 import axios from "axios";
 
+function getHeader() {
+    // 获取用户 Token 从 sessionStorage 中
+    const userToken = sessionStorage.getItem('userToken');
+    const username = sessionStorage.getItem('chineseName');
+    if (!userToken) {
+        console.error('User token not found in sessionStorage');
+        return;
+    }
+    type tenantType = {
+        tenantcode: string;
+        tenantname: string;
+        productcode: string;
+        productversioncode: string;
+        productseriescode: string;
+        productversionname: string;
+        productname: string;
+        metamodeltype: string;
+        metamodelcode: string;
+        showSedNameTip: boolean;
+        showNameTip: boolean;
+    }
+    const tenant: tenantType = JSON.parse(localStorage.getItem("tenantList")).filter((ten) => {
+        console.log(ten.tenantname)
+        console.log(sessionStorage.getItem("tenantName"))
+        return ten.tenantname == sessionStorage.getItem("tenantName")
+    })[0]
+    let headers = {
+        'idetoken': userToken,
+        'Content-Type': 'application/json',
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36 Edg/117.0.2045.43",
+        "ctcode": 7,
+        "metamodeltype": 2,
+        // "pdcode": '100000000000000000',
+        "pdcode": tenant.productcode,
+        "pscode": tenant.productseriescode,
+        "pvcode": tenant.productversioncode,
+        "req_id": 23,
+        "tecode": tenant.tenantcode,
+        "tenantname": encodeURIComponent(tenant.tenantname),
+        "usercode": localStorage.getItem('userCode'),
+        "userinfoname": encodeURIComponent(username),
+        "username": encodeURIComponent(username),
+
+    }
+    return headers
+}
+
+
 export async function getBizObjectsData() {
     try {
-        // 获取用户 Token 从 sessionStorage 中
-        const userToken = sessionStorage.getItem('userToken');
-        if (!userToken) {
-            console.error('User token not found in sessionStorage');
-            return;
-        }
-        const { data } = await axios.post('http://121.37.206.131:18001/bizserv/biz/getBizObjects', {}, {
-            headers: {
-                'Idetoken': userToken,
-                'Content-Type': 'application/json',
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36 Edg/117.0.2045.43",
-                "ctcode": 7,
-                "metamodeltype": 2,
-                "pdcode": '100000000000000000',
-                "pscode": '829609747450691584',
-                "pvcode": '100000000000000062',
-                "req_id": 23,
-                "tecode": '1113041',
-                "tenantname": "%E5%AE%9E%E6%96%BD1%E7%BB%846.2%E6%B5%8B%E8%AF%95%E7%8E%AF%E5%A2%83",
-                "usercode": '1695985426495574016',
-                "userinfoname": "%E9%82%93%E6%96%87%E5%AE%87",
-                "username": "dengwenyu"
 
-            }
+
+
+        const { data } = await axios.post('http://121.37.206.131:18001/bizserv/biz/getBizObjects', {}, {
+            headers: getHeader()
         })
         return data
         // bizObjects = response.data;
@@ -64,10 +93,7 @@ export async function getProtocol() {
             const { data } = await axios.post('http://121.37.206.131:18001/bizserv/bizmodel/getModelLogic', {
                 "modellogiccode": modellogiccode
             }, {
-                headers: {
-                    'Idetoken': userToken,
-                    'Content-Type': 'application/json'
-                }
+                headers: getHeader()
             })
 
             return data

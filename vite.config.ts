@@ -14,10 +14,13 @@ export default defineConfig({
     monkey({
       entry: 'src/main.ts',
       userscript: {
-        icon: 'https://vitejs.dev/logo.svg',
-        namespace: 'npm/vite-plugin-monkey',
+        icon: 'http://flydoc.dwsy.link/xwlogoblue.png',
+        namespace: 'dwsy/flycodegenerator',
         match: ['http://ide.wxchina.com:9000/*'],
-        "run-at": 'document-start'
+        "run-at": 'document-start',
+        updateURL: "https://github.com/Dwsy/FlyCodeGenerator/blob/main/flycodegenerator.user.js",
+        downloadURL: "https://github.com/Dwsy/FlyCodeGenerator/blob/main/flycodegenerator.user.js",
+        version: "1.0.0"
       },
       build: {
         externalGlobals: {

@@ -20,7 +20,8 @@ import type { GlobalTheme } from 'naive-ui'
 import { useFlyStore } from './store/flyStore';
 import { ActionType } from './type/actionType'
 import { nextTick } from 'vue';
-
+import { GM, GM_getValue } from '$';
+import { addTs } from './flycodeDts'
 
 const theme = ref<GlobalTheme | null>(darkTheme)
 const flyStore = useFlyStore()
@@ -30,26 +31,43 @@ onMounted(async () => {
   console.log('vue--mounted');
 
 
-  await flyStore.init()
+  const codeGeneratorEnable = GM_getValue("codeGeneratorEnable", false)
+  if (codeGeneratorEnable) {
+    await flyStore.init()
+  }
+  const addDtsEnable = GM_getValue("addDtsEnable", false)
+
+
   const waitMonaco = setInterval(async () => {
     // @ts-ignore
     if (typeof monaco !== 'undefined') {
+
+
       const button = document.querySelector("#beSetting > div.main-content > div.tab-operation > button:nth-child(2) > i")
       if (button != null) {
-        console.log(new Date(), "FlyCodeGenerator初始化.....")
-        flyStore.initStatus = true
-        await nextTick()
-        flyStore.appMounted = true
-        checkURLChangeThenUpdateProtocol()
+        if (codeGeneratorEnable) {
+
+          flyStore.initStatus = true
+          await nextTick()
+          flyStore.appMounted = true
+          checkURLChangeThenUpdateProtocol()
+          console.log("FlyCodeGenerator初始化.....", new Date())
+        }
+        if (addDtsEnable) {
+          addTs()
+          console.log("添加DTS", new Date())
+        }
+
         clearInterval(waitMonaco);
       } else {
         console.log("等待领域页面加载。。。");
       }
+
     } else {
       console.log("等待monaco。。。");
-
     }
   }, 1000)
+
   let lightThemeInit = false
   // @ts-ignore
   window.lightTheme = (lightThemeInit: boolean) => {

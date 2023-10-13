@@ -1,0 +1,189 @@
+{
+  "modellogicname": "CRM经销商开户变更销户-客户销户",
+  "execmode": "1",
+  "status": "1",
+  "actiontype": "3",
+  "modelcode": "1706557317752950880",
+  "actioncategory": "1",
+  "usedatarule": "1",
+  "functionname": "",
+  "tenantdbtype": "2",
+  "tenantdbcode": "1674251226201591808",
+  "tenantdbname": "",
+  "operations": [
+    {
+      "templateref": "106",
+      "modellogicstepname": "",
+      "marktype": "2",
+      "modellogiccode": "1705127957636452436",
+      "modellogicstepcode": "1705127957636452435",
+      "seq": 1,
+      "status": "1",
+      "templateparams": {
+        "flycode": "var kbci = IN.kx_basic_customer_information\nvar customerId = IN.ka_kq_channelcustomers.id\n\nvar errmsg = ''\n\n\n\n\nvar bo = BO.new('kx_basic_customer_information')\n\nbo.\n\nbo.id = FLY.genId()\n//单据编号\ndate = new Date(NOW.time()).Format(\"yyyyMMdd\");\nvar fixStr = \"KHSZ\" + date;\nvar seqnumber = FLY.nextval('kx_basic_customer_information');\nif (seqnumber > 9999999999) {\n    throw new ERROR(\"[终端]编码超过最大值！\");\n}\nFLY.log(\"seqnumber\" + seqnumber)\nbo.application_code = fixStr + (\"0000\" + seqnumber).substr(-4);\nbo.application_status = 0//待复审\nbo.customer_closed_id = customerId\n// 1711285700961374208主1711285734461280256子\nbo.customer_type = '1706606391843753984'\n\n\n// else if (t == '1706606391843753984') {\n//     Page.link('1706843367448645731', {\n//         application_type: '1706606391843753984'\n//     }, 'push');\n// }\n// else if (t == '1706606422688665600') {\n//     Page.link('1705139571261575267', {\n//         application_type: '1706606422688665600'\n//     }, 'push');\n// }\n\nDB.insert(kbci)\n// }\n\n/**\n * 校验客户数据的有效性\n *\n * @param {Object} customerData - 包含客户基本信息的对象\n * @param {number} customerData.effective_date - 生效日期的时间戳\n * @param {string} customerData.customer_contact_phone - 客户联系电话\n * @returns {string} - 校验结果信息，如果通过校验返回\\\"数据校验通过\\\"，否则返回相应的错误信息\n */\nfunction validateCustomerData(customerData) {\n    var currentDateTimestamp = new Date().getTime();\n\n    // 校验生效日期是否大于当前日期\n    if (customerData.effective_date <= currentDateTimestamp) {\n        return \"生效日期必须大于当前日期\";\n    }\n\n    // 校验客户联系电话是否为11位电话号码\n    var phonePattern = /^\\\\d{11}$/;\n    if (!phonePattern.test(customerData.customer_contact_phone)) {\n        return \"客户联系电话必须是11位数字\";\n    }\n\n    // 所有校验通过\n    return \"数据校验通过\";\n}\n\n\n"
+      }
+    }
+  ],
+  "modellogiccode": "1705127957636452436",
+  "marktype": "2",
+  "input": [
+    {
+      "name": "ka_kq_channelcustomers",
+      "objectcode": "893288512944738403",
+      "objectname": "渠道客户",
+      "datatype": "0",
+      "marktype": "2",
+      "properties": [
+        {
+          "name": "id",
+          "propertyname": "主键",
+          "propertytypecode": "1",
+          "objectcode": "893288512944738403",
+          "propertycode": "896252769617449059",
+          "marktype": "2"
+        }
+      ]
+    },
+    {
+      "name": "kx_basic_customer_information",
+      "objectcode": "1705047287740371043",
+      "objectname": "客户基本信息",
+      "datatype": "0",
+      "marktype": "2",
+      "properties": [
+        {
+          "name": "application_type",
+          "propertyname": "申请类型",
+          "propertytypecode": "10000000000",
+          "objectcode": "1705047287740371043",
+          "propertycode": "1705047287740371305",
+          "marktype": "2"
+        },
+        {
+          "name": "effective_date",
+          "propertyname": "生效日期",
+          "propertytypecode": "7",
+          "objectcode": "1705047287740371043",
+          "propertycode": "1705047287740371306",
+          "marktype": "2"
+        },
+        {
+          "name": "customer_full_name",
+          "propertyname": "客户全称",
+          "propertytypecode": "3",
+          "objectcode": "1705047287740371043",
+          "propertycode": "1705047287740371308",
+          "marktype": "2"
+        },
+        {
+          "name": "customer_short_name",
+          "propertyname": "客户简称",
+          "propertytypecode": "3",
+          "objectcode": "1705047287740371043",
+          "propertycode": "1705047287740371309",
+          "marktype": "2"
+        },
+        {
+          "name": "customer_contact_person",
+          "propertyname": "客户联系人姓名",
+          "propertytypecode": "3",
+          "objectcode": "1705047287740371043",
+          "propertycode": "1705047287740371311",
+          "marktype": "2"
+        },
+        {
+          "name": "customer_contact_phone",
+          "propertyname": "客户联系电话",
+          "propertytypecode": "3",
+          "objectcode": "1705047287740371043",
+          "propertycode": "1705047287740371312",
+          "marktype": "2"
+        },
+        {
+          "name": "sales_region",
+          "propertyname": "经销区域",
+          "propertytypecode": "3",
+          "objectcode": "1705047287740371043",
+          "propertycode": "1705047287740371313",
+          "marktype": "2"
+        },
+        {
+          "name": "contact_address",
+          "propertyname": "联系地址",
+          "propertytypecode": "17",
+          "objectcode": "1705047287740371043",
+          "propertycode": "1705047287740371317",
+          "marktype": "2"
+        },
+        {
+          "name": "application_department",
+          "propertyname": "申请部门",
+          "propertytypecode": "100000000000",
+          "objectcode": "1705047287740371043",
+          "propertycode": "1705047287740371319",
+          "marktype": "2"
+        },
+        {
+          "name": "attachments",
+          "propertyname": "附件",
+          "propertytypecode": "26",
+          "objectcode": "1705047287740371043",
+          "propertycode": "1705047287740371322",
+          "marktype": "2"
+        },
+        {
+          "name": "cancellation_reason",
+          "propertyname": "销户原因",
+          "propertytypecode": "4",
+          "objectcode": "1705047287740371043",
+          "propertycode": "1705047287740371336",
+          "marktype": "2"
+        },
+        {
+          "name": "change_type",
+          "propertyname": "变更销户类型",
+          "propertytypecode": "6",
+          "objectcode": "1705047287740371043",
+          "propertycode": "1705096907954720864",
+          "marktype": "2"
+        },
+        {
+          "name": "price_type",
+          "propertyname": "价格类型",
+          "propertytypecode": "10000000000",
+          "objectcode": "1705047287740371043",
+          "propertycode": "1706125248463769698",
+          "marktype": "2"
+        },
+        {
+          "name": "applicant",
+          "propertyname": "申请人",
+          "propertytypecode": "100000000000",
+          "objectcode": "1705047287740371043",
+          "propertycode": "1706135703106228310",
+          "marktype": "2"
+        },
+        {
+          "name": "remark",
+          "propertyname": "备注",
+          "propertytypecode": "3",
+          "objectcode": "1705047287740371043",
+          "propertycode": "1706861712403206236",
+          "marktype": "2"
+        },
+        {
+          "name": "customer_closed_id",
+          "propertyname": "销户id",
+          "propertytypecode": "100000000000",
+          "objectcode": "1705047287740371043",
+          "propertycode": "1711267523879637090",
+          "marktype": "2"
+        }
+      ]
+    }
+  ],
+  "output": [],
+  "logicscript": "",
+  "uilogicscript": "",
+  "message": null
+}

@@ -16,7 +16,6 @@ onMounted(async () => {
         // @ts-ignore
         monaco.editor.colorizeElement(document.getElementById("flyCode"), {
             theme: "vs-dark",
-            lineNumbers: "on",
         });
     })
     // @ts-ignore

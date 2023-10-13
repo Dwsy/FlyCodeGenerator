@@ -30,6 +30,8 @@
   <n-modal v-model:show="showCode" preset="card" title="Flycode" style="width: 900px" :bordered="false">
     <CodePreview :fly-code="flyCode" :showCode="showCode"></CodePreview>
   </n-modal>
+  <SaveProtocolWatch>
+  </SaveProtocolWatch>
 </template>
 
 <script setup lang="tsx">
@@ -61,6 +63,7 @@ import { message } from "../../util/message";
 import { GM, GM_setClipboard } from "$";
 import CodePreview from "../common/CodePreview.vue";
 import { autoMapFunc, generateCodeFunc, readExcelFileFunc } from ".";
+import SaveProtocolWatch from "../saveProtocolWatch.vue";
 const flyStore = useFlyStore();
 const OperatorSelectOptions = ref([]);
 type MapPair = {

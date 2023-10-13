@@ -105,6 +105,8 @@
 
 
         </n-modal>
+        <SaveProtocolWatch>
+        </SaveProtocolWatch>
     </div>
 </template>
 
@@ -121,6 +123,7 @@ import { watch } from "vue";
 import { getPropertyTypeEmoji, getRandomEmojiByUnicode, getRandomEmoji } from "../../type/model/propertyTypeCodeRef";
 import { Input, Property } from "../../type/protocol";
 import { generatorCode } from "./index";
+import SaveProtocolWatch from "../saveProtocolWatch.vue";
 
 const flyStore = useFlyStore()
 const showModal = ref(false)
@@ -187,7 +190,6 @@ const previewCode = async () => {
     // @ts-ignore
     monaco.editor.colorizeElement(document.getElementById("flyCode"), {
         theme: "vs-dark",
-        lineNumbers: "on",
     });
 
 

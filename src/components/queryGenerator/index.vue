@@ -7,6 +7,9 @@
 
 
     </n-modal>
+    <save-protocol-watch>
+
+    </save-protocol-watch>
 </template>
 
 <script setup lang="tsx">
@@ -17,6 +20,7 @@ import { copyToClipboard } from '../../util';
 import { NButton, useMessage } from "naive-ui";
 import { render } from 'naive-ui/es/_utils';
 import { getRandomEmojiByUnicode } from '../../type/model/propertyTypeCodeRef';
+import SaveProtocolWatch from '../saveProtocolWatch.vue';
 
 const message = useMessage()
 const flyStore = useFlyStore()
@@ -26,27 +30,8 @@ onMounted(async () => {
 
     init()
     addGenQueryElement()
-    checkSaveProtocol()
 })
 
-
-function checkSaveProtocol() {
-    // 监听元素的点击事件
-    const button = document.querySelector("#beSetting > div.main-content > div.tab-footer > button.ant-btn.ant-btn-primary");
-    button.addEventListener("click", async () => {
-        console.log("click")
-        await flyStore.updateProtocol()
-    });
-    // 监听 Ctrl + S 键盘事件
-    document.addEventListener("keydown", async (event) => {
-        if (event.ctrlKey && event.key === "s") {
-            await flyStore.updateProtocol()
-            event.preventDefault();
-        }
-    });
-
-
-}
 const fquery = ref('')
 const showCode = ref()
 function addGenQueryElement() {
@@ -75,7 +60,6 @@ function addGenQueryElement() {
                             // @ts-ignore
                             monaco.editor.colorizeElement(document.getElementById("flyCode"), {
                                 theme: "vs-dark",
-                                lineNumbers: "on",
                             });
                         })
                     }}>预览代码</NButton>
