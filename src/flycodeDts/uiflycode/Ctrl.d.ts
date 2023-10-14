@@ -15,7 +15,7 @@ declare class Ctrl {
     floatValue: number;
 
     /**
-     * 控件的显示或隐藏状态，设置后需要手动刷新界面。
+     * 控件的显示或隐藏状态
      */
     hidden: boolean;
 
@@ -46,10 +46,10 @@ declare class Ctrl {
      * @param newValue - 属性对应的值
      * @param groupIndex - 指定属性所在分组的序号（仅适用于分组型控件）
      * @example
-     * // 设置文本控件前景色为内置颜色 red
+     *  设置文本控件前景色为内置颜色 red
      * textCtrl.setProperty('color', Color.red);
      *
-     * // 设置文本控件文字的排版属性
+     *  设置文本控件文字的排版属性
      * textCtrl.setProperty('textAlign', 'center');
      */
     setProperty(propertyName: string, newValue: any, groupIndex?: number): void;
@@ -61,7 +61,7 @@ declare class Ctrl {
      * @param groupIndex - 属性所在分组的序号
      * @returns 属性的值
      * @example
-     * // 获取文本控件的前景色
+     *  获取文本控件的前景色
      * var color = textCtrl.getProperty('color');
      */
     getProperty(propertyName: string, groupIndex?: number): any;
@@ -72,13 +72,13 @@ declare class Ctrl {
      * @param value - 控件的值
      * @param setter - 控件值设置规则
      * @example
-     * // 设置定位控件 address 属性的值
+     *  设置定位控件 address 属性的值
      * var address = '广州天河';
      * var location1Ctrl = Page.getCtrl('定位控件1');
      * var setter = CtrlValueSetter('address');
      * location1Ctrl.setValue(address, setter);
      *
-     * // 直接把 value 赋给控件，由控件自行处理
+     *  直接把 value 赋给控件，由控件自行处理
      * var position = {'lat': 23.242342, 'lng': 133.556.433231, 'address': '中国'};
      * var location2Ctrl = Page.getCtrl('定位控件2');
      * location2Ctrl.setValue(position);
@@ -91,12 +91,12 @@ declare class Ctrl {
      * @param getter - 控件值获取规则
      * @returns 控件的值
      * @example
-     * // 获取定位控件 address 属性的值
+     *  获取定位控件 address 属性的值
      * var location1Ctrl = Page.getCtrl('定位控件1');
      * var getter = CtrlValueGetter('address');
      * var address = location1Ctrl.getValue(getter);
      *
-     * // 不指定取值规则，返回值由控件决定
+     *  不指定取值规则，返回值由控件决定
      * var location2Ctrl = Page.getCtrl('定位控件2');
      * var position = location2Ctrl.getValue();
      */
@@ -108,9 +108,9 @@ declare class Ctrl {
      * @param msg - 控件上展现的校验结果提示语
      * @example
      * var ctrl = Page.getCtrl('控件');
-     * // 复杂校验
+     *  复杂校验
      * var result = ComplexValidateValue(ctrl.value);
-     * // 反馈校验结果
+     *  反馈校验结果
      * if (!result.isLegal) {
      *     ctrl.setErrorMsg(result.errMsg);
      * }
@@ -121,9 +121,9 @@ declare class Ctrl {
      * 清除控件的错误信息。
      * @example
      * var ctrl = Page.getCtrl('控件');
-     * // 复杂校验
+     *  复杂校验
      * var result = ComplexValidateValue(ctrl.value);
-     * // 反馈校验结果
+     *  反馈校验结果
      * if (result.isLegal) {
      *     ctrl.clearErrorMsg();
      * }
@@ -136,7 +136,7 @@ declare class Ctrl {
      * @returns 控件校验结果
      * @example
      * var ctrl = Page.getCtrl('控件');
-     * // 触发控件的校验
+     *  触发控件的校验
      * var isLegal = ctrl.validate();
      */
     validate(): boolean;
@@ -146,7 +146,7 @@ declare class Ctrl {
      *
      * @param triggerName - 控件的EventTrigger
      * @example
-     * // 触发列表配置协议中的 onload 事件
+     *  触发列表配置协议中的 onload 事件
      * Page.getCtrl('列表').triggerEvent('onload');
      */
     triggerEvent(triggerName: string): void;
@@ -156,7 +156,7 @@ declare class Ctrl {
      *
      * @param color - 控件标题字体颜色
      * @example
-     * // 改变文本控件标题字体颜色（编辑状态/查看状态/只读状态）
+     *  改变文本控件标题字体颜色（编辑状态/查看状态/只读状态）
      * var color = Page.getCtrl('文本控件').setTitleColor('#FFFFFF');
      */
     setTitleColor(color: string): void;

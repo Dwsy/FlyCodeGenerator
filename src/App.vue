@@ -22,28 +22,27 @@ import { ActionType } from './type/actionType'
 import { nextTick } from 'vue';
 import { GM, GM_getValue } from '$';
 import { addTs } from './flycodeDts'
+import { generateEntityDtsByProtocol } from './flycodeDts/EntityDts/testTemplate';
 
 const theme = ref<GlobalTheme | null>(darkTheme)
 const flyStore = useFlyStore()
 
 let previousURL = window.location.href;
 onMounted(async () => {
-  console.log('vue--mounted');
-
-
   const codeGeneratorEnable = GM_getValue("codeGeneratorEnable", false)
-  if (codeGeneratorEnable) {
-    await flyStore.init()
-  }
   const addDtsEnable = GM_getValue("addDtsEnable", false)
 
+  await flyStore.init()
+
+  console.log(flyStore.protocol)
 
   const waitMonaco = setInterval(async () => {
     // @ts-ignore
     if (typeof monaco !== 'undefined') {
       if (addDtsEnable) {
-        addTs()
+        addTs(flyStore.protocol)
         console.log("添加DTS", new Date())
+
       }
       const button = document.querySelector("#beSetting > div.main-content > div.tab-operation > button:nth-child(2) > i")
       if (button != null) {

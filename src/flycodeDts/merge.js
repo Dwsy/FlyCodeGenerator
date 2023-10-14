@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as glob from "glob";
 
-const dtsFiles = glob.sync("*.d.ts");
+const dtsFiles = glob.sync(["./flycode/*.d.ts", "./uiflycode/*.d.ts"]);
 const dtsContent = dtsFiles
   .map((file) => fs.readFileSync(file, "utf8"))
   .join("\n");

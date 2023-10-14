@@ -1,9 +1,13 @@
-export function addTs() {
+import { useFlyStore } from "../store/flyStore";
+import { Protocol } from "../type/protocol";
+import { generateInAndOutEntityDtsByProtocol } from "./EntityDts/testTemplate";
 
+export function addTs(protocol: Protocol) {
+    const entityDts = generateInAndOutEntityDtsByProtocol(protocol)
+    console.log(entityDts)
     // @ts-ignore
-    monaco.languages.typescript.javascriptDefaults.addExtraLib(dts);
+    monaco.languages.typescript.javascriptDefaults.addExtraLib(dts + entityDts);
     console.log("添加DTS")
-
 }
 
 const dts = `// 3.1.5. 工具库
@@ -199,7 +203,7 @@ declare class SESSION {
     const subpdcodes: string[];
 }
 
-// // 以下是 System 对象的补充信息
+// // 以下是 System 对象的补充信息 前后端flycode会混
 // declare class System {
 //     // /**
 //     //  * 获取用户信息
@@ -262,6 +266,207 @@ declare class SESSION {
 // }
 
 
+// 3.1.2. DB 数据库操作
+declare class DB {
+    /**
+     * 将业务对象或数组添加到业务数据库。如果业务对象类型为数组，则会批量操作。
+     * @param obj 业务对象或数组
+     */
+    static insert(obj: any | any[]): void;
+
+    /**
+     * 将业务对象或数组更新到业务数据库。如果业务对象类型为数组，则会批量操作。
+     * @param obj 业务对象或数组
+     */
+    static update(obj: any | any[]): void;
+
+    /**
+     * 根据传入的字段作为条件更新业务对象。如果业务对象类型为数组，则会批量操作。
+     * 使用“:”分割加入时间格式表达式来格式化时间条件字段。
+     * @param obj 业务对象或数组
+     * @param fieldsAndConditions 字段和条件的键值对，例如："业务对象.字段A" 或 "业务对象.字段B:yyyy-MM-dd"
+     */
+    static update(obj: any | any[], ...fieldsAndConditions: string[]): void;
+
+    /**
+     * 根据业务对象的ID，从业务数据库中移除数据（逻辑删除）。
+     * 如果业务对象类型为数组，则会批量操作。
+     * @param obj 业务对象或数组
+     */
+    static delete(obj: any | any[]): void;
+
+    /**
+     * 根据ID唯一性规则自动识别业务对象的新增和更新到业务数据库，不做批量处理。
+     * 由于save的内部机制需要查询后判断插入还是更新，若做批量可能影响性能，将批量交由外部处理。
+     * @param obj 业务对象
+     * @param fieldsAndConditions 字段和条件的键值对，例如："业务对象.字段A" 或 "业务对象.字段B:yyyy-MM-dd"
+     */
+    static save(obj: any, ...fieldsAndConditions: string[]): void;
+
+    /**
+     * 根据删除条件对象进行物理删除，然后插入业务对象/数组。
+     * 该操作是物理删除，建议只使用在关联表上。
+     * @param obj 业务对象或数组
+     * @param deleteCondition 删除条件对象
+     */
+    static replace(obj: any | any[], deleteCondition: any): void;
+
+    /**
+     * 根据传入的业务对象去寻找依赖它的对象。
+     * 返回值格式：{"result": 布尔值, "refBy": "对象英文名", "refName": "对象中文名"}
+     * @param obj 业务对象
+     */
+    static findObjectRef(obj: any): { result: boolean, refBy: string, refName: string };
+}
+
+declare class Date {
+    /**
+     * 格式化日期
+     * @param formatStr 日期格式字符串
+     * @returns 格式化后的日期字符串
+     */
+    Format(formatStr: string): string;
+
+    /**
+     * 获取时间戳
+     * @returns 时间戳
+     */
+    getTime(): number;
+
+    /**
+     * 获取时间格式为“yyyy-MM-dd HH:mm:ss”的时间字符串
+     * @returns 时间字符串
+     */
+    time(): string;
+
+    /**
+     * 获取时间格式为“yyyy-MM-dd”的时间字符串
+     * @returns 时间字符串
+     */
+    date(): string;
+
+    /**
+     * 获取当天开始时间
+     * @returns 当天开始时间
+     */
+    getDayBegin(): Date;
+
+    /**
+     * 获取当天结束时间
+     * @returns 当天结束时间
+     */
+    getDayEnd(): Date;
+
+    /**
+     * 获取昨天开始时间
+     * @returns 昨天开始时间
+     */
+    getLastDayBegin(): Date;
+
+    /**
+     * 获取昨天结束时间
+     * @returns 昨天结束时间
+     */
+    getLastDayEnd(): Date;
+
+    /**
+     * 获取本周开始时间
+     * @returns 本周开始时间
+     */
+    getWeekBegin(): Date;
+
+    /**
+     * 获取本周结束时间
+     * @returns 本周结束时间
+     */
+    getWeekEnd(): Date;
+
+    /**
+     * 获取上周开始时间
+     * @returns 上周开始时间
+     */
+    getLastWeekBegin(): Date;
+
+    /**
+     * 获取上周结束时间
+     * @returns 上周结束时间
+     */
+    getLastWeekEnd(): Date;
+
+    /**
+     * 获取本月开始时间
+     * @returns 本月开始时间
+     */
+    getMonthBegin(): Date;
+
+    /**
+     * 获取本月结束时间
+     * @returns 本月结束时间
+     */
+    getMonthEnd(): Date;
+
+    /**
+     * 获取上月开始时间
+     * @returns 上月开始时间
+     */
+    getLastMonthBegin(): Date;
+
+    /**
+     * 获取上月结束时间
+     * @returns 上月结束时间
+     */
+    getLastMonthEnd(): Date;
+
+    /**
+     * 获取本年开始时间
+     * @returns 本年开始时间
+     */
+    getYearBegin(): Date;
+
+    /**
+     * 获取本年结束时间
+     * @returns 本年结束时间
+     */
+    getYearEnd(): Date;
+
+    /**
+     * 获取上年开始时间
+     * @returns 上年开始时间
+     */
+    getLastYearBegin(): Date;
+
+    /**
+     * 获取上年结束时间
+     * @returns 上年结束时间
+     */
+    getLastYearEnd(): Date;
+
+    /**
+     * 获取本季度开始时间
+     * @returns 本季度开始时间
+     */
+    getQuarterBegin(): Date;
+
+    /**
+     * 获取本季度结束时间
+     * @returns 本季度结束时间
+     */
+    getQuarterEnd(): Date;
+
+    /**
+     * 将时间戳转换为Date对象
+     * @param timestamp 时间戳
+     * @returns Date对象
+     */
+    static parseDate(timestamp: number): Date;
+
+    /**
+     * 将时间字符串转换为Date对象
+     * @param dateString 时间字符串
+     * @returns Date对象
+     */
+    constructor(dateString: string);
+}
 /**
  * 表示用于获取用户信息的 System 类。
  * @declare
@@ -738,207 +943,6 @@ declare enum AlertType {
 
 
 
-// 3.1.2. DB 数据库操作
-declare class DB {
-    /**
-     * 将业务对象或数组添加到业务数据库。如果业务对象类型为数组，则会批量操作。
-     * @param obj 业务对象或数组
-     */
-    static insert(obj: any | any[]): void;
-
-    /**
-     * 将业务对象或数组更新到业务数据库。如果业务对象类型为数组，则会批量操作。
-     * @param obj 业务对象或数组
-     */
-    static update(obj: any | any[]): void;
-
-    /**
-     * 根据传入的字段作为条件更新业务对象。如果业务对象类型为数组，则会批量操作。
-     * 使用“:”分割加入时间格式表达式来格式化时间条件字段。
-     * @param obj 业务对象或数组
-     * @param fieldsAndConditions 字段和条件的键值对，例如："业务对象.字段A" 或 "业务对象.字段B:yyyy-MM-dd"
-     */
-    static update(obj: any | any[], ...fieldsAndConditions: string[]): void;
-
-    /**
-     * 根据业务对象的ID，从业务数据库中移除数据（逻辑删除）。
-     * 如果业务对象类型为数组，则会批量操作。
-     * @param obj 业务对象或数组
-     */
-    static delete(obj: any | any[]): void;
-
-    /**
-     * 根据ID唯一性规则自动识别业务对象的新增和更新到业务数据库，不做批量处理。
-     * 由于save的内部机制需要查询后判断插入还是更新，若做批量可能影响性能，将批量交由外部处理。
-     * @param obj 业务对象
-     * @param fieldsAndConditions 字段和条件的键值对，例如："业务对象.字段A" 或 "业务对象.字段B:yyyy-MM-dd"
-     */
-    static save(obj: any, ...fieldsAndConditions: string[]): void;
-
-    /**
-     * 根据删除条件对象进行物理删除，然后插入业务对象/数组。
-     * 该操作是物理删除，建议只使用在关联表上。
-     * @param obj 业务对象或数组
-     * @param deleteCondition 删除条件对象
-     */
-    static replace(obj: any | any[], deleteCondition: any): void;
-
-    /**
-     * 根据传入的业务对象去寻找依赖它的对象。
-     * 返回值格式：{"result": 布尔值, "refBy": "对象英文名", "refName": "对象中文名"}
-     * @param obj 业务对象
-     */
-    static findObjectRef(obj: any): { result: boolean, refBy: string, refName: string };
-}
-
-declare class Date {
-    /**
-     * 格式化日期
-     * @param formatStr 日期格式字符串
-     * @returns 格式化后的日期字符串
-     */
-    Format(formatStr: string): string;
-
-    /**
-     * 获取时间戳
-     * @returns 时间戳
-     */
-    getTime(): number;
-
-    /**
-     * 获取时间格式为“yyyy-MM-dd HH:mm:ss”的时间字符串
-     * @returns 时间字符串
-     */
-    time(): string;
-
-    /**
-     * 获取时间格式为“yyyy-MM-dd”的时间字符串
-     * @returns 时间字符串
-     */
-    date(): string;
-
-    /**
-     * 获取当天开始时间
-     * @returns 当天开始时间
-     */
-    getDayBegin(): Date;
-
-    /**
-     * 获取当天结束时间
-     * @returns 当天结束时间
-     */
-    getDayEnd(): Date;
-
-    /**
-     * 获取昨天开始时间
-     * @returns 昨天开始时间
-     */
-    getLastDayBegin(): Date;
-
-    /**
-     * 获取昨天结束时间
-     * @returns 昨天结束时间
-     */
-    getLastDayEnd(): Date;
-
-    /**
-     * 获取本周开始时间
-     * @returns 本周开始时间
-     */
-    getWeekBegin(): Date;
-
-    /**
-     * 获取本周结束时间
-     * @returns 本周结束时间
-     */
-    getWeekEnd(): Date;
-
-    /**
-     * 获取上周开始时间
-     * @returns 上周开始时间
-     */
-    getLastWeekBegin(): Date;
-
-    /**
-     * 获取上周结束时间
-     * @returns 上周结束时间
-     */
-    getLastWeekEnd(): Date;
-
-    /**
-     * 获取本月开始时间
-     * @returns 本月开始时间
-     */
-    getMonthBegin(): Date;
-
-    /**
-     * 获取本月结束时间
-     * @returns 本月结束时间
-     */
-    getMonthEnd(): Date;
-
-    /**
-     * 获取上月开始时间
-     * @returns 上月开始时间
-     */
-    getLastMonthBegin(): Date;
-
-    /**
-     * 获取上月结束时间
-     * @returns 上月结束时间
-     */
-    getLastMonthEnd(): Date;
-
-    /**
-     * 获取本年开始时间
-     * @returns 本年开始时间
-     */
-    getYearBegin(): Date;
-
-    /**
-     * 获取本年结束时间
-     * @returns 本年结束时间
-     */
-    getYearEnd(): Date;
-
-    /**
-     * 获取上年开始时间
-     * @returns 上年开始时间
-     */
-    getLastYearBegin(): Date;
-
-    /**
-     * 获取上年结束时间
-     * @returns 上年结束时间
-     */
-    getLastYearEnd(): Date;
-
-    /**
-     * 获取本季度开始时间
-     * @returns 本季度开始时间
-     */
-    getQuarterBegin(): Date;
-
-    /**
-     * 获取本季度结束时间
-     * @returns 本季度结束时间
-     */
-    getQuarterEnd(): Date;
-
-    /**
-     * 将时间戳转换为Date对象
-     * @param timestamp 时间戳
-     * @returns Date对象
-     */
-    static parseDate(timestamp: number): Date;
-
-    /**
-     * 将时间字符串转换为Date对象
-     * @param dateString 时间字符串
-     * @returns Date对象
-     */
-    constructor(dateString: string);
-}
 declare class Ctrl {
     /**
      * 控件编码，只读。
