@@ -38,7 +38,7 @@ export const copyToClipboard = (text: string) => {
  * @param {number} seq - 按钮的序号
  * @param {string} [hoverText] - 按钮的悬停文本
  */
-export const addButton = (selector: string, text: string, iconClass: string, clickHandler: () => void, seq, hoverText?: string) => {
+export const addButton = (selector: string, text: string, iconClass: string, clickHandler: () => void, seq: number, hoverText?: string) => {
   if (selector == undefined) {
     selector = "#beSetting > div.main-content > div.tab-operation > button:nth-child(2)"
   }
@@ -83,7 +83,7 @@ export function toCamelCase(str: string): string {
  * @param {string} tablePropertyCode - 表格属性代码
  * @returns {string} 主键字段名称
  */
-export function getPrimaryKey(tablePropertyCode: string) {
+export function getPrimaryKey(tablePropertyCode: string): string {
   const flyStore = useFlyStore()
 
   const tableData = flyStore.tableDataMap.get(tablePropertyCode)
@@ -111,7 +111,7 @@ export function getPrimaryKey(tablePropertyCode: string) {
  * @param {string} str2 - 第二个字符串
  * @returns {number} Levenshtein 距离
  */
-export function levenshteinDistance(str1, str2) {
+export function levenshteinDistance(str1: string, str2: string): number {
   const m = str1.length;
   const n = str2.length;
   const dp = Array.from({ length: m + 1 }, () => Array.from({ length: n + 1 }, () => 0));

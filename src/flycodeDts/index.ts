@@ -1,16 +1,40 @@
 import { useFlyStore } from "../store/flyStore";
 import { Protocol } from "../type/protocol";
-import { generateInAndOutEntityDtsByProtocol } from "./EntityDts/testTemplate";
+import { generateFullEntityDtsByProtocol } from "./EntityDts/FullEntityDtsGenerator";
+import { generateInAndOutEntityDtsByProtocol } from "./EntityDts/InAndOutEntityDtsGenerator";
 
-export function addTs(protocol: Protocol) {
-    const entityDts = generateInAndOutEntityDtsByProtocol(protocol)
-    console.log(entityDts)
+
+let entityDts: string
+let inOutEntityDts: string
+let init = false
+export function RefreshExtraLib() {
+    const flyStore = useFlyStore()
+    console.log(init)
+    console.log(flyStore.protocol);
+
+    if (!flyStore.addDtsEnable) {
+        return
+    }
+    if (!init) {
+        init = true
+        entityDts = generateFullEntityDtsByProtocol(flyStore.tableDatas)
+        console.log("push")
+    } else {
+        inOutEntityDts = generateInAndOutEntityDtsByProtocol(flyStore.protocol)
+    }
+
     // @ts-ignore
-    monaco.languages.typescript.javascriptDefaults.addExtraLib(dts + entityDts);
-    console.log("添加DTS")
+    monaco.languages.typescript.javascriptDefaults.setExtraLibs([
+        { content: entityDts },
+        { content: flycodeDts },
+        { content: inOutEntityDts }
+    ])
 }
 
-const dts = `// 3.1.5. 工具库
+
+
+
+const flycodeDts = `// 3.1.5. 工具库
 declare class FLY {
     /**
      * 3.1.5.1. 打印日志

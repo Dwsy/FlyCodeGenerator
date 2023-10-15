@@ -9,11 +9,43 @@ export function getMonacoModel() {
 }
 
 
-export function getMonacoInit() {
+function MonacoInitialized() {
     // @ts-ignore
-    const Models = monaco?.editor?.getModels()
-    return !!Models
+    return typeof monaco !== 'undefined'
+}
+
+interface MonacoInitializedUtil {
+    isInitialized(): boolean;
+    addInitializedCallback(callback: () => void): void;
+}
+
+function createMonacoInitializedUtil(): MonacoInitializedUtil {
+    const callbacks: (() => void)[] = [];
+    let initialized = false;
+
+    function checkInitialized() {
+        if (!initialized) {
+            const isInitialized = MonacoInitialized();
+            if (isInitialized) {
+                initialized = true;
+                callbacks.forEach(callback => callback());
+            }
+        }
+    }
+
+    setInterval(checkInitialized, 700);
+
+    return {
+        isInitialized: () => initialized,
+        addInitializedCallback: (callback) => {
+            if (initialized) {
+                callback();
+            } else {
+                callbacks.push(callback);
+            }
+        }
+    };
 }
 
 
-
+export const monacoInitializedUtil = createMonacoInitializedUtil();

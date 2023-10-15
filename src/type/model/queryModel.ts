@@ -1,74 +1,222 @@
 import { Property } from "../protocol"
 import { DatePropertyCodes, PropertyTypeCode } from "./propertyTypeCodeRef"
 
+/**
+ * 查询模型
+ * @interface
+ */
 export interface QueryModel {
-    tableName: string
-    tableShortName: string
-    columns: ColumnModel[]
-    conditions: ConditionModel[]
-    joins: JoinModel[]
+    /**
+     * 表名
+     */
+    tableName: string;
+    /**
+     * 表别名
+     */
+    tableShortName: string;
+    /**
+     * 列列表
+     */
+    columns: ColumnModel[];
+    /**
+     * 条件列表
+     */
+    conditions: ConditionModel[];
+    /**
+     * 连接列表
+     */
+    joins: JoinModel[];
 }
 
-
-
-
+/**
+ * 列模型
+ * @interface
+ */
 export interface ColumnModel {
-    columnName: string
-    tableShortName: string
-    queryName?: string,
-    relationTable?: RelationTableModel
+    /**
+     * 列名
+     */
+    columnName: string;
+    /**
+     * 表别名
+     */
+    tableShortName: string;
+    /**
+     * 查询名
+     */
+    queryName?: string;
+    /**
+     * 关联表
+     */
+    relationTable?: RelationTableModel;
 }
 
-
+/**
+ * 关联表模型
+ * @interface
+ */
 export interface RelationTableModel {
-    name: string
-    shortName: string
-    idField: string | boolean
+    /**
+     * 表名
+     */
+    name: string;
+    /**
+     * 表别名
+     */
+    shortName: string;
+    /**
+     * ID 字段(主键)
+     */
+    idField: string | boolean;
 }
 
+/**
+ * 连接模型
+ * @interface
+ */
 export interface JoinModel {
-    tableName: string
-    tableShortName: string
+    /**
+     * 表名
+     */
+    tableName: string;
+    /**
+     * 表别名
+     */
+    tableShortName: string;
+    /**
+     * 关联表
+     */
     relationTable: {
-        name: string
-        shortName: string
-        idField: string | boolean
-    }
-    columnName: string
+        /**
+         * 表名
+         */
+        name: string;
+        /**
+         * 表别名
+         */
+        shortName: string;
+        /**
+         * ID 字段
+         */
+        idField: string | boolean;
+    };
+    /**
+     * 列名
+     */
+    columnName: string;
 }
 
-
+/**
+ * 条件模型
+ * @interface
+ */
 export interface ConditionModel {
-    tableName: string
-    tableShortName: string
-    columnName: string
-    operator: Operator
-    value?: string
-    secondValue?: string
-    propertytypecode?: string
+    /**
+     * 表名
+     */
+    tableName: string;
+    /**
+     * 表别名
+     */
+    tableShortName: string;
+    /**
+     * 列名
+     */
+    columnName: string;
+    /**
+     * 操作符
+     */
+    operator: Operator;
+    /**
+     * 值
+     */
+    value?: string;
+    /**
+     * 第二个值
+     */
+    secondValue?: string;
+    /**
+     * 属性类型代码
+     */
+    propertytypecode?: string;
+    /**
+     * 模糊匹配
+     */
     like?: {
-        matchType: LikeMatchType
-    }
+        /**
+         * 匹配类型
+         */
+        matchType: LikeMatchType;
+    };
 }
 
+/**
+ * 操作符枚举
+ * @enum
+ */
 export enum Operator {
+    /**
+     * 等于
+     */
     Equal = "=",
+    /**
+     * 不等于
+     */
     NotEqual = "<>",
+    /**
+     * 大于
+     */
     GreaterThan = ">",
+    /**
+     * 大于等于
+     */
     GreaterThanOrEqual = ">=",
+    /**
+     * 小于
+     */
     LessThan = "<",
+    /**
+     * 小于等于
+     */
     LessThanOrEqual = "<=",
+    /**
+     * 介于
+     */
     Between = "BETWEEN",
+    /**
+     * 与
+     */
     AND = "AND",
+    /**
+     * 包含
+     */
     IN = "IN",
+    /**
+     * 不介于
+     */
     NotBetween = "NOT BETWEEN",
+    /**
+     * 模糊匹配
+     */
     Like = "LIKE",
 }
 
-
+/**
+ * 模糊匹配类型枚举
+ * @enum
+ */
 export enum LikeMatchType {
+    /**
+     * 以某个字符串开始
+     */
     StartsWith = "StartsWith",
+    /**
+     * 以某个字符串结束
+     */
     EndsWith = "EndsWith",
+    /**
+     * 包含某个字符串
+     */
     Contains = "Contains",
 }
 

@@ -1,4 +1,4 @@
-import { getPropertyTypeEmoji } from "../../type/model/propertyTypeCodeRef"
+import { getPropertyTypeEmoji, getPropertyTypeName } from "../../type/model/propertyTypeCodeRef"
 import { Input, Output, Protocol } from "../../type/protocol"
 
 export type EntityType = "IN" | "OUT" | ""
@@ -100,14 +100,15 @@ const generateInOutDts = (entiy: Entiy, entityType: EntityType) => {
  * @param {EntityType} entityType - 实体类型。
  * @returns {Array<Entiy>} 实体对象列表。
  */
-const generateEntiyObjList = (entiys: Array<Input> | Array<Output>, entityType: EntityType) =>
-    entiys
+const generateEntiyObjList = (entiys: Array<Input> | Array<Output>, entityType: EntityType) => {
+    return entiys
         .map((entity): Entiy => {
             const EntityComment = `${entity.name}(${entity.objectname})`
             const EntiyColumns = entity.properties
                 .map((property): EntiyColumn => {
-                    const emojiType = `(${getPropertyTypeEmoji(Number(property.propertytypecode))})`
-                    const EntiyColumnComment = `${property.propertyname}(${property.name})` + emojiType
+                    const propertyTypeName = getPropertyTypeName(Number(property.propertytypecode))
+                    const emojiType = getPropertyTypeEmoji(Number(property.propertytypecode))
+                    const EntiyColumnComment = emojiType + `${property.propertyname}(${propertyTypeName})`
                     const EntiyColumnName = property.name
                     const EntiyColumnType = "string"
                     return {
@@ -124,6 +125,7 @@ const generateEntiyObjList = (entiys: Array<Input> | Array<Output>, entityType: 
                 EntiyColumns,
             }
         })
+}
 
 /**
  * 根据协议生成输入输出实体的类型定义。
@@ -139,3 +141,4 @@ export const generateInAndOutEntityDtsByProtocol = (protocol: Protocol) => {
     const outEntityDts = outputEntiyList.map((entity) => generateInOutDts(entity, "OUT"))
     return inEntityDts.concat(outEntityDts).join("\n")
 }
+

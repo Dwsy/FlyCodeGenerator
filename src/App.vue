@@ -2,7 +2,7 @@
   <n-message-provider>
     <n-config-provider :theme="theme">
 
-      <div v-if="flyStore.initStatus">
+      <div v-if="flyStore.codeGeneratorInitStatus">
         <component :is="Generator[flyStore.ActiveGenerator]"></component>
       </div>
 
@@ -12,59 +12,88 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import { darkTheme, lightTheme, useMessage } from 'naive-ui'
+import { darkTheme, lightTheme } from 'naive-ui'
 import { Generator } from './components'
 
-import { ref, watchEffect, watch } from 'vue'
+import { ref } from 'vue'
 import type { GlobalTheme } from 'naive-ui'
 import { useFlyStore } from './store/flyStore';
-import { ActionType } from './type/actionType'
+
 import { nextTick } from 'vue';
 import { GM, GM_getValue } from '$';
-import { addTs } from './flycodeDts'
-import { generateEntityDtsByProtocol } from './flycodeDts/EntityDts/testTemplate';
-
+import { RefreshExtraLib } from './flycodeDts'
+import { monacoInitializedUtil } from './util/monacoUtil'
 const theme = ref<GlobalTheme | null>(darkTheme)
 const flyStore = useFlyStore()
 
 let previousURL = window.location.href;
 onMounted(async () => {
-  const codeGeneratorEnable = GM_getValue("codeGeneratorEnable", false)
-  const addDtsEnable = GM_getValue("addDtsEnable", false)
-
   await flyStore.init()
-
-  console.log(flyStore.protocol)
-
-  const waitMonaco = setInterval(async () => {
-    // @ts-ignore
-    if (typeof monaco !== 'undefined') {
-      if (addDtsEnable) {
-        addTs(flyStore.protocol)
-        console.log("添加DTS", new Date())
-
+  monacoInitializedUtil
+    .addInitializedCallback(async () => {
+      if (flyStore.addDtsEnable) {
+        RefreshExtraLib()
       }
       const button = document.querySelector("#beSetting > div.main-content > div.tab-operation > button:nth-child(2) > i")
       if (button != null) {
-        if (codeGeneratorEnable) {
-
-          flyStore.initStatus = true
+        if (flyStore.codeGeneratorEnable) {
+          flyStore.codeGeneratorInitStatus = true
           await nextTick()
           flyStore.appMounted = true
           checkURLChangeThenUpdateProtocol()
           console.log("FlyCodeGenerator初始化.....", new Date())
         }
+        if (flyStore.addDtsEnable) {
+          console.log("     if (flyStore.addDtsEnable) {");
 
-        clearInterval(waitMonaco);
+          checkURLChangeThenUpdateProtocol()
+        }
       } else {
         console.log("等待领域页面加载。。。");
       }
+    })
 
-    } else {
-      console.log("等待monaco。。。");
-    }
+  addLightTheme()
+})
+
+// 定义一个函数，用于检测URL是否发生变化然后更新协议
+function checkURLChangeThenUpdateProtocol() {
+  const urlInterval = setInterval(() => {
+    _()
   }, 1000)
 
+
+  const _ = async () => {
+    // 获取当前URL
+    const currentURL = window.location.href;
+
+    // 检查当前URL与上次的URL是否相同
+    if (currentURL !== previousURL && currentURL.indexOf("modeledit") != -1) {
+      // URL发生变化，执行您的函数
+
+      console.log("// URL发生变化，执行您的函数",
+        "currentURL:", currentURL, "previousURL", previousURL);
+      const temp = previousURL.split("/")
+      const temp1 = currentURL.split("/")
+      if (currentURL.indexOf("modeledit") != -1) {
+        if (temp.length == temp1.length) {
+          await flyStore.updateProtocol(500)
+        } else {
+          await flyStore.updateProtocol(100)
+        }
+      }
+
+
+      // addGenQueryElement();
+      // 更新previousURL以反映新的URL
+      previousURL = currentURL;
+    } else {
+      previousURL = currentURL;
+    }
+  }
+}
+
+function addLightTheme() {
   let lightThemeInit = false
   // @ts-ignore
   window.lightTheme = (lightThemeInit: boolean) => {
@@ -90,43 +119,6 @@ onMounted(async () => {
   })
   setTimeout(() => { document.querySelector("#app > div > div.content > div.envi-style").append(span) }, 2000)
 
-})
-
-// 定义一个函数，用于检测URL是否发生变化然后更新协议
-function checkURLChangeThenUpdateProtocol() {
-  const urlInterval = setInterval(() => {
-    _()
-  }, 1000)
-
-
-  const _ = async () => {
-    // 获取当前URL
-    const currentURL = window.location.href;
-
-    // 检查当前URL与上次的URL是否相同
-    if (currentURL !== previousURL && currentURL.indexOf("modeledit") != -1) {
-      // URL发生变化，执行您的函数
-
-      console.log("// URL发生变化，执行您的函数",
-        "currentURL:", currentURL, "previousURL", previousURL);
-      const temp = previousURL.split("/")
-      const temp1 = currentURL.split(" /")
-      if (currentURL.indexOf("modeledit") != -1) {
-        if (temp.length == temp1.length) {
-          await flyStore.updateProtocol(500)
-        } else {
-          await flyStore.updateProtocol(500)
-        }
-      }
-
-
-      // addGenQueryElement();
-      // 更新previousURL以反映新的URL
-      previousURL = currentURL;
-    } else {
-      previousURL = currentURL;
-    }
-  }
 }
 
 

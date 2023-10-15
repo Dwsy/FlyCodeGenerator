@@ -4,20 +4,31 @@ import { getBizObjectsData, getProtocol } from "../dataRequest"
 import { Protocol } from "../type/protocol"
 import { ActionType } from "../type/actionType";
 import { GeneratorName } from "../components";
+import { RefreshExtraLib } from "../flycodeDts";
+import { GM_getValue } from "$";
+import { monacoInitializedUtil } from "../util/monacoUtil";
 
 export const useFlyStore = defineStore('flyStore', () => {
-    const tableDatas = ref<tableData[]>()
-    const protocol = ref<Protocol>()
-    const tableDataMap = ref(new Map<string, tableData>);
-    const columnDataMap = ref(new Map<string, columnData>);
-    const initStatus = ref(false)
+
+    const codeGeneratorInitStatus = ref(false)
     const appMounted = ref(false)
     const ActiveGenerator = ref()
+    const protocol = ref<Protocol>()
+    const tableDatas = ref<tableData[]>()
+    const tableDataMap = ref(new Map<string, tableData>);
+    const columnDataMap = ref(new Map<string, columnData>);
+
+
+
+
+    const addDtsEnable = GM_getValue("addDtsEnable", false)
+    const codeGeneratorEnable = GM_getValue("codeGeneratorEnable", false)
+
 
     async function init() {
         tableDatas.value = (await getBizObjectsData())?.resp_data
         if (document.URL.indexOf("modeledit") != -1 && document.URL.split("/").length == 6) {
-            protocol.value = (await getProtocol())?.resp_data
+            await updateProtocol(0)
         }
 
         // 遍历 tableDatas 数组
@@ -34,13 +45,13 @@ export const useFlyStore = defineStore('flyStore', () => {
 
     }
     watch(protocol, async () => {
-        console.log(` watch(protocol, () => {`, protocol.value, appMounted.value, initStatus.value)
+        console.log(` watchcprotocol`, protocol.value, appMounted.value, codeGeneratorInitStatus.value)
         if (appMounted.value) {
             console.log("if (appMounted.value) {")
-            initStatus.value = false
+            codeGeneratorInitStatus.value = false
             await nextTick()
             refresh()
-            initStatus.value = true
+            codeGeneratorInitStatus.value = true
         } else {
             refresh()
         }
@@ -48,6 +59,14 @@ export const useFlyStore = defineStore('flyStore', () => {
     async function updateProtocol(Timeout = 1000) {
         setTimeout(async () => {
             protocol.value = (await getProtocol()).resp_data
+            if (addDtsEnable) {
+                console.log("updateProtocol");
+
+                monacoInitializedUtil.addInitializedCallback(
+                    () => RefreshExtraLib()
+                )
+            }
+
         }, Timeout);
     }
 
@@ -55,6 +74,7 @@ export const useFlyStore = defineStore('flyStore', () => {
     const insertOrUpdateNameArray = ["新增", "修改", "编辑", "创建", "更新", "添加", "保存"]
     const deletedDataNameArray = ["删除"]
     const refresh = () => {
+
         const actionType = protocol.value.actiontype
         const actioncategory = protocol.value.actioncategory
         const Import = actionType == ActionType.Import
@@ -89,11 +109,29 @@ export const useFlyStore = defineStore('flyStore', () => {
 
 
     return {
-        tableDatas, appMounted, ActiveGenerator,
-        protocol, tableDataMap, columnDataMap,
+        // data
+        protocol,
+        tableDatas,
+        columnDataMap,
+        tableDataMap,
+        // data
+
+        // status
+        appMounted,
+        ActiveGenerator,
+        codeGeneratorInitStatus,
+        // statis
+
+
+        // fuc
         init,
         updateProtocol,
-        initStatus,
+
+        // fuc
+
+        //menu
+        codeGeneratorEnable, addDtsEnable
+        //menu
     }
 })
 
