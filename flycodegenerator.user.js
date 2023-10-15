@@ -4,8 +4,8 @@
 // @version      1.0.0
 // @author       monkey
 // @icon         http://flydoc.dwsy.link/xwlogoblue.png
-// @downloadURL  https://github.com/Dwsy/FlyCodeGenerator/blob/main/flycodegenerator.user.js
-// @updateURL    https://github.com/Dwsy/FlyCodeGenerator/blob/main/flycodegenerator.user.js
+// @downloadURL  https://ghproxy.com/?q=https%3A%2F%2Fraw.githubusercontent.com%2FDwsy%2FFlyCodeGenerator%2Fmain%2Fflycodegenerator.user.js
+// @updateURL    https://ghproxy.com/?q=https%3A%2F%2Fraw.githubusercontent.com%2FDwsy%2FFlyCodeGenerator%2Fmain%2Fflycodegenerator.user.js
 // @match        http://ide.wxchina.com:9000/*
 // @require      https://cdn.jsdelivr.net/npm/vue@3.3.4/dist/vue.global.prod.js
 // @grant        GM_addStyle
