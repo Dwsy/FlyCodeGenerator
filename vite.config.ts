@@ -21,9 +21,10 @@ export default defineConfig({
         namespace: 'dwsy/flycodegenerator',
         match: ['http://ide.wxchina.com:9000/*'],
         "run-at": 'document-start',
-        updateURL: "https://github.com/Dwsy/FlyCodeGenerator/blob/main/flycodegenerator.user.js",
-        downloadURL: "https://github.com/Dwsy/FlyCodeGenerator/blob/main/flycodegenerator.user.js",
-        version: "1.0.0"
+        updateURL: "https://ghproxy.com/?q=https%3A%2F%2Fraw.githubusercontent.com%2FDwsy%2FFlyCodeGenerator%2Fmain%2Fflycodegenerator.user.js",
+        downloadURL: "https://ghproxy.com/?q=https%3A%2F%2Fraw.githubusercontent.com%2FDwsy%2FFlyCodeGenerator%2Fmain%2Fflycodegenerator.user.js",
+        version: "1.1.1",
+        author: "Dwsy"
       },
       build: {
         externalGlobals: {

@@ -76,7 +76,7 @@ export const generateFullEntityDtsByProtocol = (tableDatas: tableData[]): string
                 const emojiType = getPropertyTypeEmoji(Number(property.propertytypecode))
                 const propertyTypeName = getPropertyTypeName(Number(property.propertytypecode))
                 const EntiyColumnComment = emojiType
-                    + `${property.propertyname}(${propertyTypeName})`
+                    + `${property.propertyname}(${propertyTypeName})\n` + property.propertydescr
                 const EntiyColumnName = property.columnname
                 const EntiyColumnType = "string"
                 return {
