@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         flycodegenerator
 // @namespace    dwsy/flycodegenerator
-// @version      1.0.0
+// @version      1.1.0
 // @author       monkey
 // @icon         http://flydoc.dwsy.link/xwlogoblue.png
 // @downloadURL  https://ghproxy.com/?q=https%3A%2F%2Fraw.githubusercontent.com%2FDwsy%2FFlyCodeGenerator%2Fmain%2Fflycodegenerator.user.js
