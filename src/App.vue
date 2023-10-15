@@ -23,9 +23,10 @@ import { nextTick } from 'vue';
 import { GM, GM_getValue } from '$';
 import { RefreshExtraLib } from './flycodeDts'
 import { monacoInitializedUtil } from './util/monacoUtil'
-import { getFqueryModel } from './flycodeDts/FQuery/test'
+
 const theme = ref<GlobalTheme | null>(darkTheme)
 const flyStore = useFlyStore()
+
 
 let previousURL = window.location.href;
 onMounted(async () => {
@@ -35,28 +36,33 @@ onMounted(async () => {
       if (flyStore.addDtsEnable) {
         RefreshExtraLib()
       }
-      const button = document.querySelector("#beSetting > div.main-content > div.tab-operation > button:nth-child(2) > i")
-      if (button != null) {
-        if (flyStore.codeGeneratorEnable) {
-          flyStore.codeGeneratorInitStatus = true
-          await nextTick()
-          flyStore.appMounted = true
-          checkURLChangeThenUpdateProtocol()
-          console.log("FlyCodeGenerator初始化.....", new Date())
-        }
-        if (flyStore.addDtsEnable) {
-          console.log("     if (flyStore.addDtsEnable) {");
-
-          checkURLChangeThenUpdateProtocol()
-        }
-      } else {
-        console.log("等待领域页面加载。。。");
+      if (flyStore.addDtsEnable || flyStore.codeGeneratorEnable) {
+        checkURLChangeThenUpdateProtocol()
       }
+      if (flyStore.codeGeneratorEnable) {
+        const c = setInterval(async () => {
+          const button = document.querySelector("#beSetting > div.main-content > div.tab-operation > button:nth-child(2) > i")
+          if (button != null) {
+
+            flyStore.codeGeneratorInitStatus = true
+            await nextTick()
+            flyStore.appMounted = true
+            checkURLChangeThenUpdateProtocol()
+            console.log("FlyCodeGenerator初始化.....", new Date())
+            clearInterval(c)
+          } else {
+            console.log("等待领域页面加载。。。");
+          }
+        }, 1000)
+      }
+
     })
 
-  monacoInitializedUtil.addInitializedCallback(getFqueryModel)
+
   addLightTheme()
 })
+
+
 
 // 定义一个函数，用于检测URL是否发生变化然后更新协议
 function checkURLChangeThenUpdateProtocol() {
@@ -70,20 +76,32 @@ function checkURLChangeThenUpdateProtocol() {
     const currentURL = window.location.href;
 
     // 检查当前URL与上次的URL是否相同
-    if (currentURL !== previousURL && currentURL.indexOf("modeledit") != -1) {
+    if (currentURL !== previousURL) {
       // URL发生变化，执行您的函数
 
-      console.log("// URL发生变化，执行您的函数",
-        "currentURL:", currentURL, "previousURL", previousURL);
-      const temp = previousURL.split("/")
-      const temp1 = currentURL.split("/")
       if (currentURL.indexOf("modeledit") != -1) {
-        if (temp.length == temp1.length) {
-          await flyStore.updateProtocol(500)
-        } else {
-          await flyStore.updateProtocol(100)
+        console.log("// URL发生变化，执行您的函数",
+          "currentURL:", currentURL, "previousURL", previousURL);
+        const temp = previousURL.split("/")
+        const temp1 = currentURL.split("/")
+        if (currentURL.indexOf("modeledit") != -1) {
+          if (temp.length == temp1.length) {
+            await flyStore.updateProtocol(500)
+          } else {
+            await flyStore.updateProtocol(100)
+          }
         }
       }
+
+      if (currentURL.indexOf("uiedit") != -1) {
+        if (flyStore.addDtsEnable) {
+          console.log("update uiflycode dts");
+          monacoInitializedUtil.addInitializedCallback(
+            () => RefreshExtraLib(true)
+          )
+        }
+      }
+
 
 
       // addGenQueryElement();
@@ -91,6 +109,7 @@ function checkURLChangeThenUpdateProtocol() {
       previousURL = currentURL;
     } else {
       previousURL = currentURL;
+
     }
   }
 }

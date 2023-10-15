@@ -61,7 +61,6 @@ export const useFlyStore = defineStore('flyStore', () => {
             protocol.value = (await getProtocol()).resp_data
             if (addDtsEnable) {
                 console.log("updateProtocol");
-
                 monacoInitializedUtil.addInitializedCallback(
                     () => RefreshExtraLib()
                 )

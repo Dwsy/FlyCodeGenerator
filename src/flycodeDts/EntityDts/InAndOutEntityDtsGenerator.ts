@@ -133,6 +133,9 @@ const generateEntiyObjList = (entiys: Array<Input> | Array<Output>, entityType: 
  * @returns {string} 输入输出实体的类型定义。
  */
 export const generateInAndOutEntityDtsByProtocol = (protocol: Protocol) => {
+    if (protocol == undefined) {
+        return undefined
+    }
     const inputEntiyList = generateEntiyObjList(protocol.input, "IN")
     const outputEntiyList = generateEntiyObjList(protocol.output, "OUT")
     console.log(inputEntiyList)
