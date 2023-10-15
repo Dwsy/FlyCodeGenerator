@@ -5,7 +5,7 @@ export function getMonacoModel() {
     const uriSplit = dataUri.split("/")
     // @ts-ignore
     const Models = monaco.editor.getModels()
-    return Models.filter((model) => model.id === `$model${uriSplit[uriSplit.length - 1]}`)
+    return Models.filter((model) => model.id === `$model${uriSplit[uriSplit.length - 1]}`)[0]
 }
 
 
@@ -22,7 +22,6 @@ interface MonacoInitializedUtil {
 function createMonacoInitializedUtil(): MonacoInitializedUtil {
     const callbacks: (() => void)[] = [];
     let initialized = false;
-
     function checkInitialized() {
         if (!initialized) {
             const isInitialized = MonacoInitialized();
@@ -32,9 +31,7 @@ function createMonacoInitializedUtil(): MonacoInitializedUtil {
             }
         }
     }
-
     setInterval(checkInitialized, 700);
-
     return {
         isInitialized: () => initialized,
         addInitializedCallback: (callback) => {

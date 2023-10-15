@@ -23,6 +23,7 @@ import { nextTick } from 'vue';
 import { GM, GM_getValue } from '$';
 import { RefreshExtraLib } from './flycodeDts'
 import { monacoInitializedUtil } from './util/monacoUtil'
+import { getFqueryModel } from './flycodeDts/FQuery/test'
 const theme = ref<GlobalTheme | null>(darkTheme)
 const flyStore = useFlyStore()
 
@@ -53,6 +54,7 @@ onMounted(async () => {
       }
     })
 
+  monacoInitializedUtil.addInitializedCallback(getFqueryModel)
   addLightTheme()
 })
 
