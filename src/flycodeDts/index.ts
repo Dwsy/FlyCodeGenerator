@@ -19,20 +19,26 @@ export function RefreshExtraLib(onlyUIFlycode: boolean = false) {
         init = true
         entityDts = generateFullEntityDtsByProtocol(flyStore.tableDatas)
     } else {
-        inOutEntityDts = generateInAndOutEntityDtsByProtocol(flyStore.protocol)
-        BONewDts = generateBONewDtsByProtocol(flyStore.protocol, flyStore.tableDataMap)
-
+        console.log(flyStore.protocol)
+        console.log("protocol")
+        if (flyStore.protocol != undefined) {
+            inOutEntityDts = generateInAndOutEntityDtsByProtocol(flyStore.protocol)
+            BONewDts = generateBONewDtsByProtocol(flyStore.protocol, flyStore.tableDataMap)
+        }
     }
 
-
-    if (BONewDts != undefined && inOutEntityDts != undefined) {
-        ExtraLibs.push({ content: inOutEntityDts })
-        ExtraLibs.push({ content: flycodeDts })
-        ExtraLibs.push({ content: entityDts })
-        ExtraLibs.push({ content: BONewDts })
-    } else {
+    if (onlyUIFlycode || window.location.href.indexOf("uiedit") != -1) {
         ExtraLibs.push({ content: UIFlycodeDts })
+    } else {
+        if (inOutEntityDts != undefined) {
+            ExtraLibs.push({ content: inOutEntityDts })
+            ExtraLibs.push({ content: flycodeDts })
+            ExtraLibs.push({ content: entityDts })
+            ExtraLibs.push({ content: BONewDts })
+        }
     }
+
+
     // @ts-ignore
     monaco.languages.typescript.javascriptDefaults.setExtraLibs(ExtraLibs)
     console.log("RefreshExtraLib", ExtraLibs)
