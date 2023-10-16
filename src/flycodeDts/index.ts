@@ -1,11 +1,13 @@
 import { useFlyStore } from "../store/flyStore";
 import { Protocol } from "../type/protocol";
+import { generateBONewDtsByProtocol } from "./BoNew";
 import { generateFullEntityDtsByProtocol } from "./EntityDts/FullEntityDtsGenerator";
 import { generateInAndOutEntityDtsByProtocol } from "./EntityDts/InAndOutEntityDtsGenerator";
 
 
 let entityDts: string
 let inOutEntityDts: string
+let BONewDts: string
 let init = false
 export function RefreshExtraLib(onlyUIFlycode: boolean = false) {
     const flyStore = useFlyStore()
@@ -13,27 +15,21 @@ export function RefreshExtraLib(onlyUIFlycode: boolean = false) {
     if (!flyStore.addDtsEnable) {
         return
     }
-    // if (!onlyUIFlycode) {
     if (!init) {
         init = true
         entityDts = generateFullEntityDtsByProtocol(flyStore.tableDatas)
-        console.log("push")
     } else {
         inOutEntityDts = generateInAndOutEntityDtsByProtocol(flyStore.protocol)
+        BONewDts = generateBONewDtsByProtocol(flyStore.protocol, flyStore.tableDataMap)
+
     }
-    // }
 
 
-    // if (onlyUIFlycode) {
-
-    // } else {
-
-
-    // }
-    if (inOutEntityDts != undefined) {
+    if (BONewDts != undefined && inOutEntityDts != undefined) {
+        ExtraLibs.push({ content: inOutEntityDts })
         ExtraLibs.push({ content: flycodeDts })
         ExtraLibs.push({ content: entityDts })
-        ExtraLibs.push({ content: inOutEntityDts })
+        ExtraLibs.push({ content: BONewDts })
     } else {
         ExtraLibs.push({ content: UIFlycodeDts })
     }

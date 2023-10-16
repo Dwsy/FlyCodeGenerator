@@ -65,7 +65,7 @@ const generateEntityDts = (entiy: Entiy): string => {
  * @returns {string} 输入输出实体的类型定义。
  */
 export const generateFullEntityDtsByProtocol = (tableDatas: tableData[]): string => {
-    return tableDatas.map((entity): Entiy => {
+    return tableDatas.slice(1, 10).map((entity): Entiy => {
         const EntityName = entity.objectmark
         let EntityComment = `${entity.objectmark}(${entity.objectname})`
         if (entity.tablename != entity.objectmark) {
@@ -90,6 +90,6 @@ export const generateFullEntityDtsByProtocol = (tableDatas: tableData[]): string
             EntityComment,
             EntiyColumns,
         }
-    }).map(generateEntityDts).join()
+    }).map(generateEntityDts).join("\n")
 
 }
