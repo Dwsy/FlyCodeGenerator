@@ -1,12 +1,13 @@
 import { defineStore } from "pinia"
 import { computed, nextTick, ref, watch, watchEffect } from "vue"
 import { getBizObjectsData, getProtocol } from "../dataRequest"
-import { Protocol } from "../type/protocol"
+import { Output, Protocol } from "../type/protocol"
 import { ActionType } from "../type/actionType";
 import { GeneratorName } from "../components";
 import { RefreshExtraLib } from "../flycodeDts";
 import { GM_getValue } from "$";
 import { monacoInitializedUtil } from "../util/monacoUtil";
+import { getPropertyTypeName } from "../type/model/propertyTypeCodeRef";
 
 export const useFlyStore = defineStore('flyStore', () => {
 
@@ -21,6 +22,8 @@ export const useFlyStore = defineStore('flyStore', () => {
 
 
 
+    // const addDtsEnable = true
+    // const codeGeneratorEnable = false
     const addDtsEnable = GM_getValue("addDtsEnable", false)
     const codeGeneratorEnable = GM_getValue("codeGeneratorEnable", false)
 
@@ -55,6 +58,39 @@ export const useFlyStore = defineStore('flyStore', () => {
         } else {
             refresh()
         }
+
+        const markdownTableHeadTemplate =
+            `|对象|字段|字段类型|长度|必填|说明|备注|\n|--|--|--|--|--|--|--|\n`
+        const markdownTableRowTemplate =
+            `|{{对象}}|{{字段类型}}|{{长度}}|{{必填}}|{{说明}}|{{备注}}|`
+        // `||||||||`
+
+        // ---
+        const ApiDocModel = protocol.value.output
+        // ---
+        console.log(ApiDocModel)
+        const document = ApiDocModel.map((model, index) => {
+            const rows = model.properties.map((outPut, index2) => {
+                let rowText = markdownTableRowTemplate
+                if (index2 == 0) {
+                    rowText = rowText.replace("{{对象}}", model.name)
+                } else {
+                    rowText = rowText.replace("{{对象}}", " ")
+                }
+                // const desc = columnDataMap.value.get(outPut.propertycode)?.propertydescr.replace(/\n/g, " ");
+                // rowText = rowText.replace("{{字段}}", outPut.name)
+                rowText = rowText.replace("{{字段类型}}", "varchar")
+                rowText = rowText.replace("{{长度}}", ' ')
+                rowText = rowText.replace("{{必填}}", ' ')
+                rowText = rowText.replace("{{说明}}", outPut.propertyname)
+                // rowText = rowText.replace("{{备注}}", desc)
+                rowText = rowText.replace("{{备注}}", " ")
+                console.log(rowText)
+                return rowText
+            }).join("\n")
+            return rows
+        }).join("\n")
+        console.log(markdownTableHeadTemplate + document)
     })
     async function updateProtocol(Timeout = 1000) {
         setTimeout(async () => {

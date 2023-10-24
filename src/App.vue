@@ -20,9 +20,9 @@ import type { GlobalTheme } from 'naive-ui'
 import { useFlyStore } from './store/flyStore';
 
 import { nextTick } from 'vue';
-import { GM, GM_getValue } from '$';
 import { RefreshExtraLib } from './flycodeDts'
 import { monacoInitializedUtil } from './util/monacoUtil'
+
 
 const theme = ref<GlobalTheme | null>(darkTheme)
 const flyStore = useFlyStore()
@@ -39,27 +39,37 @@ onMounted(async () => {
       if (flyStore.addDtsEnable || flyStore.codeGeneratorEnable) {
         checkURLChangeThenUpdateProtocol()
       }
-      if (flyStore.codeGeneratorEnable) {
-        const c = setInterval(async () => {
-          const button = document.querySelector("#beSetting > div.main-content > div.tab-operation > button:nth-child(2) > i")
-          if (button != null) {
-
+      const c = setInterval(async () => {
+        const button = document.querySelector("#beSetting > div.main-content > div.tab-operation > button:nth-child(2) > i")
+        if (button != null) {
+          if (flyStore.codeGeneratorEnable) {
             flyStore.codeGeneratorInitStatus = true
             await nextTick()
             flyStore.appMounted = true
             checkURLChangeThenUpdateProtocol()
             console.log("FlyCodeGenerator初始化.....", new Date())
-            clearInterval(c)
-          } else {
-            console.log("等待领域页面加载。。。");
+
           }
-        }, 1000)
-      }
+          // addButton(null, "Test", "ideicon-share", () => {
+          //   console.log("test");
+          //   getFqueryModel()
+          // }, 1)
+          clearInterval(c)
+        } else {
+          console.log("wait...");
+        }
+      }, 1000)
+
 
     })
 
 
   addLightTheme()
+
+
+  // addButton(null, "生成API文档", "ideicon-share", () => {
+  //   console.log("生成API文档");
+  // }, 2)
 })
 
 

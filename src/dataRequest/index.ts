@@ -22,8 +22,6 @@ function getHeader() {
         showNameTip: boolean;
     }
     const tenant: tenantType = JSON.parse(localStorage.getItem("tenantList")).filter((ten) => {
-        console.log(ten.tenantname)
-        console.log(sessionStorage.getItem("tenantName"))
         return ten.tenantname == sessionStorage.getItem("tenantName")
     })[0]
     let headers = {

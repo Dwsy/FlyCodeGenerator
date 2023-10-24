@@ -19,11 +19,11 @@ export default defineConfig({
       userscript: {
         icon: 'http://flydoc.dwsy.link/xwlogoblue.png',
         namespace: 'dwsy/flycodegenerator',
-        match: ['http://ide.wxchina.com:9000/*'],
+        match: ['http://xwide.dwsy.link/*'],
         "run-at": 'document-start',
         updateURL: "https://ghproxy.com/?q=https%3A%2F%2Fraw.githubusercontent.com%2FDwsy%2FFlyCodeGenerator%2Fmain%2Fflycodegenerator.user.js",
         downloadURL: "https://ghproxy.com/?q=https%3A%2F%2Fraw.githubusercontent.com%2FDwsy%2FFlyCodeGenerator%2Fmain%2Fflycodegenerator.user.js",
-        version: "1.1.1",
+        version: "1.2.0",
         author: "Dwsy"
       },
       build: {

@@ -74,9 +74,15 @@ const generateFullEntityInterfaceDtsByProtocol = (tableDatas: tableData[]): stri
     // 筛选tableDatas 的objectmark 在 inoutNameArray 中的数据
 
     return tableDatas.map((entity): Entiy => {
-        const EntityName = entity.objectmark
-        let EntityComment = `${entity.objectmark}(${entity.objectname})`
-        if (entity.tablename != entity.objectmark) {
+
+        let EntityName
+        if (entity && typeof entity.objectmark !== 'undefined') {
+            EntityName = entity.objectmark
+        } else {
+            EntityName = entity.tablename
+        }
+        let EntityComment = `${entity}(${entity.objectname})`
+        if (entity.tablename != EntityName) {
             EntityComment += `-衍生于(${entity.tablename})`
         }
         const EntiyColumns = entity.properties
@@ -124,7 +130,16 @@ export function generateBONewDtsByProtocol(protocol: Protocol, tableDataMap: Map
     if (undefined == tableDataMap) {
         return undefined
     }
-    const inoutArray = protocol.input.concat(protocol.output)
+    let inoutArray = []
+    if (protocol.input.length != 0) {
+        inoutArray.push(...protocol.input)
+    }
+    if (protocol.output.length != 0) {
+        inoutArray.push(...protocol.output)
+    }
+    if (inoutArray.length == 0) {
+        return undefined
+    }
     const inoutNameArray = inoutArray.map((inout) => inout.name)
     const inoutRableDataArray = inoutArray.map((inout) => tableDataMap.get(inout.objectcode))
     const FullEntityInterfaceDts = generateFullEntityInterfaceDtsByProtocol(inoutRableDataArray)

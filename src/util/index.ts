@@ -29,6 +29,9 @@ export const copyToClipboard = (text: string) => {
 
 }
 
+let getButtonSeq = (seq = 1) => {
+  return () => seq++
+}
 /**
  * 添加一个按钮到指定的选择器中
  * @param {string} selector - 指定的选择器
@@ -38,11 +41,12 @@ export const copyToClipboard = (text: string) => {
  * @param {number} seq - 按钮的序号
  * @param {string} [hoverText] - 按钮的悬停文本
  */
-export const addButton = (selector: string, text: string, iconClass: string, clickHandler: () => void, seq: number, hoverText?: string) => {
+export const addButton = (selector: string, text: string, iconClass: string, clickHandler: () => void, seq?: number, hoverText?: string) => {
   if (selector == undefined) {
     selector = "#beSetting > div.main-content > div.tab-operation > button:nth-child(2)"
   }
-  if (document.querySelector(`#beSetting > div.main-content > div.tab-operation > button:nth-child(${2 + seq})`) != null) {
+  const ButtonSeq = getButtonSeq(seq)//todo sort logic
+  if (document.querySelector(`#beSetting > div.main-content > div.tab-operation > button:nth-child(${2 + ButtonSeq()})`) != null) {
     return
   }
   if (!document.querySelector(selector)) {

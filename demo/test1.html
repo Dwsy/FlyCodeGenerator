@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Monaco Editor</title>
+  </head>
+  <body>
+    <h1>Monaco</h1>
+    <div id="editor" style="height: 500px"></div>
+
+    <!-- 引入 Monaco Editor 和 Monaco Languages 的库文件 -->
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/editor/editor.main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/loader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/editor/editor.main.nls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/basic-languages/javascript/javascript.js"></script>
+    <!-- 在这里添加 JavaScript 代码来创建 Monaco Editor -->
+    <script>
+      var editor = monaco.editor.create(document.getElementById("editor"), {
+        value: [
+          "function sayHello() {",
+          '    console.log("Hello, world!");',
+          "}",
+        ].join("\n"),
+        language: "javascript",
+      });
+
+      // 注册文档符号提供程序
+      monaco.languages.registerDocumentSymbolProvider("javascript", {
+        provideDocumentSymbols: function (model, token) {
+          var symbols = [];
+          var content = model.getValue();
+
+          // 此处需要添加代码来生成文档符号
+          // 你可以参考以下示例来生成函数的文档符号
+          var functionRegex = /function\s+([^\(]+)\(/g;
+          var match;
+          while ((match = functionRegex.exec(content))) {
+            symbols.push({
+              name: match[1],
+              kind: monaco.languages.SymbolKind.Function,
+              range: model.getDecorationRange(match.index),
+              selectionRange: model.getDecorationRange(match.index),
+            });
+          }
+
+          return symbols;
+        },
+      });
+    </script>
+  </body>
+</html>

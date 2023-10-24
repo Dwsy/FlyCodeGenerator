@@ -1,3 +1,4 @@
+import { useFlyStore } from "../../store/flyStore"
 import { getPropertyTypeEmoji, getPropertyTypeName } from "../../type/model/propertyTypeCodeRef"
 import { Input, Output, Protocol } from "../../type/protocol"
 
@@ -101,14 +102,20 @@ const generateInOutDts = (entiy: Entiy, entityType: EntityType) => {
  * @returns {Array<Entiy>} 实体对象列表。
  */
 const generateEntiyObjList = (entiys: Array<Input> | Array<Output>, entityType: EntityType) => {
+    const flyStore = useFlyStore()
+
     return entiys
         .map((entity): Entiy => {
             const EntityComment = `${entity.name}(${entity.objectname})`
+
+
             const EntiyColumns = entity.properties
                 .map((property): EntiyColumn => {
                     const propertyTypeName = getPropertyTypeName(Number(property.propertytypecode))
                     const emojiType = getPropertyTypeEmoji(Number(property.propertytypecode))
-                    const EntiyColumnComment = emojiType + `${property.propertyname}(${propertyTypeName})`
+                    const EntiyColumnComment = emojiType
+                        + `${property.propertyname}(${propertyTypeName})
+                    ${flyStore.columnDataMap.get(property.propertycode).propertydescr}`
                     const EntiyColumnName = property.name
                     const EntiyColumnType = "string"
                     return {
