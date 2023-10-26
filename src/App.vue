@@ -5,6 +5,7 @@
       <div v-if="flyStore.codeGeneratorInitStatus">
         <component :is="Generator[flyStore.ActiveGenerator]"></component>
       </div>
+      <Ftheme></Ftheme>
 
     </n-config-provider>
   </n-message-provider>
@@ -14,7 +15,7 @@
 import { onMounted } from 'vue';
 import { darkTheme, lightTheme } from 'naive-ui'
 import { Generator } from './components'
-
+import Ftheme from './components/Theme/index.vue'
 import { ref } from 'vue'
 import type { GlobalTheme } from 'naive-ui'
 import { useFlyStore } from './store/flyStore';
@@ -22,6 +23,7 @@ import { useFlyStore } from './store/flyStore';
 import { nextTick } from 'vue';
 import { RefreshExtraLib } from './flycodeDts'
 import { monacoInitializedUtil } from './util/monacoUtil'
+import { GM_getValue } from '$';
 
 
 const theme = ref<GlobalTheme | null>(darkTheme)

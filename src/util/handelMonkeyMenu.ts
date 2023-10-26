@@ -19,4 +19,24 @@ export const registerMenuCommand = () => {
         GM_setValue("addDtsEnable", !addDtsEnable)
         setTimeout(() => { window.location.reload() }, 100)
     });
+    const bracketPairColorizationEnable = GM_getValue("bracketPairColorizationEnable", false)
+    GM_registerMenuCommand(`${bracketPairColorizationEnable ? '✅' : '❌'}彩虹括号`, () => {
+        GM_setValue("bracketPairColorizationEnable", !bracketPairColorizationEnable)
+        if (bracketPairColorizationEnable) {
+            localStorage.setItem("bracketPairColorization", "1")
+        } else {
+            localStorage.setItem("bracketPairColorization", "-1")
+        }
+
+        setTimeout(() => { window.location.reload() }, 100)
+    });
+
+
+    GM_registerMenuCommand(`切换主题（Beta Version）`, () => {
+        // @ts-ignore
+        window.showChangeTheme()
+
+        // setTimeout(() => { window.location.reload() }, 100)
+    });
+
 }
