@@ -121,13 +121,13 @@ const changeTheme = (name: string = 'default') => {
                 // // 定义Monarch语法规则
 
                 // 添加规则到语言定义
-                monaco.languages.setMonarchTokensProvider("flycode", {
-                    tokenizer: {
-                        root: [
-                            [/FLY\.log.*/, 'flylog'],
-                        ],
-                    },
-                });
+                // monaco.languages.setMonarchTokensProvider("flycode", {
+                //     tokenizer: {
+                //         root: [
+                //             [/FLY\.log.*/, 'flylog'],
+                //         ],
+                //     },
+                // });
                 // debugger
                 const rules: Array<any> = data.rules
                 rules.push({ token: "flylog", foreground: "27ae60", fontStyle: "underline" })
@@ -138,7 +138,7 @@ const changeTheme = (name: string = 'default') => {
                 monaco.editor.setTheme("mytheme");
             })
         GM_setValue("bracketPairColorizationEnable", name)
-        showChangeTheme.value = !showChangeTheme.value
+        // showChangeTheme.value = !showChangeTheme.value
     }
 }
 var seq = 0

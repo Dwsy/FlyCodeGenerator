@@ -4,6 +4,7 @@ import { Protocol } from "../../type/protocol"
 
 
 import { getPropertyTypeEmoji, getPropertyTypeName } from "../../type/model/propertyTypeCodeRef"
+import { internalSelectMenuDark } from "naive-ui"
 
 
 export interface Entiy {
@@ -132,10 +133,10 @@ export function generateBONewDtsByProtocol(protocol: Protocol, tableDataMap: Map
     }
     let inoutArray = []
     if (protocol.input.length != 0) {
-        inoutArray.push(...protocol.input)
+        inoutArray.push(...protocol.input.filter((data) => !Object.hasOwn(data, 'customcode')))//entity
     }
     if (protocol.output.length != 0) {
-        inoutArray.push(...protocol.output)
+        inoutArray.push(...protocol.output.filter((data) => !Object.hasOwn(data, 'customcode')))//entity
     }
     if (inoutArray.length == 0) {
         return undefined

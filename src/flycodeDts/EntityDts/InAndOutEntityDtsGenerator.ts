@@ -1,5 +1,5 @@
 import { useFlyStore } from "../../store/flyStore"
-import { getPropertyTypeEmoji, getPropertyTypeName } from "../../type/model/propertyTypeCodeRef"
+import { PropertyTypeCode, getPropertyTypeEmoji, getPropertyTypeName } from "../../type/model/propertyTypeCodeRef"
 import { Input, Output, Protocol } from "../../type/protocol"
 
 export type EntityType = "IN" | "OUT" | ""
@@ -105,10 +105,9 @@ const generateEntiyObjList = (entiys: Array<Input> | Array<Output>, entityType: 
     const flyStore = useFlyStore()
 
     return entiys
+        .filter((data) => data.properties.length > 0)
         .map((entity): Entiy => {
             const EntityComment = `${entity.name}(${entity.objectname})`
-
-
             const EntiyColumns = entity.properties
                 .map((property): EntiyColumn => {
                     const propertyTypeName = getPropertyTypeName(Number(property.propertytypecode))
@@ -145,10 +144,66 @@ export const generateInAndOutEntityDtsByProtocol = (protocol: Protocol) => {
     }
     const inputEntiyList = generateEntiyObjList(protocol.input, "IN")
     const outputEntiyList = generateEntiyObjList(protocol.output, "OUT")
+    // debugger
+    protocol.input.filter((data) => Object.hasOwn(data, 'customcode')).forEach((custimEntity) => {
+        inputEntiyList.push({
+            Type: "IN",
+            EntityName: custimEntity.name,
+            EntityComment: `${custimEntity.name}(${custimEntity.objectname})`,
+            EntiyColumns: custimEntity.properties.map((column) => {
+                let columnData: EntiyColumn = {
+                    EntiyColumnComment: `${column.propertyname}(${PropertyTypeCode[column.propertytypecode]})})`,
+                    EntiyColumnName: column.propertyname,
+                    EntiyColumnType: getPropertyTypeName(column.propertytypecode),
+                }
+                return columnData
+            })
+        })
+    })
+
+    protocol.output.filter((data) => Object.hasOwn(data, 'customcode')).forEach((custimEntity) => {
+        inputEntiyList.push({
+            Type: "OUT",
+            EntityName: custimEntity.name,
+            EntityComment: `${custimEntity.name}(${custimEntity.objectname})`,
+            EntiyColumns: custimEntity.properties.map((column) => {
+                let columnData: EntiyColumn = {
+                    EntiyColumnComment: `${column.propertyname}(${PropertyTypeCode[column.propertytypecode]})})`,
+                    EntiyColumnName: column.propertyname,
+                    EntiyColumnType: getPropertyTypeName(column.propertytypecode),
+                }
+                return columnData
+            })
+        })
+    })
+
+
+    const singleField = protocol.input.filter((data) => {
+        return data.properties.length == 0
+    }).map(data => {
+        return `const ${data.name}:string`
+    })
+
+    const singleField2 = protocol.output.filter((data) => {
+        return data.properties.length == 0
+    }).map(data => {
+        return `const ${data.name}:string`
+    })
+
+
+    console.log(singleField)
     console.log(inputEntiyList)
     console.log(outputEntiyList)
     const inEntityDts = inputEntiyList.map((entity) => generateInOutDts(entity, "IN"))
+    inEntityDts.push(InOutTemplate.replace("{{Type}}", "IN")
+        .replace("{{ArrayEntityTypeDts}}", '')
+        .replace("{{EntiyNameSpaces}}", singleField.join('\n'))
+        .replace("{{TypeComment}}", "输入参数"))
     const outEntityDts = outputEntiyList.map((entity) => generateInOutDts(entity, "OUT"))
+    outEntityDts.push(InOutTemplate.replace("{{Type}}", "OUT")
+        .replace("{{ArrayEntityTypeDts}}", '')
+        .replace("{{EntiyNameSpaces}}", singleField2.join('\n'))
+        .replace("{{TypeComment}}", "输入参数"))
     return inEntityDts.concat(outEntityDts).join("\n")
 }
 

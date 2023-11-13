@@ -27,6 +27,7 @@ export interface Property {
 }
 
 export interface Input {
+  customcode?: string;
   name: string;
   objectcode: string;
   objectname: string;
@@ -38,6 +39,7 @@ export interface Input {
 
 
 export interface Output {
+  customcode?: string;
   name: string;
   objectcode: string;
   objectname: string;
@@ -67,3 +69,4 @@ export interface Protocol {
   uilogicscript: string;
   message: any;
 }
+
