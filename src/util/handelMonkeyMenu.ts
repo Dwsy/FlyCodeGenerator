@@ -3,10 +3,10 @@ import { GM_getValue, GM_registerMenuCommand, GM_setValue } from "$";
 
 
 export const registerMenuCommand = () => {
-    GM_registerMenuCommand("🌞日间主题（仅本次）", () => {
-        // @ts-ignore
-        window.lightTheme(false);
-    });
+    // GM_registerMenuCommand("🌞日间主题（仅本次）", () => {
+    //     // @ts-ignore
+    //     window.lightTheme(false);
+    // });
 
 
     const codeGeneratorEnable = GM_getValue("codeGeneratorEnable", false)

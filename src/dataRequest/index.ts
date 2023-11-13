@@ -21,6 +21,7 @@ function getHeader() {
         showSedNameTip: boolean;
         showNameTip: boolean;
     }
+
     const tenant: tenantType = JSON.parse(localStorage.getItem("tenantList")).filter((ten) => {
         return ten.tenantname == sessionStorage.getItem("tenantName")
     })[0]
@@ -50,8 +51,9 @@ export async function getBizObjectsData() {
     try {
 
 
-
-        const { data } = await axios.post('http://121.37.206.131:18001/bizserv/biz/getBizObjects', {}, {
+        const exeIp = sessionStorage.getItem("exeIp")
+        const ip = sessionStorage.getItem("IP")
+        const { data } = await axios.post(ip + '/bizserv/biz/getBizObjects', {}, {
             headers: getHeader()
         })
         return data
@@ -88,7 +90,9 @@ export async function getProtocol() {
                 console.error('User token not found in sessionStorage');
                 return;
             }
-            const { data } = await axios.post('http://121.37.206.131:18001/bizserv/bizmodel/getModelLogic', {
+            const ip = sessionStorage.getItem("IP")
+            // debugger
+            const { data } = await axios.post(ip + '/bizserv/bizmodel/getModelLogic', {
                 "modellogiccode": modellogiccode
             }, {
                 headers: getHeader()

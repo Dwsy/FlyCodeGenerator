@@ -26,7 +26,6 @@
 import { GM_getValue, GM_setValue } from '$';
 import { ref, onMounted } from 'vue';
 import { monacoInitializedUtil } from '../../util/monacoUtil';
-
 const showChangeTheme = ref(false)
 
 
@@ -119,7 +118,21 @@ const changeTheme = (name: string = 'default') => {
             .then(data => {
                 console.log(data)
                 data.colors['editor.background'] = "#1E1E1E"
-                // @ts-ignore
+                // // 定义Monarch语法规则
+
+                // 添加规则到语言定义
+                monaco.languages.setMonarchTokensProvider("flycode", {
+                    tokenizer: {
+                        root: [
+                            [/FLY\.log.*/, 'flylog'],
+                        ],
+                    },
+                });
+                // debugger
+                const rules: Array<any> = data.rules
+                rules.push({ token: "flylog", foreground: "27ae60", fontStyle: "underline" })
+
+                // @ts-ignore         "fontStyle": "underline",
                 monaco.editor.defineTheme("mytheme", data);
                 // @ts-ignore
                 monaco.editor.setTheme("mytheme");
