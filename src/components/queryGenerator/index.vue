@@ -59,7 +59,7 @@ function addGenQueryElement() {
                         await nextTick(() => {
                             // @ts-ignore
                             monaco.editor.colorizeElement(document.getElementById("flyCode"), {
-                                theme: "vs-dark",
+                                //                                theme: "vs-dark",
                             });
                         })
                     }}>预览代码</NButton>

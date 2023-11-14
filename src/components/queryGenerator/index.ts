@@ -1,12 +1,20 @@
 // 引入自定义模块中的 getTableShortName 方法
-import { getTableShortName } from "../../util/";
-import { QueryModel, ColumnModel, RelationTableModel, JoinModel, ConditionModel, Operator, LikeMatchType, ConditionGenerator, getOperator }
-  from "../../type/model/queryModel"
-import { DatePropertyCodes, PropertyTypeCode } from "../../type/model/propertyTypeCodeRef";
-import { useFlyStore } from "../../store/flyStore";
-import { watchEffect } from "vue";
-import { Output, Property, Protocol } from "../../type/protocol";
-import { message } from "../../util/message";
+import {getTableShortName} from "../../util/";
+import {
+  ColumnModel,
+  ConditionGenerator,
+  ConditionModel,
+  getOperator,
+  JoinModel,
+  LikeMatchType,
+  Operator,
+  QueryModel
+} from "../../type/model/queryModel"
+import {DatePropertyCodes} from "../../type/model/propertyTypeCodeRef";
+import {useFlyStore} from "../../store/flyStore";
+import {watchEffect} from "vue";
+import {Output, Property, Protocol} from "../../type/protocol";
+import {message} from "../../util/message";
 
 
 let protocol: Protocol
@@ -134,9 +142,15 @@ function gen(output: Output, queryArgumentArrayMap: Map<string, Property[]>): Qu
   let selectColumns = outPropertiesDataMap
     .map((data) => {
       // console.log("data", data)//todo
+      // debugger
       const queryname = relationTableColumnMap.get(data.propertycode);
+      if (data.columnname=='shelfdisplay'){
+        return
+        // ??
+      }
       // console.log("relationTableShortNameMap", relationTableShortNameMap.get(queryname))
       relationTableShortNameMap.get(queryname)
+      // debugger
       if (queryname === undefined) {
         const columnModel: ColumnModel = {
           tableShortName: tableShortName,
@@ -173,10 +187,11 @@ function gen(output: Output, queryArgumentArrayMap: Map<string, Property[]>): Qu
   // 定义模板字符串
   const template = `{#if {{if}}}\n and {{condition}}\n{#endif}\n`;
   // 遍历 queryMap，将查询条件添加到 fquery 中
+  // debugger
   queryArgumentArrayMap.forEach((properties, tableName) => {
     if (tableName === mainTableName) {
       properties.forEach((property) => {
-        if (property.propertytypecode == "3") return
+        // if (property.propertytypecode == "3") return
         // 先完成 = 操作 todo
         const argName = property.name
         const operator = getOperator(property)
@@ -190,6 +205,7 @@ function gen(output: Output, queryArgumentArrayMap: Map<string, Property[]>): Qu
           like: null
         }
         let condition = `${tableShortName}.${argName} `
+
         if (operator == Operator.Equal) {
           conditionModelArray.push(conditionModel)
           condition += operator
@@ -261,6 +277,7 @@ function gen(output: Output, queryArgumentArrayMap: Map<string, Property[]>): Qu
 
   queryModel.columns = columnModelArray
   queryModel.joins = joinModelArray
+  // debugger
   queryModel.conditions = conditionModelArray
   // console.log(fquery)
   return queryModel
@@ -268,10 +285,13 @@ function gen(output: Output, queryArgumentArrayMap: Map<string, Property[]>): Qu
 
 
 
+
 export function generateSql(queryModel: QueryModel): string {
+  // debugger
   // 生成 SELECT 子句
   const selectClause = `SELECT\n  ${queryModel.columns.map((c) => {
-    if (c.queryName == null || c.queryName == undefined) {
+    
+    if (c.queryName == null) {
       return `${c.tableShortName}.${c.columnName}`
     } else {
       return `${c.tableShortName}.${c.columnName} as ${c.queryName}`
@@ -282,7 +302,22 @@ export function generateSql(queryModel: QueryModel): string {
   const fromClause = `FROM\n  ${queryModel.tableName} as ${queryModel.tableShortName}`;
 
   // 生成 JOIN 子句
-  const joinClauses = queryModel.joins.map((j) => {
+  const joinClauses = queryModel.joins.map(getJoinCallbackfn());
+
+  // debugger
+
+
+// 生成 WHERE 子句
+  const whereClauses = queryModel.conditions.map(getWhereCallback());
+  const whereClause = whereClauses.length > 0 ? `WHERE 1=1\n${whereClauses.join("")}` : "";
+
+  // 拼接 SQL 语句
+  return `${selectClause}\n${fromClause}\n${joinClauses.join("\n")}\n${whereClause} NORULE;`;
+}
+
+
+function getJoinCallbackfn() {
+  return (j) => {
     let lj: string
     let on: string
     if (j.relationTable.name != null || j.relationTable.name != undefined) {
@@ -293,10 +328,11 @@ export function generateSql(queryModel: QueryModel): string {
       on = `ON ${j.relationTable.name}.${j.columnName} = ${j.tableShortName}.${j.columnName}`
     }
     return lj.concat(on)
-  });
+  };
+}
 
-  // 生成 WHERE 子句
-  const whereClauses = queryModel.conditions.map((c) => {
+function getWhereCallback() {
+  return (c) => {
     // 定义模板字符串
     let whereTemplate = `{#if {{if}}}\n and {{condition}}\n{#endif}\n`;
     const generator = new ConditionGenerator(c);
@@ -304,14 +340,14 @@ export function generateSql(queryModel: QueryModel): string {
       const juede = `!String.isBlank(IN.${c.tableName}.${c.columnName})`
       const condition = generator.generateWhereClause();
       whereTemplate = whereTemplate
-        .replace("{{if}}", juede)
-        .replace("{{condition}}", condition);
+          .replace("{{if}}", juede)
+          .replace("{{condition}}", condition);
     } else if (c.operator === Operator.Like) {
       const juede = `!String.isBlank(IN.${c.tableName}.${c.columnName})`
       let whereClause = generator.generateWhereClause()
       whereTemplate = whereTemplate
-        .replace('{{if}}', juede)
-        .replace('{{condition}}', whereClause);
+          .replace('{{if}}', juede)
+          .replace('{{condition}}', whereClause);
     } else if (c.operator === Operator.Between) {
       const isDate = DatePropertyCodes.indexOf(Number(c.propertytypecode)) !== -1
       const [lvalue, rvalue] = isDate ? ["begin", "end"] : ["min", "max"]
@@ -320,16 +356,10 @@ export function generateSql(queryModel: QueryModel): string {
       let whereClause = generator.generateWhereClause()
       // console.log("c.propertytypecode", c.propertytypecode)
       whereTemplate = whereTemplate
-        .replace('{{if}}', juede)
-        .replace('{{condition}}', whereClause);
+          .replace('{{if}}', juede)
+          .replace('{{condition}}', whereClause);
     }
 
     return whereTemplate;
-  });
-  const whereClause = whereClauses.length > 0 ? `WHERE 1=1\n${whereClauses.join("")}` : "";
-
-  // 拼接 SQL 语句
-  const sql = `${selectClause}\n${fromClause}\n${joinClauses.join("\n")}\n${whereClause} NORULE;`;
-
-  return sql;
+  };
 }

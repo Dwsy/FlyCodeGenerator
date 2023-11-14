@@ -52,68 +52,6 @@ onMounted(() => {
                     console.log("editor", editor)
                     console.log("  editor.addAction({")
                     var flyStore = useFlyStore()
-                    setTimeout(() => {
-                        editor.addAction({
-                            // An unique identifier of the contributed action.
-                            id: "my-unique-id",
-
-                            // A label of the action that will be presented to the user.
-                            label: "My Label!!!",
-
-                            // An optional array of keybindings for the action.
-                            keybindings: [
-                                monaco.KeyMod.CtrlCmd | monaco.KeyCode.F10,
-                            ],
-
-                            // A precondition for this action.
-                            precondition: null,
-
-                            // A rule to evaluate on top of the precondition in order to dispatch the keybindings.
-                            keybindingContext: null,
-
-                            contextMenuGroupId: "navigation",
-
-                            contextMenuOrder: 1.5,
-
-                            // Method that will be executed when the action is triggered.
-                            // @param editor The editor instance is passed in as a convenience
-                            run: function (ed) {
-                                console.log(ed)
-                                const lineContent = getMonacoModel().getLineContent(ed.getPosition().lineNumber);
-                                const match = lineContent.match(/BO.new\((.*?)\)/);
-                                const boName = match[1]
-                                console.log(boName)
-                                var b = flyStore.tableNameDataMap.get(boName).properties.map((item) => {
-                                    if (item.propertytypecode == PropertyTypeCode.PrimaryKey.toString()) {
-                                        return `${boName}.${item.columnname} = FLY.genId()`
-                                    } else {
-                                        let temp = `${boName}.${item.columnname} = ${item.columnname}`
-                                        let sum = 0
-                                        let len = temp.length
-                                        for (var i = 0; i < 50 - len; i++) {
-                                            temp += " "
-                                            sum++
-                                        }
-                                        // debugger
-                                        return `${temp}//${item.propertyname}`
-                                    }
-                                })
-                                b.unshift(`var ${boName} = BO.new("${boName}")`)
-                                console.log(b.join("\n"))
-                                // 删除当前行
-                                ed.executeEdits("my-source", [{
-                                    range: new monaco.Range(ed.getPosition().lineNumber, 1, ed.getPosition().lineNumber + 1, 1),
-                                    text: ""
-                                }])
-                                ed.executeEdits("my-source", [{
-                                    range: new monaco.Range(ed.getPosition().lineNumber, 1, ed.getPosition().lineNumber, 1),
-                                    text: b.join("\n") + "\n"
-                                }])
-                                var genStore = useGenStore()
-                                pushTempBoNewDtsList(boName)
-                            },
-                        });
-                    }, 1000);
 
                 })
             }

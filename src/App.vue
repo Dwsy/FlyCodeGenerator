@@ -6,24 +6,25 @@
         <component :is="Generator[flyStore.ActiveGenerator]"></component>
       </div>
       <Ftheme></Ftheme>
-
+      <MonacoEnhance></MonacoEnhance>
     </n-config-provider>
   </n-message-provider>
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
-import { darkTheme, lightTheme } from 'naive-ui'
-import { Generator } from './components'
+import {onMounted} from 'vue';
+import {darkTheme, lightTheme} from 'naive-ui'
+import {Generator} from './components'
 import Ftheme from './components/Theme/index.vue'
-import { ref } from 'vue'
-import type { GlobalTheme } from 'naive-ui'
-import { useFlyStore } from './store/flyStore';
+import MonacoEnhance from './components/MonacoEnhance/index.vue'
+import {ref} from 'vue'
+import type {GlobalTheme} from 'naive-ui'
+import {useFlyStore} from './store/flyStore';
 
-import { nextTick } from 'vue';
-import { RefreshExtraLib } from './flycodeDts'
-import { getMonacoModel, monacoInitializedUtil } from './util/monacoUtil'
-import { GM_getValue } from '$';
+import {nextTick} from 'vue';
+import {RefreshExtraLib} from './flycodeDts'
+import {getMonacoModel, monacoInitializedUtil} from './util/monacoUtil'
+import {GM_getValue} from '$';
 
 
 const theme = ref<GlobalTheme | null>(darkTheme)
@@ -32,42 +33,10 @@ const flyStore = useFlyStore()
 
 let previousURL = window.location.href;
 onMounted(async () => {
+  localStorage.getItem("ide_theme") === 'light' ? theme.value = lightTheme : theme.value = darkTheme
   await flyStore.init()
   monacoInitializedUtil
-    .addInitializedCallback(async () => {
-      if (flyStore.addDtsEnable) {
-        RefreshExtraLib()
-      }
-      if (flyStore.addDtsEnable || flyStore.codeGeneratorEnable) {
-        checkURLChangeThenUpdateProtocol()
-      }
-      const c = setInterval(async () => {
-        const button = document.querySelector("#beSetting > div.main-content > div.tab-operation > button:nth-child(2) > i")
-        if (button != null) {
-          if (flyStore.codeGeneratorEnable) {
-            flyStore.codeGeneratorInitStatus = true
-            await nextTick()
-            flyStore.appMounted = true
-            checkURLChangeThenUpdateProtocol()
-            console.log("FlyCodeGenerator初始化.....", new Date())
-
-          }
-          // addButton(null, "Test", "ideicon-share", () => {
-          //   console.log("test");
-          //   getFqueryModel()
-          // }, 1)
-          // @ts-ignore
-          window.getMonacoModel = getMonacoModel
-          clearInterval(c)
-        } else {
-          console.log("wait...");
-        }
-      }, 1000)
-
-
-    })
-
-
+      .addInitializedCallback(_)
 
 
   // addButton(null, "生成API文档", "ideicon-share", () => {
@@ -75,7 +44,38 @@ onMounted(async () => {
   // }, 2)
 })
 
+const _ = async () => {
+  if (flyStore.addDtsEnable) {
+    RefreshExtraLib()
+  }
+  if (flyStore.addDtsEnable || flyStore.codeGeneratorEnable) {
+    checkURLChangeThenUpdateProtocol()
+  }
+  const c = setInterval(async () => {
+    const button = document.querySelector("#beSetting > div.main-content > div.tab-operation > button:nth-child(2) > i")
+    if (button != null) {
+      if (flyStore.codeGeneratorEnable) {
+        flyStore.codeGeneratorInitStatus = true
+        await nextTick()
+        flyStore.appMounted = true
+        checkURLChangeThenUpdateProtocol()
+        console.log("FlyCodeGenerator初始化.....", new Date())
 
+      }
+      // addButton(null, "Test", "ideicon-share", () => {
+      //   console.log("test");
+      //   getFqueryModel()
+      // }, 1)
+      // @ts-ignore
+      window.getMonacoModel = getMonacoModel
+      clearInterval(c)
+    } else {
+      console.log("wait...");
+    }
+  }, 1000)
+
+
+}
 
 // 定义一个函数，用于检测URL是否发生变化然后更新协议
 function checkURLChangeThenUpdateProtocol() {
@@ -94,7 +94,7 @@ function checkURLChangeThenUpdateProtocol() {
 
       if (currentURL.indexOf("modeledit") != -1) {
         console.log("// URL发生变化，执行您的函数",
-          "currentURL:", currentURL, "previousURL", previousURL);
+            "currentURL:", currentURL, "previousURL", previousURL);
         const temp = previousURL.split("/")
         const temp1 = currentURL.split("/")
         if (currentURL.indexOf("modeledit") != -1) {
@@ -110,13 +110,10 @@ function checkURLChangeThenUpdateProtocol() {
         if (flyStore.addDtsEnable) {
           console.log("update uiflycode dts");
           monacoInitializedUtil.addInitializedCallback(
-            () => RefreshExtraLib(true)
+              () => RefreshExtraLib(true)
           )
         }
       }
-
-
-
       // addGenQueryElement();
       // 更新previousURL以反映新的URL
       previousURL = currentURL;
