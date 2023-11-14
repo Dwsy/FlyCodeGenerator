@@ -74,57 +74,58 @@ const generateEntityDts = (entiy: Entiy): string => {
 const generateFullEntityInterfaceDtsByProtocol = (tableDatas: tableData[]): string => {
     // 筛选tableDatas 的objectmark 在 inoutNameArray 中的数据
 
-    return tableDatas.map((entity): Entiy => {
-
-        let EntityName
-        if (entity && typeof entity.objectmark !== 'undefined') {
-            EntityName = entity.objectmark
-        } else {
-            EntityName = entity.tablename
-        }
-        let EntityComment = `${entity}(${entity.objectname})`
-        if (entity.tablename != EntityName) {
-            EntityComment += `-衍生于(${entity.tablename})`
-        }
-        const EntiyColumns = entity.properties
-            .map((property): EntiyColumn => {
-                const emojiType = getPropertyTypeEmoji(Number(property.propertytypecode))
-                const propertyTypeName = getPropertyTypeName(Number(property.propertytypecode))
-                const EntiyColumnComment = emojiType
-                    + `${property.propertyname}(${propertyTypeName})\n` + property.propertydescr
-                const EntiyColumnName = property.columnname
-                const EntiyColumnType = "string"
-                return {
-                    EntiyColumnComment,
-                    EntiyColumnName,
-                    EntiyColumnType,
-                }
-            });
-        return {
-            EntityName,
-            EntityComment,
-            EntiyColumns,
-        }
-    }).map(generateEntityDts).join("\n")
+    return tableDatas.map(generateFullEntityInterfaceDtsFunc).map(generateEntityDts).join("\n")
 
 }
 
+export const generateFullEntityInterfaceDtsFunc = (entity: tableData): Entiy => {
+    let EntityName
+    if (entity && typeof entity.objectmark !== 'undefined') {
+        EntityName = entity.objectmark
+    } else {
+        EntityName = entity.tablename
+    }
+    let EntityComment = `${entity}(${entity.objectname})`
+    if (entity.tablename != EntityName) {
+        EntityComment += `-衍生于(${entity.tablename})`
+    }
+    const EntiyColumns = entity.properties
+        .map((property): EntiyColumn => {
+            const emojiType = getPropertyTypeEmoji(Number(property.propertytypecode))
+            const propertyTypeName = getPropertyTypeName(Number(property.propertytypecode))
+            const EntiyColumnComment = emojiType
+                + `${property.propertyname}(${propertyTypeName})\n` + property.propertydescr
+            const EntiyColumnName = property.columnname
+            const EntiyColumnType = "string"
+            return {
+                EntiyColumnComment,
+                EntiyColumnName,
+                EntiyColumnType,
+            }
+        });
+    return {
+        EntityName,
+        EntityComment,
+        EntiyColumns,
+    }
+}
 
-const BoTemplate = `/**
+
+export const BoTemplate = `/**
 * BO 业务对象
 */
 declare class BO {
 {{BoNewList}}
+{{tempDtsList}}
 }
 `
 
-const BoNewTemplate = `
+export const BoNewTemplate = `
     /**
      * 创建业务对象{@link {{EntityName}}}。
      * @returns 业务对象实例
      */
     static new(entityName: "{{EntityName}}"): {{EntityName}};
-
 `
 
 export function generateBONewDtsByProtocol(protocol: Protocol, tableDataMap: Map<string, tableData>) {

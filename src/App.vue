@@ -22,7 +22,7 @@ import { useFlyStore } from './store/flyStore';
 
 import { nextTick } from 'vue';
 import { RefreshExtraLib } from './flycodeDts'
-import { monacoInitializedUtil } from './util/monacoUtil'
+import { getMonacoModel, monacoInitializedUtil } from './util/monacoUtil'
 import { GM_getValue } from '$';
 
 
@@ -56,6 +56,8 @@ onMounted(async () => {
           //   console.log("test");
           //   getFqueryModel()
           // }, 1)
+          // @ts-ignore
+          window.getMonacoModel = getMonacoModel
           clearInterval(c)
         } else {
           console.log("wait...");

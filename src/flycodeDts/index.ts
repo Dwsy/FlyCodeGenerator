@@ -1,6 +1,6 @@
 import { useFlyStore } from "../store/flyStore";
 import { Protocol } from "../type/protocol";
-import { generateBONewDtsByProtocol } from "./BoNew";
+import { BoNewTemplate, BoTemplate, generateBONewDtsByProtocol } from "./BoNew";
 import { generateFullEntityDtsByProtocol } from "./EntityDts/FullEntityDtsGenerator";
 import { generateInAndOutEntityDtsByProtocol } from "./EntityDts/InAndOutEntityDtsGenerator";
 
@@ -9,6 +9,14 @@ let entityDts: string
 let inOutEntityDts: string
 let BONewDts: string
 let init = false
+let tempBoNewDtsList = []
+
+export function pushTempBoNewDtsList(boname) {
+
+    tempBoNewDtsList.push(BoNewTemplate.replaceAll("{{EntityName}}", boname))
+    console.log("tempBoNewDtsList", tempBoNewDtsList)
+    RefreshExtraLib(false)
+}
 export function RefreshExtraLib(onlyUIFlycode: boolean = false) {
     const flyStore = useFlyStore()
     const ExtraLibs = []
@@ -24,6 +32,9 @@ export function RefreshExtraLib(onlyUIFlycode: boolean = false) {
         if (flyStore.protocol != undefined) {
             inOutEntityDts = generateInAndOutEntityDtsByProtocol(flyStore.protocol)
             BONewDts = generateBONewDtsByProtocol(flyStore.protocol, flyStore.tableDataMap)
+            if (!BONewDts) {
+                BONewDts = BoTemplate.replace("{{BoNewList}}", "")
+            }
         }
     }
 
@@ -34,7 +45,7 @@ export function RefreshExtraLib(onlyUIFlycode: boolean = false) {
             ExtraLibs.push({ content: inOutEntityDts })
             ExtraLibs.push({ content: flycodeDts })
             ExtraLibs.push({ content: entityDts })
-            ExtraLibs.push({ content: BONewDts })
+            ExtraLibs.push({ content: BONewDts.replaceAll("{{tempDtsList}}", `\n${tempBoNewDtsList.join("\n")}`) })
         }
     }
 

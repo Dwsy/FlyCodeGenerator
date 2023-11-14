@@ -8,6 +8,7 @@ import { RefreshExtraLib } from "../flycodeDts";
 import { GM_getValue } from "$";
 import { monacoInitializedUtil } from "../util/monacoUtil";
 import { getPropertyTypeName } from "../type/model/propertyTypeCodeRef";
+import { useGenStore } from "./genStore";
 
 export const useFlyStore = defineStore('flyStore', () => {
 
@@ -17,6 +18,7 @@ export const useFlyStore = defineStore('flyStore', () => {
     const protocol = ref<Protocol>()
     const tableDatas = ref<tableData[]>()
     const tableDataMap = ref(new Map<string, tableData>);
+    const tableNameDataMap = ref(new Map<string, tableData>);
     const columnDataMap = ref(new Map<string, columnData>);
 
 
@@ -38,6 +40,7 @@ export const useFlyStore = defineStore('flyStore', () => {
         tableDatas.value.forEach((data) => {
             // 将 data 对象添加到 tableDataMap 中
             tableDataMap.value.set(data.objectcode, data);
+            tableNameDataMap.value.set(data.tablename, data);
             // 遍历 data.properties 数组
             data.properties.forEach((columnData) => {
                 // 将 columnData 对象添加到 columnDataMap 中
@@ -96,6 +99,8 @@ export const useFlyStore = defineStore('flyStore', () => {
         setTimeout(async () => {
             protocol.value = (await getProtocol()).resp_data
             if (addDtsEnable) {
+                const genStore = useGenStore()
+                genStore.tempBoNewDtsList = []
                 console.log("updateProtocol");
                 monacoInitializedUtil.addInitializedCallback(
                     () => RefreshExtraLib()
@@ -149,6 +154,7 @@ export const useFlyStore = defineStore('flyStore', () => {
         tableDatas,
         columnDataMap,
         tableDataMap,
+        tableNameDataMap,
         // data
 
         // status

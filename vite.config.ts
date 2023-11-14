@@ -6,7 +6,7 @@ import AutoImport from 'unplugin-auto-import/vite';
 // https://vitejs.dev/config/
 export default defineConfig({
   build: {
-    minify: "terser"
+    minify: "esbuild"
   },
   plugins: [
     jsx({}),
@@ -15,6 +15,7 @@ export default defineConfig({
     }),
     vue(),
     monkey({
+      server: { open: false },
       entry: 'src/main.ts',
       userscript: {
         icon: 'http://flydoc.dwsy.link/xwlogoblue.png',
