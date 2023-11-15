@@ -1,6 +1,7 @@
 import { pushTempBoNewDtsList } from "../../flycodeDts";
 import { useFlyStore } from "../../store/flyStore";
 import { PropertyTypeCode } from "../../type/model/propertyTypeCodeRef";
+import { getTableShortName } from "../../util";
 import { getMonacoModel } from "../../util/monacoUtil";
 
 export const addBoNewAction = (editor) => {
@@ -22,13 +23,24 @@ export const addBoNewAction = (editor) => {
             // @param editor The editor instance is passed in as a convenience
             run: function (ed) {
                 const lineContent = getMonacoModel().getLineContent(ed.getPosition().lineNumber);
-                const match = lineContent.match(/BO.new\((.*?)\)/);
+                let match = lineContent.match(/BO.new\((.*?)\)/);
+                if (!match) {
+                    match = lineContent.match(/new\s+(.*)/);
+                }
+                if (!match) {
+                    return
+                }
                 const boName = match[1]
+                let shortName = boName
+                if (shortName.length > 15) {
+                    shortName = getTableShortName(boName)
+                }
+
                 var b = flyStore.tableNameDataMap.get(boName).properties.map((item) => {
                     if (item.propertytypecode == PropertyTypeCode.PrimaryKey.toString()) {
-                        return `${boName}.${item.columnname} = FLY.genId()`
+                        return `${shortName}.${item.columnname} = FLY.genId()`
                     } else {
-                        let temp = `${boName}.${item.columnname} = ${item.columnname}`
+                        let temp = `${shortName}.${item.columnname} = ${item.columnname}`
                         let len = temp.length
                         for (var i = 0; i < 55 - len; i++) {
                             temp += " "
@@ -36,7 +48,8 @@ export const addBoNewAction = (editor) => {
                         return `${temp}//${item.propertyname}`
                     }
                 })
-                b.unshift(`var ${boName} = BO.new("${boName}")`)
+
+                b.unshift(`var ${shortName} = BO.new("${boName}")`)
                 console.log(b.join("\n"))
                 // 删除当前行
                 ed.executeEdits("source", [{
@@ -45,7 +58,7 @@ export const addBoNewAction = (editor) => {
                 }])
                 ed.executeEdits("source", [{
                     range: new monaco.Range(ed.getPosition().lineNumber, 1, ed.getPosition().lineNumber, 1),
-                    text: b.join("\n") + "\n"
+                    text: b.join("\n") + "\n\n"
                 }])
                 pushTempBoNewDtsList(boName)
             },

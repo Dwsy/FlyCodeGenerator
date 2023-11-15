@@ -1,5 +1,5 @@
 // 引入自定义模块中的 getTableShortName 方法
-import {getTableShortName} from "../../util/";
+import { getTableShortName } from "../../util/";
 import {
   ColumnModel,
   ConditionGenerator,
@@ -10,11 +10,11 @@ import {
   Operator,
   QueryModel
 } from "../../type/model/queryModel"
-import {DatePropertyCodes} from "../../type/model/propertyTypeCodeRef";
-import {useFlyStore} from "../../store/flyStore";
-import {watchEffect} from "vue";
-import {Output, Property, Protocol} from "../../type/protocol";
-import {message} from "../../util/message";
+import { DatePropertyCodes } from "../../type/model/propertyTypeCodeRef";
+import { useFlyStore } from "../../store/flyStore";
+import { watchEffect } from "vue";
+import { Output, Property, Protocol } from "../../type/protocol";
+import { message } from "../../util/message";
 
 
 let protocol: Protocol
@@ -140,11 +140,12 @@ function gen(output: Output, queryArgumentArrayMap: Map<string, Property[]>): Qu
   // console.log(relationTableShortNameReverseMapReverse)
   // 查询列
   let selectColumns = outPropertiesDataMap
+    .filter(predicate => predicate != undefined)
     .map((data) => {
       // console.log("data", data)//todo
       // debugger
       const queryname = relationTableColumnMap.get(data.propertycode);
-      if (data.columnname=='shelfdisplay'){
+      if (data.columnname == 'shelfdisplay') {
         return
         // ??
       }
@@ -290,7 +291,7 @@ export function generateSql(queryModel: QueryModel): string {
   // debugger
   // 生成 SELECT 子句
   const selectClause = `SELECT\n  ${queryModel.columns.map((c) => {
-    
+
     if (c.queryName == null) {
       return `${c.tableShortName}.${c.columnName}`
     } else {
@@ -307,7 +308,7 @@ export function generateSql(queryModel: QueryModel): string {
   // debugger
 
 
-// 生成 WHERE 子句
+  // 生成 WHERE 子句
   const whereClauses = queryModel.conditions.map(getWhereCallback());
   const whereClause = whereClauses.length > 0 ? `WHERE 1=1\n${whereClauses.join("")}` : "";
 
@@ -340,14 +341,14 @@ function getWhereCallback() {
       const juede = `!String.isBlank(IN.${c.tableName}.${c.columnName})`
       const condition = generator.generateWhereClause();
       whereTemplate = whereTemplate
-          .replace("{{if}}", juede)
-          .replace("{{condition}}", condition);
+        .replace("{{if}}", juede)
+        .replace("{{condition}}", condition);
     } else if (c.operator === Operator.Like) {
       const juede = `!String.isBlank(IN.${c.tableName}.${c.columnName})`
       let whereClause = generator.generateWhereClause()
       whereTemplate = whereTemplate
-          .replace('{{if}}', juede)
-          .replace('{{condition}}', whereClause);
+        .replace('{{if}}', juede)
+        .replace('{{condition}}', whereClause);
     } else if (c.operator === Operator.Between) {
       const isDate = DatePropertyCodes.indexOf(Number(c.propertytypecode)) !== -1
       const [lvalue, rvalue] = isDate ? ["begin", "end"] : ["min", "max"]
@@ -356,8 +357,8 @@ function getWhereCallback() {
       let whereClause = generator.generateWhereClause()
       // console.log("c.propertytypecode", c.propertytypecode)
       whereTemplate = whereTemplate
-          .replace('{{if}}', juede)
-          .replace('{{condition}}', whereClause);
+        .replace('{{if}}', juede)
+        .replace('{{condition}}', whereClause);
     }
 
     return whereTemplate;

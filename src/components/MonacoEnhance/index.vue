@@ -13,14 +13,22 @@ import { PropertyTypeCode } from '../../type/model/propertyTypeCodeRef';
 import { useGenStore } from '../../store/genStore';
 import { pushTempBoNewDtsList } from '../../flycodeDts';
 import { addBoNewAction } from './index'
-
+import { applyCustomFlycode, MonarchTokensProvider, LanguageConfiguration } from "./monaco.languages.conf";
 onMounted(() => {
-
+    //@ts-ignore
+    window.MonarchTokensProvider = MonarchTokensProvider
+    //@ts-ignore
+    window.LanguageConfiguration = LanguageConfiguration
+    //@ts-ignore
+    window.apply = applyCustomFlycode
+    // @ts-ignore
+    window.getMonacoModel0 = getMonacoModel
     monacoInitializedUtil
         .addInitializedCallback(async () => {
             //@ts-ignore
             monaco.editor.onDidCreateEditor((editor: ICodeEditor) => {
                 addBoNewAction(editor)
+                applyCustomFlycode()
             })
         })
 
