@@ -31,12 +31,92 @@ export let LanguageConfiguration = sent.conf;
 // monaco.languages.register({
 //   id: "flycode",
 // });
+const operators = [
+  "<=",
+  ">=",
+  "==",
+  "!=",
+  "===",
+  "!==",
+  "=>",
+  "+",
+  "-",
+  "**",
+  "*",
+  "/",
+  "%",
+  "++",
+  "--",
+  "<<",
+  "</",
+  ">>",
+  ">>>",
+  "&",
+  "|",
+  "^",
+  "!",
+  "~",
+  "&&",
+  "||",
+  "??",
+  "?",
+  ":",
+  "=",
+  "+=",
+  "-=",
+  "*=",
+  "**=",
+  "/=",
+  "%=",
+  "<<=",
+  ">>=",
+  ">>>=",
+  "&=",
+  "|=",
+  "^=",
+  "@",
+  "ALL",
+  "AND",
+  "ANY",
+  "BETWEEN",
+  "EXISTS",
+  "IN",
+  "LIKE",
+  "NOT",
+  "OR",
+  "SOME",
+  "EXCEPT",
+  "INTERSECT",
+  "UNION",
+  "APPLY",
+  "CROSS",
+  "FULL",
+  "INNER",
+  "JOIN",
+  "LEFT",
+  "OUTER",
+  "RIGHT",
+  "CONTAINS",
+  "FREETEXT",
+  "IS",
+  "NULL",
+  "PIVOT",
+  "UNPIVOT",
+  "MATCHED"
+]
+
+const PropertyRegex = /\.(\w+).(?=\s|[" + operators.join("|") + "])/
+
+const PropertyRegexPre = /\w+(?=\.)/;
+
 MonarchTokensProvider.tokenizer.root.unshift([/\/\/\s*TODO\b/i, 'comment.todo'])
 MonarchTokensProvider.tokenizer.root.unshift([/\/\/\s*FIXME\b/i, 'comment.fixme'])
 MonarchTokensProvider.tokenizer.root.unshift([/\/\/\s*NOTE\b/i, 'comment.fixme'])
 MonarchTokensProvider.tokenizer.root.unshift([/\/\/\s*todo\b/i, 'comment.todo'])
 MonarchTokensProvider.tokenizer.root.unshift([/\/\/\s*fixme\b/i, 'comment.fixme'])
 MonarchTokensProvider.tokenizer.root.unshift([/\/\/\s*remind\b/i, 'comment.remind'])
+MonarchTokensProvider.tokenizer.root.unshift([PropertyRegex, 'code.property'])
+MonarchTokensProvider.tokenizer.root.unshift([PropertyRegexPre, 'code.propertypre'])
 MonarchTokensProvider.tokenizer.root.unshift([/FLY\.log/, 'flylog'])
 export const applyCustomFlycode = (monarchTokensProvider = MonarchTokensProvider, languageConfiguration = LanguageConfiguration) => {
   console.log("apply MonarchTokensProvider and setLanguageConfiguration");

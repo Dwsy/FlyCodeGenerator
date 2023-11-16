@@ -147,6 +147,9 @@ const changeTheme = (name: string = 'default') => {
 
 
                 rules.push({ token: "flylog", foreground: "27ae60", fontStyle: "bold" })
+                // AD3DA4
+                rules.push({ token: "code.property", foreground: "4B22B0" })
+                // rules.push({ token: "code.propertypre", foreground: "AD3DA4" })
 
                 // @ts-ignore         "fontStyle": "underline",
                 monaco.editor.defineTheme("mytheme", data);
@@ -177,7 +180,7 @@ const nextTheme = () => {
 }
 
 .view-line {
-    font-family: 'Cascadia Mono PL', Courier, monospace;
+    /* font-family: 'Cascadia Mono PL', Courier, monospace; */
     /* font-size: medium; */
     font-weight: normal
 }
