@@ -1,6 +1,6 @@
 import { useFlyStore } from "../store/flyStore";
 import { Protocol } from "../type/protocol";
-import { BoNewTemplate, BoTemplate, generateBONewDtsByProtocol } from "./BoNew";
+import { BoNewTemplate, BoTemplate, generateBONewDtsByProtocol, generateEntityInterfaceDtsByProtocol } from "./BoNew";
 import { generateFullEntityDtsByProtocol } from "./EntityDts/FullEntityDtsGenerator";
 import { generateInAndOutEntityDtsByProtocol } from "./EntityDts/InAndOutEntityDtsGenerator";
 
@@ -10,11 +10,13 @@ let inOutEntityDts: string
 let BONewDts: string
 let init = false
 let tempBoNewDtsList = []
+let tempBoNewEntityInterfaceDtsList = []
 
 export function pushTempBoNewDtsList(boname) {
-
+    const tableNameDataMap = useFlyStore().tableNameDataMap
     tempBoNewDtsList.push(BoNewTemplate.replaceAll("{{EntityName}}", boname))
     console.log("tempBoNewDtsList", tempBoNewDtsList)
+    tempBoNewEntityInterfaceDtsList.push(generateEntityInterfaceDtsByProtocol([tableNameDataMap.get(boname)]))
     RefreshExtraLib(false)
 }
 export function RefreshExtraLib(onlyUIFlycode: boolean = false) {
@@ -44,8 +46,10 @@ export function RefreshExtraLib(onlyUIFlycode: boolean = false) {
         if (inOutEntityDts != undefined) {
             ExtraLibs.push({ content: inOutEntityDts })
             ExtraLibs.push({ content: flycodeDts })
+            ExtraLibs.push({ content: testDts })
             ExtraLibs.push({ content: entityDts })
             ExtraLibs.push({ content: BONewDts.replaceAll("{{tempDtsList}}", `\n${tempBoNewDtsList.join("\n")}`) })
+            ExtraLibs.push({ content: tempBoNewEntityInterfaceDtsList.join("\n") })
         }
     }
 
@@ -56,9 +60,16 @@ export function RefreshExtraLib(onlyUIFlycode: boolean = false) {
 }
 
 
+const testDts = `
+var select:Array<string>
+var SELECT:Array<string>
+`
 
-
-const flycodeDts = `// 3.1.5. 工具库
+const flycodeDts = `
+declare class String {
+    static isBlank(str: string): boolean;
+}
+// 3.1.5. 工具库
 declare class FLY {
     /**
      * 3.1.5.1. 打印日志

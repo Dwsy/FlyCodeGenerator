@@ -71,7 +71,7 @@ const generateEntityDts = (entiy: Entiy): string => {
  * @param {tableData} tableData - 协议对象。
  * @returns {string} 输入输出实体的类型定义。
  */
-const generateFullEntityInterfaceDtsByProtocol = (tableDatas: tableData[]): string => {
+export const generateEntityInterfaceDtsByProtocol = (tableDatas: tableData[]): string => {
     // 筛选tableDatas 的objectmark 在 inoutNameArray 中的数据
 
     return tableDatas.map(generateFullEntityInterfaceDtsFunc).map(generateEntityDts).join("\n")
@@ -144,7 +144,10 @@ export function generateBONewDtsByProtocol(protocol: Protocol, tableDataMap: Map
     }
     const inoutNameArray = inoutArray.map((inout) => inout.name)
     const inoutRableDataArray = inoutArray.map((inout) => tableDataMap.get(inout.objectcode))
-    const FullEntityInterfaceDts = generateFullEntityInterfaceDtsByProtocol(inoutRableDataArray)
+
+
+
+    const FullEntityInterfaceDts = generateEntityInterfaceDtsByProtocol(inoutRableDataArray)
     const boNewTemplateArray = inoutNameArray
         .map((name) => { return BoNewTemplate.replaceAll("{{EntityName}}", name) })
         .join("\n")

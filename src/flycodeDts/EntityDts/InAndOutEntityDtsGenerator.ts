@@ -1,5 +1,5 @@
 import { useFlyStore } from "../../store/flyStore"
-import { PropertyTypeCode, getPropertyTypeEmoji, getPropertyTypeName } from "../../type/model/propertyTypeCodeRef"
+import { PropertyTypeCode, getPropertyTypeEmoji, getPropertyTypeJavaScriptName, getPropertyTypeName } from "../../type/model/propertyTypeCodeRef"
 import { Input, Output, Protocol } from "../../type/protocol"
 
 export type EntityType = "IN" | "OUT" | ""
@@ -50,6 +50,7 @@ const EntityColumnsTemplate = `    /**
  * @returns {string} 输入输出类型定义。
  */
 const generateInOutDts = (entiy: Entiy, entityType: EntityType) => {
+
     let arrayEntityTypeDts = ''
     let isArray = false
     if (entiy.EntityName.startsWith("$")) {
@@ -105,7 +106,7 @@ const generateEntiyObjList = (entiys: Array<Input> | Array<Output>, entityType: 
     const flyStore = useFlyStore()
 
     return entiys
-        .filter((data) => data.properties.length > 0)
+        .filter((data) => data.properties.length > 0 && data.datatype == "0")
         .map((entity): Entiy => {
             const EntityComment = `${entity.name}(${entity.objectname})`
             const EntiyColumns = entity.properties
@@ -145,36 +146,75 @@ export const generateInAndOutEntityDtsByProtocol = (protocol: Protocol) => {
     const inputEntiyList = generateEntiyObjList(protocol.input, "IN")
     const outputEntiyList = generateEntiyObjList(protocol.output, "OUT")
     // debugger
+    // 处理自定义入参
     protocol.input.filter((data) => Object.hasOwn(data, 'customcode')).forEach((custimEntity) => {
-        inputEntiyList.push({
-            Type: "IN",
-            EntityName: custimEntity.name,
-            EntityComment: `${custimEntity.name}(${custimEntity.objectname})`,
-            EntiyColumns: custimEntity.properties.map((column) => {
-                let columnData: EntiyColumn = {
-                    EntiyColumnComment: `${column.propertyname}(${PropertyTypeCode[column.propertytypecode]})})`,
-                    EntiyColumnName: column.propertyname,
-                    EntiyColumnType: getPropertyTypeName(column.propertytypecode),
-                }
-                return columnData
+        console.log(custimEntity)
+        //实体
+        if (custimEntity.datatype == "0") {
+            inputEntiyList.push({
+                Type: "IN",
+                EntityName: custimEntity.name,
+                EntityComment: `${custimEntity.name}(${custimEntity.objectname})`,
+                EntiyColumns: custimEntity.properties.map((column) => {
+                    let columnData: EntiyColumn = {
+                        EntiyColumnComment: `${column.propertyname}(${PropertyTypeCode[column.propertytypecode]})})`,
+                        EntiyColumnName: column.name,
+                        EntiyColumnType: getPropertyTypeJavaScriptName(column.propertytypecode),
+                    }
+                    return columnData
+                })
             })
-        })
+        }
+        //数组
+        else if (custimEntity.datatype == "1") {
+            inputEntiyList.push({
+                Type: "IN",
+                EntityName: "$" + custimEntity.name,
+                EntityComment: `${custimEntity.name}(${custimEntity.objectname})`,
+                EntiyColumns: custimEntity.properties.map((column) => {
+                    let columnData: EntiyColumn = {
+                        EntiyColumnComment: `${column.propertyname}(${PropertyTypeCode[column.propertytypecode]})})`,
+                        EntiyColumnName: column.name,
+                        EntiyColumnType: getPropertyTypeJavaScriptName(column.propertytypecode),
+                    }
+                    return columnData
+                })
+            })
+        }
     })
-
-    protocol.output.filter((data) => Object.hasOwn(data, 'customcode')).forEach((custimEntity) => {
-        inputEntiyList.push({
-            Type: "OUT",
-            EntityName: custimEntity.name,
-            EntityComment: `${custimEntity.name}(${custimEntity.objectname})`,
-            EntiyColumns: custimEntity.properties.map((column) => {
-                let columnData: EntiyColumn = {
-                    EntiyColumnComment: `${column.propertyname}(${PropertyTypeCode[column.propertytypecode]})})`,
-                    EntiyColumnName: column.propertyname,
-                    EntiyColumnType: getPropertyTypeName(column.propertytypecode),
-                }
-                return columnData
+    // 处理自定义出参
+    protocol.output.filter((data) => Object.hasOwn(data, 'customcode') && data.datatype == "0").forEach((custimEntity) => {
+        if (custimEntity.datatype == "0") {
+            outputEntiyList.push({
+                Type: "OUT",
+                EntityName: custimEntity.name,
+                EntityComment: `${custimEntity.name}(${custimEntity.objectname})`,
+                EntiyColumns: custimEntity.properties.map((column) => {
+                    let columnData: EntiyColumn = {
+                        EntiyColumnComment: `${column.propertyname}(${PropertyTypeCode[column.propertytypecode]})})`,
+                        EntiyColumnName: column.name,
+                        EntiyColumnType: getPropertyTypeJavaScriptName(column.propertytypecode),
+                    }
+                    return columnData
+                })
             })
-        })
+        }
+        else if (custimEntity.datatype == "1") {
+            outputEntiyList.push({
+                Type: "OUT",
+                EntityName: "$" + custimEntity.name,
+                EntityComment: `${custimEntity.name}(${custimEntity.objectname})`,
+                EntiyColumns: custimEntity.properties.map((column) => {
+                    let columnData: EntiyColumn = {
+                        EntiyColumnComment: `${column.propertyname}(${PropertyTypeCode[column.propertytypecode]})})`,
+                        EntiyColumnName: column.name,
+                        EntiyColumnType: getPropertyTypeJavaScriptName(column.propertytypecode),
+                    }
+                    return columnData
+                })
+            })
+        }
+
     })
 
 

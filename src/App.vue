@@ -12,19 +12,20 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted} from 'vue';
-import {darkTheme, lightTheme} from 'naive-ui'
-import {Generator} from './components'
+import { onMounted } from 'vue';
+import { darkTheme, lightTheme } from 'naive-ui'
+import { Generator } from './components'
 import Ftheme from './components/Theme/index.vue'
 import MonacoEnhance from './components/MonacoEnhance/index.vue'
-import {ref} from 'vue'
-import type {GlobalTheme} from 'naive-ui'
-import {useFlyStore} from './store/flyStore';
+import { ref } from 'vue'
+import type { GlobalTheme } from 'naive-ui'
+import { useFlyStore } from './store/flyStore';
 
-import {nextTick} from 'vue';
-import {RefreshExtraLib} from './flycodeDts'
-import {getMonacoModel, monacoInitializedUtil} from './util/monacoUtil'
-import {GM_getValue} from '$';
+import { nextTick } from 'vue';
+import { RefreshExtraLib } from './flycodeDts'
+import { getMonacoModel, monacoInitializedUtil } from './util/monacoUtil'
+import { GM_getValue } from '$';
+import { getFqueryModel } from './flycodeDts/FQuery/test';
 
 
 const theme = ref<GlobalTheme | null>(darkTheme)
@@ -33,10 +34,12 @@ const flyStore = useFlyStore()
 
 let previousURL = window.location.href;
 onMounted(async () => {
+  //@ts-ignore
+  window.getFqueryModel = getFqueryModel
   localStorage.getItem("ide_theme") === 'light' ? theme.value = lightTheme : theme.value = darkTheme
   await flyStore.init()
   monacoInitializedUtil
-      .addInitializedCallback(_)
+    .addInitializedCallback(_)
 
 
   // addButton(null, "生成API文档", "ideicon-share", () => {
@@ -94,7 +97,7 @@ function checkURLChangeThenUpdateProtocol() {
 
       if (currentURL.indexOf("modeledit") != -1) {
         console.log("// URL发生变化，执行您的函数",
-            "currentURL:", currentURL, "previousURL", previousURL);
+          "currentURL:", currentURL, "previousURL", previousURL);
         const temp = previousURL.split("/")
         const temp1 = currentURL.split("/")
         if (currentURL.indexOf("modeledit") != -1) {
@@ -110,7 +113,7 @@ function checkURLChangeThenUpdateProtocol() {
         if (flyStore.addDtsEnable) {
           console.log("update uiflycode dts");
           monacoInitializedUtil.addInitializedCallback(
-              () => RefreshExtraLib(true)
+            () => RefreshExtraLib(true)
           )
         }
       }

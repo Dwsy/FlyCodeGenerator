@@ -82,6 +82,22 @@ export function getPropertyTypeName(code: PropertyTypeCode | string): string {
     return PropertyTypeName[Number(code)] || '';
 }
 
+export function getPropertyTypeJavaScriptName(code: PropertyTypeCode | string): string {
+    if (code === PropertyTypeCode.Integer) {
+        return "number"
+    }
+    if (code === PropertyTypeCode.LongInteger) {
+        return "number"
+    }
+    if (code === PropertyTypeCode.Status) {
+        return "number"
+    }
+    if (code === PropertyTypeCode.SortOrder) {
+        return "number"
+    }
+    return "string"
+}
+
 
 export const test = () => {
 

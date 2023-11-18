@@ -15,7 +15,7 @@ onMounted(async () => {
     await nextTick(() => {
         // @ts-ignore
         monaco.editor.colorizeElement(document.getElementById("flyCode"), {
-            theme: "vs-dark",
+            // theme: "vs-dark",
         });
     })
     // @ts-ignore

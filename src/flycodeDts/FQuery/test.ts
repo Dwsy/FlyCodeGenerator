@@ -1,4 +1,5 @@
 import { GM_setClipboard } from "$";
+import { formatFquery } from "../../util/formateFquery";
 import { getMonacoModel, monacoInitializedUtil } from "../../util/monacoUtil";
 
 
@@ -10,6 +11,7 @@ export function getFqueryModel() {
     let regex = /(\w+)\s*=\s*(select|SELECT)[^;]+;/g;
     var matches = text.match(regex);
 
+    const allFQuery: Array<string> = []
     if (matches) {
         matches.forEach(function (match, index) {
             var assignment = match.match(/(\w+)\s*=\s*(select|SELECT)/);
@@ -17,19 +19,20 @@ export function getFqueryModel() {
                 let variableName = assignment[1];
                 let query = match.substring(match.indexOf(variableName)).trim();
                 console.log(query)
-                const parts = query.split('=');
+                const partsIndex = query.indexOf('=');
 
                 // if (parts.length === 2) {
                 // const variableName = parts[0].trim();
-                const queryString = parts[1].trim();
+                const queryString = query.substring(partsIndex + 1).trim();
                 // console.log("Variable Name:", variableName);
                 // console.log("Query String:", queryString);
-                const sqlStr = "`" + queryString + "`"
-                console.log(sqlStr)
-                text = text.replace(queryString, sqlStr)
-                // } else {
-                //     console.log("Input string does not contain an equal sign.");
-                // }
+                // const sqlStr = "`" + queryString + "`"
+
+                let formattedSQL = formatFquery(queryString.replaceAll("//", "--//"))
+                formattedSQL = formattedSQL.replaceAll("--//", "//")
+                console.log(formattedSQL)
+
+                text = text.replace(queryString, formattedSQL)
             }
         });
         console.log(text)
@@ -62,6 +65,7 @@ interface FlycodeJoin {
 }
 
 function parseFlycodeQueryString(flycodeString: string): FlycodeQuery | null {
+    debugger
     const flycodeQuery: FlycodeQuery = {
         query: "",
         select: [],

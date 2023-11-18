@@ -25,9 +25,9 @@ onMounted(() => {
     window.getMonacoModel0 = getMonacoModel
     monacoInitializedUtil
         .addInitializedCallback(async () => {
-            //@ts-ignore
-            monaco.editor.onDidCreateEditor((editor: ICodeEditor) => {
-                addBoNewAction(editor)
+
+            monaco.editor.onDidCreateEditor((editor) => {
+                addBoNewAction(editor as monaco.editor.IStandaloneCodeEditor)
                 applyCustomFlycode()
             })
         })
