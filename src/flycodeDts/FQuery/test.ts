@@ -15,6 +15,7 @@ export function getFqueryModel() {
     if (matches) {
         matches.forEach(function (match, index) {
             var assignment = match.match(/(\w+)\s*=\s*(select|SELECT)/);
+            console.log(assignment)
             if (assignment) {
                 let variableName = assignment[1];
                 let query = match.substring(match.indexOf(variableName)).trim();
@@ -28,7 +29,7 @@ export function getFqueryModel() {
                 // console.log("Query String:", queryString);
                 // const sqlStr = "`" + queryString + "`"
 
-                let formattedSQL = formatFquery(queryString.replaceAll("//", "--//"))
+                let formattedSQL = formatFquery(queryString.replaceAll("//", "--//"), "")
                 formattedSQL = formattedSQL.replaceAll("--//", "//")
                 console.log(formattedSQL)
 

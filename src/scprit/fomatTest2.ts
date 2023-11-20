@@ -43,21 +43,21 @@ WHERE 1=1
   and t1.code like  { '%' + IN.tn_crm_dwy.code + '%' }
 {#endif}
 
-{#if start != null && end != null}
+{ #if start != null && end != null}
   and t1.create_time between { start } and { end }
      and t1.create_time between { start } and { end }
   and t1.create_time between { start } and { end }
   and t1.create_time between { start } and { end }
 {#endif}
+and 1
+ = {IN.123123}
 ORDER BY create_time DESC
 paging
-RULEOBJ(onrule)
-//123`
-sql = sql.replace(/(\bpaging|\bruleobj\bselect|\bcase|\bfrom|\bwhere|\band|\bor|\border by|\bleft join|\binner join|\bjoin)\b/gi, match => {
+RULEOBJ(onrule)`
+sql = sql.replace(/(\bpaging|\bruleobj|\bnorule\bselect|\bcase|\bfrom|\bwhere|\band|\bor|\border by|\bleft join|\binner join|\bjoin)\b/gi, match => {
     console.log(match)
     return match.toUpperCase()
 });
-sql = sql.replaceAll("//", "--//")
 
 let ifArray: Array<string> = [];
 let endifArray: Array<string> = [];
@@ -74,7 +74,7 @@ interface IfSqlBlock {
 
 const ifSqlBlockArray: Array<IfSqlBlock> = [];
 
-let regex = /\{#endif.*\}/g;
+let regex = /\{\s*#endif\s*.*\}/g;
 let endifseq = 0;
 
 sql = sql.replace(regex, function (match) {
@@ -84,9 +84,11 @@ sql = sql.replace(regex, function (match) {
     });
     return `--split:endif${endifseq++}` + match;
 });
-
+sql = sql.replace("PAGING", "\n--PAGING")
+sql = sql.replace("RULEOBJ", "\n--RULEOBJ")
+sql = sql.replace("NORULE", "\n--NORULE")
 let ifSeq = 0;
-regex = /\{#if.*\}/g;
+regex = /\{\s*#if\s*.*\}/g;
 sql = sql.replace(regex, function (match) {
     ifArray.push(match);
     ifSqlBlockArray[ifSeq].if = match;
@@ -137,6 +139,9 @@ let formatSQL = format(sql, {
     tabWidth: 2,
     keywordCase: 'preserve',
     linesBetweenQueries: 2,
+    paramTypes: {
+        custom: [{ regex: String.raw`\{[\s\S]*?\}` }]
+    }
 });
 
 ifSqlBlockArray.forEach((b, index) => {
@@ -169,5 +174,9 @@ ifSqlBlockArray.forEach((b, index) => {
         return line;
     }).join("\n");
 });
-formatSQL = formatSQL.replaceAll("--//", "//")
+formatSQL = formatSQL.replace("--PAGING", "PAGING")
+formatSQL = formatSQL.replace("--RULEOBJ", "RULEOBJ")
+formatSQL = formatSQL.replace("--NORULE", "NORULE")
+formatSQL = formatSQL.replace("EMTLYL", ".")
+
 console.error(formatSQL);

@@ -1,10 +1,21 @@
 import { format } from 'sql-formatter';
-
-export function formatFquery(sql: string): string {
-    sql = sql.replace(/(\bpaging|\bruleobj\bselect|\bcase|\bfrom|\bwhere|\band|\bor|\border by|\bleft join|\binner join|\bjoin)\b/gi, match => {
+const tempFunc = (sql) => {
+    let matches = sql.match(/\{[\s\S]*?\}/g);
+    matches.map((matche) => {
+        if (matche.indexOf(".") != -1) {
+            let newmatche = matche.replace(".", "EMTLYL").replaceAll("\n", '')
+            console.log("newmatche      " + newmatche)
+            sql = sql.replace(matche, newmatche)
+        }
+    })
+    return sql
+}
+export function formatFquery(sql: string, start: string): string {
+    sql = sql.replace(/(\bpaging|\bas|\bruleobj|\bnorule\bselect|\bcase|\bfrom|\bwhere|\band|\bor|\border by|\bleft join|\binner join|\bjoin)\b/gi, match => {
         console.log(match)
         return match.toUpperCase()
     });
+    sql = sql.split("\n").map(line => line.trim()).join("\n");
     let ifArray: Array<string> = [];
     let endifArray: Array<string> = [];
     let ifSqlArray: Array<string> = [];
@@ -20,7 +31,7 @@ export function formatFquery(sql: string): string {
 
     const ifSqlBlockArray: Array<IfSqlBlock> = [];
 
-    let regex = /\{#endif.*\}/g;
+    let regex = /\{\s*#endif\s*.*\}/g;
     let endifseq = 0;
 
     sql = sql.replace(regex, function (match) {
@@ -30,9 +41,11 @@ export function formatFquery(sql: string): string {
         });
         return `--split:endif${endifseq++}` + match;
     });
-
+    sql = sql.replace("PAGING", "\n--PAGING")
+    sql = sql.replace("RULEOBJ", "\n--RULEOBJ")
+    sql = sql.replace("NORULE", "\n--NORULE")
     let ifSeq = 0;
-    regex = /\{#if.*\}/g;
+    regex = /\{\s*#if\s*.*\}/g;
     sql = sql.replace(regex, function (match) {
         ifArray.push(match);
         ifSqlBlockArray[ifSeq].if = match;
@@ -81,8 +94,11 @@ export function formatFquery(sql: string): string {
     let formatSQL = format(sql, {
         language: 'plsql',
         tabWidth: 2,
-        keywordCase: 'preserve',
+        keywordCase: 'upper',
         linesBetweenQueries: 2,
+        paramTypes: {
+            custom: [{ regex: String.raw`\{[\s\S]*?\}` }]
+        }
     });
 
     ifSqlBlockArray.forEach((b, index) => {
@@ -93,10 +109,9 @@ export function formatFquery(sql: string): string {
             let l = formatSQL.indexOf(`--split:if${index}` + bif);
             let r = formatSQL.indexOf(`--split:endif${index}` + bendif);
             let subSql = formatSQL.substring(l, r);
-
-            let subSqlNew = '  ' + subSql.replace("--" + b.ifSql, b.ifSql.trim()).trim();
+            let subSqlNew = subSql.replace("--" + b.ifSql, b.ifSql);
             formatSQL = formatSQL.replace(subSql, subSqlNew);
-            // formatSQL = formatSQL.replace("--" + b.ifSql, b.ifSql);
+            formatSQL = formatSQL.replace("--" + b.ifSql, b.ifSql.trim());
         } else {
             let ifStr = `--split:if${index}` + bif;
             let l = formatSQL.indexOf(ifStr);
@@ -116,6 +131,11 @@ export function formatFquery(sql: string): string {
             return line;
         }).join("\n");
     });
-
+    formatSQL = formatSQL.replace("--PAGING", "PAGING")
+    formatSQL = formatSQL.replace("--RULEOBJ", "RULEOBJ")
+    formatSQL = formatSQL.replace("--NORULE", "NORULE")
+    formatSQL = formatSQL.replace("EMTLYL", ".")
+    formatSQL = formatSQL.split("\n").map((line) => start + line).join("\n")
+    console.log(formatSQL);
     return formatSQL
 }
