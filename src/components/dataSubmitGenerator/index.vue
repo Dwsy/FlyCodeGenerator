@@ -116,6 +116,7 @@ import { addButton, toCamelCase } from "../../util";
 import { useFlyStore } from "../../store/flyStore";
 import { PropertyTypeCode, getPropertyTypeName, ignorePropertyType } from "../../type/model/propertyTypeCodeRef";
 import { codeDark, useMessage } from "naive-ui";
+//@ts-ignore
 import { GM_setClipboard } from '$';
 import { updateTemplate } from '../../data/updateFlycodeTemplet'
 import { nextTick } from "vue";
@@ -124,7 +125,6 @@ import { getPropertyTypeEmoji, getRandomEmojiByUnicode, getRandomEmoji } from ".
 import { Input, Property } from "../../type/protocol";
 import { generatorCode } from "./index";
 import SaveProtocolWatch from "../saveProtocolWatch.vue";
-
 const flyStore = useFlyStore()
 const showModal = ref(false)
 const showCode = ref(false)

@@ -238,10 +238,10 @@ export function getRandomEmoji(index) {
 export function getRandomEmojiByUnicode(): string {
     const ranges = [
         [0x1f600, 0x1f64f], // 常用的 emoji
-        //   [0x1f300, 0x1f5ff], // 符号和杂项符号
-        //   [0x1f680, 0x1f6ff], // 交通和地图符号
+        [0x1f300, 0x1f5ff], // 符号和杂项符号
+        [0x1f680, 0x1f6ff], // 交通和地图符号
         [0x1f900, 0x1f9ff], // 表情符号
-        //   [0x2600, 0x26ff], // 杂项符号
+        [0x2600, 0x26ff], // 杂项符号
     ];
 
     const usedEmojis: string[] = [];

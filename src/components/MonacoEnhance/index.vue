@@ -27,7 +27,7 @@ onMounted(() => {
         .addInitializedCallback(async () => {
 
             monaco.editor.onDidCreateEditor((editor) => {
-                addBoNewAction(editor as monaco.editor.IStandaloneCodeEditor)
+                addBoNewAction(editor)
                 applyCustomFlycode()
             })
         })

@@ -9,11 +9,13 @@ import { format } from 'sql-formatter';
 import { formatFquery } from "../../util/formateFquery";
 
 
-export const addBoNewAction = (editor: monaco.editor.IStandaloneCodeEditor) => {
+// export const addBoNewAction = (editor: monaco.editor.IStandaloneCodeEditor) => {
+export const addBoNewAction = (editor) => {
     const flyStore = useFlyStore()
     setTimeout(() => {
-        console.log("--")
-        const linesContent = editor.getModel().getLinesContent()
+        console.log("--", editor)
+        const linesContent = getMonacoModel().getLinesContent()
+        console.log(linesContent)
         linesContent.filter((lineContent) => { lineContent.indexOf("BO.new") > -1 })
             .map((line) => {
                 const match = line.match(/BO.new\((.*?)\)/);
@@ -21,7 +23,7 @@ export const addBoNewAction = (editor: monaco.editor.IStandaloneCodeEditor) => {
                     return
                 }
                 const boName = match[1]
-                console.log(boName);
+                console.log("boName", boName);
 
                 pushTempBoNewDtsList(boName)
             })
@@ -84,7 +86,7 @@ export const addBoNewAction = (editor: monaco.editor.IStandaloneCodeEditor) => {
             },
         });
         addFomatSqlAction(editor)
-    }, 2000);
+    }, 1500);
 }
 
 export const addFomatSqlAction = (editor) => {
