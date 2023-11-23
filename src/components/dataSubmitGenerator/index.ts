@@ -1,10 +1,11 @@
 import { useMessage } from "naive-ui";
 import { updateTemplate } from "../../data/updateFlycodeTemplet";
 import { PropertyTypeCode, getRandomEmojiByUnicode } from "../../type/model/propertyTypeCodeRef";
-import { getPrimaryKey, toCamelCase } from "../../util";
+import { getPrimaryKey, getTableShortName, toCamelCase } from "../../util";
 import { useFlyStore } from "../../store/flyStore";
 import { Input } from "../../type/protocol";
 import { GM_setClipboard } from "$";
+import { MessageApiInjection } from "naive-ui/es/message/src/MessageProvider";
 export class ValidateBuilder {
     private propertyZhName: string;
     private propertyName: string;
@@ -18,7 +19,7 @@ export class ValidateBuilder {
     public businessPropertyTypeCodes = [PropertyTypeCode.BusinessObject, PropertyTypeCode.CreatedBy, PropertyTypeCode.ModifiedBy]
     private primaryKey: string;
     private tableName: string;
-    private message
+    private message: MessageApiInjection;
 
     constructor(propertyName?: string) {
         if (propertyName != undefined) {
@@ -51,7 +52,7 @@ export class ValidateBuilder {
         return this;
     }
 
-    setErrMsg(errMsg: string = `errMsg`) {
+    setErrMsg(errMsg: string) {
         this.errMsg = errMsg
         return this;
     }
@@ -82,7 +83,9 @@ export class ValidateBuilder {
     private setPrimaryKeyAndTableName() {
         const flyStore = useFlyStore()
         const columnData = flyStore.columnDataMap.get(this.propertyCode)
-
+        if (!columnData.relationobjectcode) {
+            this.message.error(`未设置${this.propertyZhName}的关联对象`)
+        }
         const tableData = flyStore.tableDataMap.get(columnData.relationobjectcode)
 
         this.tableName = tableData.tablename
@@ -102,19 +105,24 @@ export class ValidateBuilder {
     }
 
 
-    getCallFunctionName(tableName) {
-        return `validate${toCamelCase(this.propertyName)}(IN.${tableName}.${this.propertyName})`
+    getCallFunctionName(tableName: string, tableShortName: string) {
+        return `validate${toCamelCase(this.propertyName)}(${tableShortName}.${this.propertyName})`
     }
 
     build(): string {
-        let code = `function validate${toCamelCase(this.propertyName)}(${this.propertyName}) {
+        let jsdoc = `/**
+* 校验${this.propertyZhName}函数
+*/
+`
+        let code = jsdoc + `function validate${toCamelCase(this.propertyName)}(${this.propertyName}) {
     var validationFailed = false
+    var validateErrMsg = ${this.errMsg ? this.errMsg : `"校验${this.propertyZhName}失败"`}
     {{RequiredVerification}}
     {{ValidateDictidExist}}
     {{ValidateBusinessObjectExist}}
 ${this.validateLogic}
     if (validationFailed) {
-        appendErrmsg("${this.errMsg}；");
+        appendErrmsg(validateErrMsg);
     }
 }
 `
@@ -169,6 +177,8 @@ export function generatorCode
     let validateFunctions: string[] = new Array()
     let validateFunctionNames: string[] = new Array()
     const validateLogic = new ValidateBuilder()
+    const tableName = input[0].name
+    const INTableShort = getTableShortName(tableName)
     input.forEach((item) => {
         item.properties.forEach((property) => {
             // console.log(flyStore.columnDataMap.get(property.propertycode));
@@ -193,19 +203,26 @@ export function generatorCode
                         .setPropertyCode(property.propertycode)
                         .setRequired(property.required)
                         .setValidateLogic()
-                        .setErrMsg()
+                        .setErrMsg(null)
                         .build();
                     validateFunctions.push(validateFunction)
-                    validateFunctionNames.push(validateLogic.getCallFunctionName(item.name))
+                    const callFunctionJsDoc = `// 校验${property.propertyname}\n    `
+                    validateFunctionNames.push(callFunctionJsDoc + validateLogic.getCallFunctionName(item.name, INTableShort))
                     console.log(validateFunction);
                 }
             }
         })
     })
-    const callValidationFunctions = updateTemplate.validation.replace("{{callFunctions}}", validateFunctionNames.join("\n    "))
+
+
+    const callValidationFunctions = updateTemplate.validation
+        .replace("{{renameInTable}}", `var ${INTableShort} = IN.${input[0].name}`)
+        .replace("{{callFunctions}}", validateFunctionNames.join("\n    "))
+
+
     let insertFunc = updateTemplate.insert
     let updateFunc = updateTemplate.update
-    const tableName = input[0].name
+
     const PrimaryKey = getPrimaryKey(input[0].objectcode)
     const CustomInsertCode = () => {
 
@@ -216,30 +233,36 @@ export function generatorCode
         .replaceAll("{{primaryKey}}", PrimaryKey)
         .replace("{{CustomInsertCode}}", CustomInsertCode())
 
+
     const CustomUpdateCode = () => {
-        let replaceValueTemplet = `${tableName}.{{propertyName}} = IN.${tableName}.{{propertyName}}`
+        // const callFunctionJsDoc = `// ${property.propertyname}-${property.name}\n    `
+        let replaceValueTemplet = `${tableName}.{{propertyName}} = ${INTableShort}.{{propertyName}}`
         const codeLens = new Array<string>()
         input[0].properties.forEach((property) => {
-            codeLens.push(replaceValueTemplet.replaceAll("{{propertyName}}", property.name))
+            const callFunctionJsDoc = `// ${property.propertyname}\n    `
+            codeLens.push(callFunctionJsDoc + replaceValueTemplet.replaceAll("{{propertyName}}", property.name))
         })
         return codeLens.join(`\n    `)
     }
+
     updateFunc = updateFunc
+        .replaceAll("{{renameInTable}}", `var ${INTableShort} = IN.${tableName}`)
         .replaceAll("{{tableName}}", tableName)
         .replaceAll("{{primaryKey}}", PrimaryKey)
         .replace("{{CustomUpdateCode}}", CustomUpdateCode())
 
     const code = updateTemplate.head
         .concat(updateTemplate.main)
+        .concat(updateTemplate.isInsertFunc
+            .replace("{{tableName}}", tableName)
+            .replace("{{primaryKey}}", PrimaryKey))
         .concat(insertFunc)
         .concat(updateFunc)
         .concat(callValidationFunctions)
         .concat(validateFunctions.join("\n"))
         .concat(updateTemplate.appendErrmsg)
         .concat(updateTemplate.validateDictidExistFunc)
-        .concat(updateTemplate.isInsertFunc
-            .replace("{{tableName}}", tableName)
-            .replace("{{primaryKey}}", PrimaryKey))
+
 
 
 

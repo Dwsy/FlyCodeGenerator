@@ -200,6 +200,7 @@ function gen(output: Output, queryArgumentArrayMap: Map<string, Property[]>): Qu
           tableName: tableName,
           tableShortName: tableShortName,
           columnName: argName,
+          zh_columnName: property.propertyname,
           operator: operator,
           value: null,
           secondValue: null,
@@ -260,6 +261,7 @@ function gen(output: Output, queryArgumentArrayMap: Map<string, Property[]>): Qu
           tableName: tableName,
           tableShortName: relationTableShortNameMap.get(tableName),
           columnName: argName,
+          zh_columnName: property.propertyname,
           operator: Operator.Equal,
           value: null,
           secondValue: null,
@@ -333,14 +335,15 @@ function getJoinCallbackfn() {
 }
 
 function getWhereCallback() {
-  return (c) => {
+  return (c: ConditionModel) => {
     // 定义模板字符串
-    let whereTemplate = `{#if {{if}}}\n and {{condition}}\n{#endif}\n`;
+    let whereTemplate = `{#if {{if}}}\n  // {{commit}}\n  and {{condition}}\n{#endif}\n`;
     const generator = new ConditionGenerator(c);
     if (c.operator == Operator.Equal) {
       const juede = `!String.isBlank(IN.${c.tableName}.${c.columnName})`
       const condition = generator.generateWhereClause();
       whereTemplate = whereTemplate
+        .replace("{{commit}}", `${c.zh_columnName}`)
         .replace("{{if}}", juede)
         .replace("{{condition}}", condition);
     } else if (c.operator === Operator.Like) {
@@ -360,7 +363,7 @@ function getWhereCallback() {
         .replace('{{if}}', juede)
         .replace('{{condition}}', whereClause);
     }
-
+    whereTemplate = whereTemplate.replace("{{commit}}", '')
     return whereTemplate;
   };
 }

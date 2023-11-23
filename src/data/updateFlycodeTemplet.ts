@@ -19,7 +19,10 @@ const main = `(function main() {
 
 `
 
-const insert = `function insert() {
+const insert = `/**
+* 插入函数
+*/
+function insert() {
     var id = FLY.genId();
     IN.{{tableName}}.{{primaryKey}} = id;
     {{CustomInsertCode}}
@@ -28,12 +31,15 @@ const insert = `function insert() {
 
 `
 
-const update = `function update() {
+const update = `/**
+* 更新验函数
+*/
+function update() {
     var temp = select * from {{tableName}} where {{primaryKey}} = { IN.{{tableName}}.{{primaryKey}} } NORULE;
     if (temp.length == 0){
         throw new ERROR("待更新数据不存在")
     }
-
+    {{renameInTable}}
     var {{tableName}} = temp[0]
     {{CustomUpdateCode}}
     DB.update({{tableName}});
@@ -41,7 +47,11 @@ const update = `function update() {
 
 `
 
-const validation = `function validation() {
+const validation = `/**
+* 统一校验函数
+*/
+function validation() {
+    {{renameInTable}}
     {{callFunctions}}
     if (validateFail) {
         throw new ERROR(errMsg);

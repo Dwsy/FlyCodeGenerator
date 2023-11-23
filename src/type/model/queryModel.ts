@@ -124,6 +124,10 @@ export interface ConditionModel {
      */
     columnName: string;
     /**
+     * 中文列名
+     */
+    zh_columnName: string;
+    /**
      * 操作符
      */
     operator: Operator;

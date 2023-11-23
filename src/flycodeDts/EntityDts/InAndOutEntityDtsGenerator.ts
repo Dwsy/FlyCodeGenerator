@@ -106,8 +106,9 @@ const generateEntiyObjList = (entiys: Array<Input> | Array<Output>, entityType: 
     const flyStore = useFlyStore()
 
     return entiys
-        .filter((data) => data.properties.length > 0 && data.datatype == "0")
+        .filter((data) => data.properties.length > 0 && !Object.hasOwn(data, 'customcode'))
         .map((entity): Entiy => {
+            // debugger
             const EntityComment = `${entity.name}(${entity.objectname})`
             const EntiyColumns = entity.properties
                 .map((property): EntiyColumn => {
@@ -240,7 +241,7 @@ export const generateInAndOutEntityDtsByProtocol = (protocol: Protocol) => {
         .replace("{{EntiyNameSpaces}}", singleField.join('\n'))
         .replace("{{TypeComment}}", "输入参数"))
     const outEntityDts = outputEntiyList.map((entity) => generateInOutDts(entity, "OUT"))
-    outEntityDts.push(InOutTemplate.replace("{{Type}}", "OUT")
+    outEntityDts.push(InOutTemplate.replace("{{Type}}", "")
         .replace("{{ArrayEntityTypeDts}}", '')
         .replace("{{EntiyNameSpaces}}", singleField2.join('\n'))
         .replace("{{TypeComment}}", "输入参数"))

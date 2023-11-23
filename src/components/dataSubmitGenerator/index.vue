@@ -6,7 +6,7 @@
                 <n-tabs type="line" animated size="large">
                     <n-tab-pane name="validation" tab="参数校验">
                         <div v-for="input in flyStore.protocol.input">
-                            <NList :show-divider="true">
+                            <NList :show-divider="false">
                                 <NListItem>
                                     <div>
                                         <NCheckbox v-model:checked="SelectAllProperty" @update-checked="(value, e) => {
@@ -183,13 +183,13 @@ const gen = () => {
 const previewCode = async () => {
     showCode.value = true
 
-    flycode.value = generatorCode()
+    flycode.value = generatorCode(enableValidateDictId.value, enableValidateBusinessObjectId.value)
 
 
     await nextTick()
     // @ts-ignore
     monaco.editor.colorizeElement(document.getElementById("flyCode"), {
-        theme: "vs-dark",
+        // theme: "vs-dark",
     });
 
 
@@ -235,11 +235,11 @@ const SelectAllrequiredFunc = (value: boolean) => {
     background-color: #4e4e4e66 !important;
 }
 
-.flycode-d {
+/* .flycode-d {
 
     height: 70%;
     overflow: auto;
     white-space: pre-wrap;
     word-wrap: break-word;
-}
+} */
 </style>
