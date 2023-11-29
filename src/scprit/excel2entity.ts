@@ -23,9 +23,8 @@ type Properties = {
 
 
 
-let preEntiy =
-    protocol
-
+let preEntiy = protocol
+protocol.objs[0].publishstatus = 2
 
 type Coldef = [
     zh_name: string,
@@ -35,7 +34,7 @@ type Coldef = [
 ]
 let temp = cxzy.split("\n")
 let one = BigInt("1")
-let start_code = BigInt(preEntiy.objs[0].properties[0].propertycode.toString()) + BigInt('20')
+let start_code = BigInt(preEntiy.objs[0].properties[0].propertycode.toString()) + BigInt('100')
 
 let seq = 1
 const typeName2typecode = (name, type, desc) => {
@@ -116,6 +115,10 @@ temp.map((line) => {
 // console.log(Properties)
 
 
+preEntiy.objs[0].properties = [preEntiy.objs[0].properties[0]];
+const primaryKey = PropertyTypeCode.PrimaryKey.toString()
+//@ts-ignore
+preEntiy.objs[0].properties[0].publishstatus = "2"
 //@ts-ignore
 preEntiy.objs[0].properties.push(...Properties)
 //nodejs 写入Properties到当前目录下的Properties.json文件

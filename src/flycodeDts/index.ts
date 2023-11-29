@@ -194,72 +194,72 @@ declare class SESSION {
     /**
      * 组织编码
      */
-    const orgcode: string;
+    static const orgcode: string;
 
     /**
      * 用户编码
      */
-    const usercode: string;
+    static const usercode: string;
 
     /**
      * 岗位编码
      */
-    const pscode: string;
+    static const pscode: string;
 
     /**
      * 成员编码
      */
-    const mbcode: string;
+    static const mbcode: string;
 
     /**
      * 账号编码
      */
-    const accode: string;
+    static const accode: string;
 
     /**
      * 客户端类型编码 (1-web管理端、2-iPhone端、3-Android)
      */
-    const ctcode: string;
+    static const ctcode: string;
 
     /**
      * 职位编码 (模板岗位编码)
      */
-    const rpscode: string;
+    static const rpscode: string;
 
     /**
      * 组织维度Id
      */
-    const orgdim: string;
+    static const orgdim: string;
 
     /**
      * code 编码
      */
-    const codepath: string;
+    static const codepath: string;
 
     /**
      * 判断当前登录人是否是组织架构叶子节点的
      */
-    const isleaforg: boolean;
+    static  const isleaforg: boolean;
 
     /**
      * 当前应用编码 (sales, distribution, promotion)
      */
-    const appcode: string;
+    static const appcode: string;
 
     /**
      * 当前用户可用应用编码列表
      */
-    const appcodes: string[];
+    static  const appcodes: string[];
 
     /**
      * 岗位类别
      */
-    const categorycode: string;
+    static const categorycode: string;
 
     /**
      * 子产品编码
      */
-    const subpdcodes: string[];
+    static  const subpdcodes: string[];
 }
 
 // // 以下是 System 对象的补充信息 前后端flycode会混

@@ -41,7 +41,7 @@ let getButtonSeq = (seq = 1) => {
  * @param {number} seq - 按钮的序号
  * @param {string} [hoverText] - 按钮的悬停文本
  */
-export const addButton = (selector: string, text: string, iconClass: string, clickHandler: () => void, seq?: number, hoverText?: string) => {
+export const addButton = (selector: string | any, text: string, iconClass: string, clickHandler: () => void, seq?: number, hoverText?: string) => {
   if (selector == undefined) {
     selector = "#beSetting > div.main-content > div.tab-operation > button:nth-child(2)"
   }
@@ -139,4 +139,42 @@ export function levenshteinDistance(str1: string, str2: string): number {
   }
 
   return dp[m][n];
+}
+
+export function jaroWinkler(s1: string, s2: string, p = 0.1): number {
+  const m = Math.min(s1.length, s2.length);
+  let range = Math.floor(Math.max(s1.length, s2.length) / 2) - 1;
+  let m1 = Array(m);
+  let m2 = Array(m);
+  let m1Len = 0;
+  let m2Len = 0;
+  let transpositions = 0;
+  let prefix = 0;
+
+  for (let i = 0; i < s1.length; i++) {
+    let start = i >= range ? 0 : Math.max(0, i - range);
+    let end = i + range <= s2.length ? i + range : s2.length - 1;
+
+    for (let j = start; j <= end; j++) {
+      if (m2.includes(s1[i])) continue;
+      if (s1[i] !== s2[j]) continue;
+      m1[m1Len++] = s1[i];
+      m2[m2Len++] = s2[j];
+      break;
+    }
+  }
+
+  if (m1Len === 0) return 0;
+
+  for (let i = 0; i < m1Len; i++) {
+    if (m1[i] !== m2[i]) transpositions++;
+  }
+
+  for (let i = 0; i < m; i++) {
+    if (s1[i] === s2[i]) prefix++;
+    else break;
+  }
+
+  let jaro = (m1Len / s1.length + m2Len / s2.length + (m1Len - transpositions / 2) / m1Len) / 3;
+  return jaro + Math.min(p, 1 / m) * prefix * (1 - jaro);
 }

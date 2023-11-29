@@ -5,6 +5,7 @@ import ExcelExport from './ExcelExport/index.vue'
 import ExcelImport from './ExcelImport/index.vue'
 import flycodeExport from './flycodeExport/index.vue'
 import flycodeImport from './flycodeImport/index.vue'
+import ExcelFrontImport from './ExcelFrontImport/index.vue'
 export const Generator = {
     queryGenerator,
     dataSubmitGenerator,
@@ -12,7 +13,8 @@ export const Generator = {
     ExcelExport,
     ExcelImport,
     flycodeExport,
-    flycodeImport
+    flycodeImport,
+    ExcelFrontImport
 }
 
 export const GeneratorName = {
@@ -22,5 +24,6 @@ export const GeneratorName = {
     ExcelExport: "ExcelExport",
     ExcelImport: "ExcelImport",
     flycodeExport: "flycodeExport",
-    flycodeImport: "flycodeImport"
+    flycodeImport: "flycodeImport",
+    ExcelFrontImport: "ExcelFrontImport"
 }

@@ -3,7 +3,7 @@ import { useFlyStore } from "../../store/flyStore";
 import { PropertyTypeCode } from "../../type/model/propertyTypeCodeRef";
 import { Operator } from "../../type/model/queryModel";
 import { Property } from "../../type/protocol";
-import { getPrimaryKey, levenshteinDistance, toCamelCase } from "../../util";
+import { getPrimaryKey, jaroWinkler, levenshteinDistance, toCamelCase } from "../../util";
 import { read } from "xlsx";
 import { excelExportTemplate } from "../../data/excelExportTemplate";
 import { excelImportTemplate } from "../../data/excelImportTemplate";
@@ -28,13 +28,8 @@ export const generateCodeFunc = (mapPair: MapPair[], checkedRowKeys: RowKey[]) =
     }
     code = code.concat(templet.main.replaceAll("{{boName}}", `${tableName}_bo`));
 
-    code = code.concat(templet.isInsertFunc);
-    code = code.concat(templet.createBo
-        .replace("{{setValueCode}}", ``)
-        .replaceAll("{{tableName}}", tableName));
 
-    code = code.concat(templet.xlsconf);
-    code = code.concat(templet.paramobj);
+
     let dataBind = templet.dataBind.replace(
         "{{tableName}}",
         flyStore.protocol.input[0].name
@@ -46,10 +41,18 @@ export const generateCodeFunc = (mapPair: MapPair[], checkedRowKeys: RowKey[]) =
         });
         return temp;
     };
+    debugger
     dataBind = dataBind.replace(
         "{{bindMap}}",
         JSON.stringify(bindMap(), null, 4)
     );
+    code = code.concat(dataBind);
+    code = code.concat(templet.xlsconf);
+    code = code.concat(templet.paramobj);
+    code = code.concat(templet.isInsertFunc);
+    code = code.concat(templet.createBo
+        .replace("{{setValueCode}}", `//todo`)
+        .replaceAll("{{tableName}}", tableName));
 
     const getDictIdByDicvalueArray = [];
     const getBusinessObjectIdByValueArray = [];
@@ -265,7 +268,7 @@ export const autoMapFunc = (excelColumnName: string[], sheetLine: []) => {
         let minLeven = 9999999;
         const levenMap = new Map<number, string>();
         excelColumnName.forEach((name) => {
-            let tempLeven = levenshteinDistance(property.propertyname, name);
+            let tempLeven = jaroWinkler(property.propertyname, name);
             minLeven = Math.min(tempLeven, minLeven);
             levenMap.set(tempLeven, name);
         });

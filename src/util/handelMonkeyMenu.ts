@@ -19,7 +19,7 @@ export const registerMenuCommand = () => {
         GM_setValue("addDtsEnable", !addDtsEnable)
         setTimeout(() => { window.location.reload() }, 100)
     });
-    const bracketPairColorizationEnable = GM_getValue("bracketPairColorizationEnable", false)
+    const bracketPairColorizationEnable = localStorage.getItem("bracketPairColorization") == "1"
     GM_registerMenuCommand(`${bracketPairColorizationEnable ? '✅' : '❌'}彩虹括号`, () => {
         GM_setValue("bracketPairColorizationEnable", !bracketPairColorizationEnable)
         if (bracketPairColorizationEnable) {

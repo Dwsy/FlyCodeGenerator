@@ -1,0 +1,156 @@
+load("importutils");
+
+importExcel()
+
+
+
+var errMsg = null
+var errMsgArray = []
+function importExcel() {
+
+    //标题列映射定义
+    var titlemappings = [
+        {
+            "column": "门店编码",
+            "field": "store_code",
+            "type": "String"
+        },
+        {
+            "column": "门店名称",
+            "field": "store_name",
+            "type": "String"
+        },
+        {
+            "column": "门店地址",
+            "field": "store_address",
+            "type": "String"
+        },
+        {
+            "column": "促销时间-从",
+            "field": "promotion_start_date",
+            "type": "String"
+        },
+        {
+            "column": "促销时间-至",
+            "field": "promotion_end_date",
+            "type": "String"
+        },
+        {
+            "column": "促销日期",
+            "field": "promotion_date",
+            "type": "String"
+        },
+        {
+            "column": "促销数量（天）",
+            "field": "promotion_duration_days",
+            "type": "String"
+        },
+        {
+            "column": "促销金额（元/天）",
+            "field": "promotion_cost_per_day",
+            "type": "String"
+        },
+        {
+            "column": "预计销量（元）",
+            "field": "estimated_sales",
+            "type": "String"
+        }
+
+    ];
+    //设置标题映射
+    EXCELIMP.setTitleMapping(titlemappings);
+
+    //设置为前端导入模式
+    EXCELIMP.setFrontImp(true);
+
+    //批次号获取
+    var dynamicid = EXCELIMP.dynamicid;
+    FLY.log("=====dynamicid===" + dynamicid);
+
+    //结果数据
+    var outdata = [];
+    //excel数据行处理，参数传入excel数据行及自定义的参数入参
+    var excelRowDataHandle = function (exceldata, customdata) {
+        //读取exceldata转换为要输出的列表的数据集
+        //业务处理 把excel数据
+        handelPromotionDate(exceldata)
+        verifyNonnegativeInteger(exceldata)
+        verifyCode(exceldata)
+        outdata.push(exceldata)
+    }
+
+    EXCELIMP.setExcelRowDataHandle(excelRowDataHandle)
+
+    //执行java代码
+    EXCELIMP.execute()
+
+    //数据校验
+    // ---
+    if (errMsg != null) {
+        // FLY.log(errMsg)
+        throw new ERROR(errMsg)
+
+    }
+    OUT.errmsg = errMsg
+
+
+}
+
+
+
+
+
+
+
+
+
+function handelPromotionDate(data) {
+    if (data.promotion_start_date.indexOf("；" != -1)) {
+        var date_arr = data.promotion_start_date.split("；")
+        var tempStr = ''
+        for (var i = 0; i < date_arr.length; i++) {
+            tempStr += date_arr[i]
+        }
+    }
+}
+
+
+function verifyNonnegativeInteger(data) {
+    function checkNInt(value, columnName) {
+        if (/^\d+$/.test(value)) {
+            var intValue = parseInt(value, 10);
+            if (intValue < 0) {
+                errMsg += '"' + columnName + '" 字段必须为非负整数。'
+            }
+        } else {
+            errMsg += '"' + columnName + '" 字段必须为非负整数。'
+        }
+    }
+
+    checkNInt(data.promotion_duration_days, "促销数量")
+    checkNInt(data.promotion_cost_per_day, "促销金额")
+    checkNInt(data.estimated_sales, "预计销量")
+
+}
+
+
+
+function verifyCode(data) {
+    var temp = select id, distributor, address, storename from kx_kq_store where kx_kq_store.storecode = { data.store_code };
+    if (temp.length == 0) {
+        errMsg += '终端代码:' + data.store_code + '不存在'
+    }
+    var customer_name = IN.kx_sales_campaign_cost.customer_name
+    var temp2 = select id from ka_kq_channelcustomers where channelname = { customer_name } NORULE;
+    var distributor_id = temp[0].distributor
+    if (temp2.length > 0) {
+        if (distributor_id != temp2[0].id) {
+            errMsg += '客户' + customer_name + '非终端经销商'
+        }
+
+    } else {
+        errMsg += '客户:' + customer_name + '不存在'
+    }
+    data.store_address = temp[0].address
+    data.store_name = temp[0].storename
+}

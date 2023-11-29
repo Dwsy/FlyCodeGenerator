@@ -44,7 +44,18 @@ export const useFlyStore = defineStore('flyStore', () => {
             // 遍历 data.properties 数组
             data.properties.forEach((columnData) => {
                 // 将 columnData 对象添加到 columnDataMap 中
+                // if (columnData.propertycode = '1727161236526862417') {
+                //     debugger
+                // }
+                if (undefined != columnDataMap.value.get(columnData.propertycode)) {
+                    if (data.tablename.startsWith("xxw"))
+                        console.log("存在重复columnData.propertycode", columnData.propertycode, data.tablename, data.objectname, columnData.columnname)
+                }
                 columnDataMap.value.set(columnData.propertycode, columnData);
+                // if (columnData.propertycode == "1729296870011978034") {
+
+                //     debugger
+                // }
             });
         });
 
@@ -62,10 +73,10 @@ export const useFlyStore = defineStore('flyStore', () => {
             refresh()
         }
 
-        const markdownTableHeadTemplate =
-            `|对象|字段|字段类型|长度|必填|说明|备注|\n|--|--|--|--|--|--|--|\n`
-        const markdownTableRowTemplate =
-            `|{{对象}}|{{字段类型}}|{{长度}}|{{必填}}|{{说明}}|{{备注}}|`
+        // const markdownTableHeadTemplate =
+        //     `|对象|字段|字段类型|长度|必填|说明|备注|\n|--|--|--|--|--|--|--|\n`
+        // const markdownTableRowTemplate =
+        //     `|{{对象}}|{{字段类型}}|{{长度}}|{{必填}}|{{说明}}|{{备注}}|`
         // `||||||||`
 
         // ---
@@ -144,6 +155,11 @@ export const useFlyStore = defineStore('flyStore', () => {
         } else if (Export && actioncategory == "7") {//flycode导出
             ActiveGenerator.value = GeneratorName.flycodeExport
         }
+        // debugger
+        if (Import && protocol.value.modellogicname.includes("前端导入")) {
+            ActiveGenerator.value = GeneratorName.ExcelFrontImport
+        }
+
     }
 
 
