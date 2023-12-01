@@ -19,6 +19,9 @@ export function pushTempBoNewDtsList(boname) {
     tempBoNewEntityInterfaceDtsList.push(generateEntityInterfaceDtsByProtocol([tableNameDataMap.get(boname)]))
     RefreshExtraLib(false)
 }
+
+
+
 export function RefreshExtraLib(onlyUIFlycode: boolean = false) {
     const flyStore = useFlyStore()
     const ExtraLibs = []
@@ -1449,6 +1452,9 @@ declare class ArrayCtrl {
 }
 
 declare class ArrayRowCtrl {
+    // 获取该列的控件
+    getCtrl(): Ctrl;
+
     /**
      * 获取数组型控件行控件的数据。
      * @returns {Dictionary | null} - 返回数组型控件行控件的数据，当数据不存在时，返回 null.
@@ -1502,6 +1508,13 @@ declare class ArrayRowCtrl {
      * @param {boolean} singleCheck - 为 true 时表示单选，为 false 时表示非单选.
      */
     setSingleCheck(singleCheck: boolean): void;
+
+    /**
+     * 通过名称获取特定的选择器控件。
+     * @param ctrlName - 选择器控件的名称。
+     * @returns 选择器控件。
+     */
+    getPickerCtrl(ctrlName: string): PickerCtrl;
 }
 
 declare class ArrayColCtrl {

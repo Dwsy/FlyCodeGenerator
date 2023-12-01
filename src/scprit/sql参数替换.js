@@ -18,32 +18,47 @@ function replaceInsertStatement(sql, params) {
 }
 
 // 要替换的 SQL 插入语句
-const insertSQL = `INSERT INTO kx_basic_customer_information
-  (id, effective_date, application_department, attachments, change_type, change_content, change_customer_ids, change_customer_names, application_code, application_status, application_type, createop, createtime, platcreatetime, platupdatetime, platcreateop, platupdateop, platstatus)
- VALUES (:id, :effective_date, :application_department, :attachments, :change_type, :change_content, :change_customer_ids, :change_customer_names, :application_code, :application_status, :application_type, :createop, :createtime, :platcreatetime, :platupdatetime, :platcreateop, :platupdateop, :platstatus);`;
+const insertSQL = `
 
+UPDATE xxw_promotion_guide
+SET id = :id, promotion_guide_name = :promotion_guide_name, promotion_guide_type = :promotion_guide_type, guide_code = :guide_code, start_date = :start_date, end_date = :end_date, placement_scope = :placement_scope, guide_status = :guide_status, publication_status = :publication_status, audit_record = :audit_record, associated_promotions = :associated_promotions, view_viewed = :view_viewed, view_received = :view_received, budgeted_revenue_target = :budgeted_revenue_target, comprehensive_budgeted_forecasted_revenue_target = :comprehensive_budgeted_forecasted_revenue_target, current_period_revenue_target = :current_period_revenue_target, same_period_revenue_achievement = :same_period_revenue_achievement, revenue_compared_same_growth = :revenue_compared_same_growth, attachment = :attachment, submitter = :submitter, submitting_salearea = :submitting_salearea, submission_time = :submission_time, createtime = :createtime, createop = :createop, updatetime = :updatetime, updateop = :updateop, application_instructions = :application_instructions, platupdatetime  = :platupdatetime, platupdateop = :platupdateop
+WHERE (id = :id AND platstatus = :platstatus);
+ `;
 // 参数对象
 const params = {
-  __metaname: "kx_basic_customer_information",
-  id: "1711942778042322944",
-  effective_date: "2023-10-11 11:11:00",
-  application_department: 1,
-  attachments: "[]",
-  change_type: 1706850756302344192,
-  change_content: "",
-  change_customer_ids:
-    "1527703396272967680,1478803503009894400,1696353172978798592,1696353172530008064,1696353073825452032,1543977847981477888,1184714808717611008,",
-  change_customer_names:
-    "佛山市本味寒造食品科技有限公司,海南源丰生贸易有限公司,坑梓新发贸易部,惠州升兴综合贸易部,阳春市润华贸易有限公司,哈哈哈哈,肇庆市懿成贸易有限公司,",
-  application_code: "KHSZ202310110063",
-  application_status: 1,
-  application_type: "1706606391843753984",
-  createop: 1245967295067590656,
-  createtime: "2023-10-11 11:12:19",
-  platcreatetime: 1696993939325,
-  platupdatetime: 1696993939325,
-  platcreateop: 1.24596729506759066e18,
-  platupdateop: 1.24596729506759066e18,
+  id: 1728956845755863040,
+  promotion_guide_name: "123",
+  promotion_guide_type: 1727931853828132864,
+  guide_code: "ZY20230912000001",
+  start_date: "2023-11-26",
+  end_date: "2023-11-28",
+  placement_scope: "2",
+  guide_status: "",
+  publication_status: "",
+  audit_record: "",
+  associated_promotions: "",
+  view_viewed: "",
+  view_received: "",
+  budgeted_revenue_target: null,
+  comprehensive_budgeted_forecasted_revenue_target: null,
+  current_period_revenue_target: null,
+  same_period_revenue_achievement: null,
+  revenue_compared_same_growth: null,
+  attachment: "",
+  submitter: "1722102640017543168",
+  submitting_salearea: "1722102262656012288",
+  submission_time: "1701050409000",
+  createtime: "1701050409000",
+  createop: "1722102640017543168",
+  updatetime: "2023-12-01 14:57:47",
+  updateop: 1722102640017543168,
+  application_instructions: "",
+  __metaname: "xxw_promotion_guide",
+  channel: null,
+  placement_scope__dictionaryid: null,
+  business_activity_type: null,
+  platupdatetime: 1701413867399,
+  platupdateop: 1722102640017543168,
   platstatus: 1,
 };
 

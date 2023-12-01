@@ -59,9 +59,24 @@ export const addBoNewAction = (editor) => {
                 }
 
                 var setLine = flyStore.tableNameDataMap.get(boName).properties.map((item) => {
+                    debugger
                     if (item.propertytypecode == PropertyTypeCode.PrimaryKey.toString()) {
                         return `${shortName}.${item.columnname} = FLY.genId()`
-                    } else {
+                    }
+                    else if (item.propertytypecode == PropertyTypeCode.CreatedBy.toString()) {
+
+                        return `${shortName}.${item.columnname} = SESSION.mbcode`
+                    }
+                    else if (item.propertytypecode == PropertyTypeCode.CreatedTime.toString()) {
+                        return `${shortName}.${item.columnname} = NOW.time()`
+                    }
+                    else if (item.propertytypecode == PropertyTypeCode.ModifiedBy.toString()) {
+                        return `${shortName}.${item.columnname} = SESSION.mbcode`
+                    }
+                    else if (item.propertytypecode == PropertyTypeCode.ModifiedTime.toString()) {
+                        return `${shortName}.${item.columnname} = NOEW.time()`
+                    }
+                    else {
                         let temp = `${shortName}.${item.columnname} = foo.${item.columnname}`
                         let len = temp.length
                         for (var i = 0; i < 55 - len; i++) {
