@@ -65,6 +65,7 @@ import CodePreview from "../common/CodePreview.vue";
 import { autoMapFunc, generateCodeFunc, readExcelFileFunc,MapPair } from "./index";
 import SaveProtocolWatch from "../saveProtocolWatch.vue";
 import { copyToClipboard } from '../../util/index';
+import { GM_setClipboard } from "$";
 const flyStore = useFlyStore();
 const OperatorSelectOptions = ref([]);
 
@@ -149,7 +150,7 @@ function createColumns(): DataTableColumns<MapPair> {
     {
       title: "校验反查字段(自动)",
       key: "reverseQueryField",
-      width: 130,
+      width: 160,
     },
     {
       title: "校验反查字段(手动)",
@@ -160,7 +161,7 @@ function createColumns(): DataTableColumns<MapPair> {
           </NSwitch>
         );
       },
-      width: 130,
+      width: 160,
     },
 
     {
@@ -267,9 +268,6 @@ function readExcelFile(file: File) {
 }
 
 
-function GM_setClipboard(value: any, arg1: string) {
-throw new Error("Function not implemented.");
-}
 </script>
 
 <style></style>
