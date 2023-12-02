@@ -91,7 +91,8 @@ export const generateCodeFunc = (mapPair: MapPair[], checkedRowKeys: RowKey[]) =
                 .replaceAll("{{tableName}}", tableName)
                 .replaceAll("{{CamelTableName}}", toCamelCase(dictTableName))
                 .replaceAll("{{dictTableZhName}}", pair.property.propertyname);
-            let callFunc = `rowData.${pair.property.name} =\n        get${toCamelCase(dictTableName)}DictIdByDicvalue(rowData.${pair.property.name})`
+            let callFunc = `rowData.${pair.property.name} 
+            =\n        get${toCamelCase(dictTableName)}DictIdByDicvalue(rowData.${pair.property.name})`
             callGetDictIdByDicvalueArray.push(callFunc)
             getDictIdByDicvalueArray.push(getDictIdByDicvalue);
         });
