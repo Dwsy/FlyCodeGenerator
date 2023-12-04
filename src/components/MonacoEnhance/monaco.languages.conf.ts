@@ -105,8 +105,8 @@ const operators = [
   "MATCHED"
 ]
 
-const PropertyRegex = /\.(\w+).(?=\s|[" + operators.join("|") + "])/
-
+// const PropertyRegex = /\.(\w+).(?=\s|[" + operators.join("|") + "])/
+const PropertyRegex = /\.(\w+)(?=\s|[" + operators.join("|") + "])/
 const PropertyRegexPre = /\w+(?=\.)/;
 
 MonarchTokensProvider.tokenizer.root.unshift([/\/\/\s*TODO\b/i, 'comment.todo'])

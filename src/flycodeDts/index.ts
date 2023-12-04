@@ -1,3 +1,4 @@
+
 import { useFlyStore } from "../store/flyStore";
 import { Protocol } from "../type/protocol";
 import { BoNewTemplate, BoTemplate, generateBONewDtsByProtocol, generateEntityInterfaceDtsByProtocol } from "./BoNew";
@@ -51,8 +52,8 @@ export function RefreshExtraLib(onlyUIFlycode: boolean = false) {
             ExtraLibs.push({ content: flycodeDts })
             ExtraLibs.push({ content: testDts })
             ExtraLibs.push({ content: entityDts })
-            ExtraLibs.push({ content: BONewDts.replaceAll("{{tempDtsList}}", `\n${tempBoNewDtsList.join("\n")}`) })
-            ExtraLibs.push({ content: tempBoNewEntityInterfaceDtsList.join("\n") })
+            ExtraLibs.push({ content: BONewDts.replaceAll("{{tempDtsList}}", `${tempBoNewDtsList.join("")}`) })
+            ExtraLibs.push({ content: tempBoNewEntityInterfaceDtsList.join("") })
         }
     }
 
@@ -68,10 +69,16 @@ var select:Array<string>
 var SELECT:Array<string>
 `
 
-const flycodeDts = `
-declare class String {
-    static isBlank(str: string): boolean;
+
+const flycodeDts = `interface String {
+    static myStaticMethod(): void;
 }
+
+String.myStaticMethod = function () {
+    console.log('Calling static method');
+}
+
+String.myStaticMethod(); // Calling static method
 // 3.1.5. 工具库
 declare class FLY {
     /**
@@ -135,13 +142,8 @@ declare class FLY {
     static substringLastAt(str: string, separator: string, fromEnd: number): string;
 
 
-    /**
-     * 判断字符串是否为空
-     * @param str 字符串
-     * @returns 是否为空
-     */
 
-    static isBlank(str: string): boolean;
+
 
 
     /**
@@ -197,72 +199,72 @@ declare class SESSION {
     /**
      * 组织编码
      */
-    static const orgcode: string;
+    const orgcode: string;
 
     /**
      * 用户编码
      */
-    static const usercode: string;
+    const usercode: string;
 
     /**
      * 岗位编码
      */
-    static const pscode: string;
+    const pscode: string;
 
     /**
      * 成员编码
      */
-    static const mbcode: string;
+    const mbcode: string;
 
     /**
      * 账号编码
      */
-    static const accode: string;
+    const accode: string;
 
     /**
      * 客户端类型编码 (1-web管理端、2-iPhone端、3-Android)
      */
-    static const ctcode: string;
+    const ctcode: string;
 
     /**
      * 职位编码 (模板岗位编码)
      */
-    static const rpscode: string;
+    const rpscode: string;
 
     /**
      * 组织维度Id
      */
-    static const orgdim: string;
+    const orgdim: string;
 
     /**
      * code 编码
      */
-    static const codepath: string;
+    const codepath: string;
 
     /**
      * 判断当前登录人是否是组织架构叶子节点的
      */
-    static  const isleaforg: boolean;
+    const isleaforg: boolean;
 
     /**
      * 当前应用编码 (sales, distribution, promotion)
      */
-    static const appcode: string;
+    const appcode: string;
 
     /**
      * 当前用户可用应用编码列表
      */
-    static  const appcodes: string[];
+    const appcodes: string[];
 
     /**
      * 岗位类别
      */
-    static const categorycode: string;
+    const categorycode: string;
 
     /**
      * 子产品编码
      */
-    static  const subpdcodes: string[];
+    const subpdcodes: string[];
 }
 
 // // 以下是 System 对象的补充信息 前后端flycode会混
@@ -1171,6 +1173,95 @@ declare class Ctrl {
     setTitleColor(color: string): void;
 }
 
+// 这里提供完整的TypeScript定义文件代码:
+
+/**
+ * 数组控制器类
+ */
+declare class ArrayCtrl {
+
+    /**
+     * 重新设置全部数据
+     * @param rowsData 将要刷新的数据
+     * @param setter 赋值规则
+     * @returns 刷新是否成功
+     */
+    reload(rowsData: any[], setter?: ArrayCtrlSetter): boolean;
+
+    /**
+     * 插入数据到指定索引
+     * @param rowsData 将要插入的数据
+     * @param index 插入位置索引
+     * @param setter 赋值规则  
+     * @returns 插入是否成功
+     */
+    insert(rowsData: any[], index: number, setter?: ArrayCtrlSetter): boolean;
+
+    /**
+     * 插入数据到头部或尾部
+     * @param rowsData 将要插入的数据
+     * @param pos 插入位置
+     * @param setter 赋值规则
+     * @returns 插入是否成功
+     */
+    append(rowsData: any[], pos: 'head' | 'tail', setter?: ArrayCtrlSetter): boolean;
+
+    /**
+     * 更新数据
+     * @param rowsData 将要更新的数据
+     * @param indexes 更新行索引
+     * @param setter 赋值规则
+     * @returns 更新是否成功
+     */
+    update(rowsData: any[], indexes: number[], setter?: ArrayCtrlSetter): boolean;
+
+    /**
+     * 删除指定位置的数据  
+     * @param indexes 删除的行索引 
+     * @returns 删除是否成功
+     */
+    delete(indexes: number[]): boolean;
+
+    /**
+     * 删除指定范围内的数据
+     * @param scope 删除范围
+     * @returns 删除是否成功
+     */
+    deleteInScope(scope: 'all' | 'checked' | 'modified' | 'focused'): boolean;
+
+    /**
+     * 删除指定范围外的数据
+     * @param scope 删除范围
+     * @returns 删除是否成功
+     */
+    deleteInScopeReverse(scope: 'all' | 'checked' | 'modified' | 'focused'): boolean;
+
+    /**
+     * 选择行数据
+     * @param rowsData 选择的数据
+     * @param setter 赋值规则
+     */
+    selectRows(rowsData: any[], setter?: ArrayCtrlSetter);
+
+}
+
+/**
+ * 赋值规则接口
+ */
+interface ArrayCtrlSetter {
+
+    /**
+     * 赋值规则
+     * @param fromKey 来源字段
+     * @param toKey 目标字段
+     */
+    append(fromKey: string, toKey: string): void;
+
+}
+
+// 这个是完整的TypeScript定义文件内容,包含了类和接口定义以及方法参数和返回值的中文注释说明。
+
+
 /**
  * 表示数组型控件，像 List、Table 之类的由数组型数据驱动显示的控件。
  */
@@ -1454,7 +1545,6 @@ declare class ArrayCtrl {
 declare class ArrayRowCtrl {
     // 获取该列的控件
     getCtrl(): Ctrl;
-
     /**
      * 获取数组型控件行控件的数据。
      * @returns {Dictionary | null} - 返回数组型控件行控件的数据，当数据不存在时，返回 null.

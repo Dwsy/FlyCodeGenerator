@@ -1,5 +1,5 @@
 import { PropertyTypeCode } from "../type/model/propertyTypeCodeRef";
-import { protocol, cxzy } from './excel2entityProtocol'
+import { protocol, cxzy, seq } from './excel2entityProtocol'
 type Property = {
     propertycode?: string;
     propertyname?: string;
@@ -34,9 +34,9 @@ type Coldef = [
 ]
 let temp = cxzy.split("\n")
 let one = BigInt("1")
-let start_code = BigInt(preEntiy.objs[0].properties[0].propertycode.toString()) + BigInt('100')
+let start_code = BigInt(preEntiy.objs[0].properties[0].propertycode.toString()) + BigInt(seq)
 
-let seq = 1
+let seq1 = 1
 const typeName2typecode = (name, type, desc) => {
     let ret = PropertyTypeCode.LongInteger
     if (type == 'bigint') {
@@ -99,7 +99,7 @@ temp.map((line) => {
         "columnname": coldef[1],
         "propertycategorycode": "1",
         "propertytypecode": typeName2typecode(coldef[1], coldef[2], coldef[3]),
-        "seq": seq++,
+        "seq": seq1++,
         "status": "1",
         "idxtype": "1",
         "publishstatus": "2",

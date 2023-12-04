@@ -1,3 +1,12 @@
+interface String {
+    static myStaticMethod(): void;
+}
+
+String.myStaticMethod = function () {
+    console.log('Calling static method');
+}
+
+String.myStaticMethod(); // Calling static method
 // 3.1.5. 工具库
 declare class FLY {
     /**
@@ -61,13 +70,8 @@ declare class FLY {
     static substringLastAt(str: string, separator: string, fromEnd: number): string;
 
 
-    /**
-     * 判断字符串是否为空
-     * @param str 字符串
-     * @returns 是否为空
-     */
 
-    static isBlank(str: string): boolean;
+
 
 
     /**

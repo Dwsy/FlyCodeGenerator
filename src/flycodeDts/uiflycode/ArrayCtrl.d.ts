@@ -1,3 +1,92 @@
+// 这里提供完整的TypeScript定义文件代码:
+
+/**
+ * 数组控制器类
+ */
+declare class ArrayCtrl {
+
+    /**
+     * 重新设置全部数据
+     * @param rowsData 将要刷新的数据
+     * @param setter 赋值规则
+     * @returns 刷新是否成功
+     */
+    reload(rowsData: any[], setter?: ArrayCtrlSetter): boolean;
+
+    /**
+     * 插入数据到指定索引
+     * @param rowsData 将要插入的数据
+     * @param index 插入位置索引
+     * @param setter 赋值规则  
+     * @returns 插入是否成功
+     */
+    insert(rowsData: any[], index: number, setter?: ArrayCtrlSetter): boolean;
+
+    /**
+     * 插入数据到头部或尾部
+     * @param rowsData 将要插入的数据
+     * @param pos 插入位置
+     * @param setter 赋值规则
+     * @returns 插入是否成功
+     */
+    append(rowsData: any[], pos: 'head' | 'tail', setter?: ArrayCtrlSetter): boolean;
+
+    /**
+     * 更新数据
+     * @param rowsData 将要更新的数据
+     * @param indexes 更新行索引
+     * @param setter 赋值规则
+     * @returns 更新是否成功
+     */
+    update(rowsData: any[], indexes: number[], setter?: ArrayCtrlSetter): boolean;
+
+    /**
+     * 删除指定位置的数据  
+     * @param indexes 删除的行索引 
+     * @returns 删除是否成功
+     */
+    delete(indexes: number[]): boolean;
+
+    /**
+     * 删除指定范围内的数据
+     * @param scope 删除范围
+     * @returns 删除是否成功
+     */
+    deleteInScope(scope: 'all' | 'checked' | 'modified' | 'focused'): boolean;
+
+    /**
+     * 删除指定范围外的数据
+     * @param scope 删除范围
+     * @returns 删除是否成功
+     */
+    deleteInScopeReverse(scope: 'all' | 'checked' | 'modified' | 'focused'): boolean;
+
+    /**
+     * 选择行数据
+     * @param rowsData 选择的数据
+     * @param setter 赋值规则
+     */
+    selectRows(rowsData: any[], setter?: ArrayCtrlSetter);
+
+}
+
+/**
+ * 赋值规则接口
+ */
+interface ArrayCtrlSetter {
+
+    /**
+     * 赋值规则
+     * @param fromKey 来源字段
+     * @param toKey 目标字段
+     */
+    append(fromKey: string, toKey: string): void;
+
+}
+
+// 这个是完整的TypeScript定义文件内容,包含了类和接口定义以及方法参数和返回值的中文注释说明。
+
+
 /**
  * 表示数组型控件，像 List、Table 之类的由数组型数据驱动显示的控件。
  */
