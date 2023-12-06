@@ -1,5 +1,5 @@
 <template>
-  <NModal v-model:show="showModal" preset="card" title="Excel导入" style="width: 1500px" :bordered="false">
+  <NModal v-model:show="showModal" preset="card" title="Excel前端导入" style="width: 1500px" :bordered="false">
     <n-data-table
       :columns="columns"
       :data="mapPair"
@@ -61,7 +61,7 @@
             :options="
               flyStore.tableDatas.map((item) => {
                 return {
-                  label: item.objectname,
+                  label: item.objectname + '(' + item.tablename + ')',
                   value: item.objectcode
                 }
               })
@@ -179,22 +179,22 @@ function createColumns(): DataTableColumns<MapPair> {
     },
     {
       title: '映射名称',
-      key: 'property.name',
+      key: 'field',
       resizable: true,
       width: 160,
       minWidth: 200,
       render(row: MapPair, index: number) {
         return (
           <NInput
-            value={row.property.name}
+            value={row.field}
             onUpdateValue={(v) => {
               console.log(v)
-              mapPair.value[index].property.name = v
+              mapPair.value[index].field = v
             }}
             status={
-              row.property.name == '' || row.property.name == null
+              row.field == '' || row.field == null
                 ? 'error'
-                : mapPair.value.filter((item) => item.property.name === row.property.name).length > 1
+                : mapPair.value.filter((item) => item.field === row.field).length > 1
                 ? 'error'
                 : 'success'
             }
@@ -210,8 +210,10 @@ function createColumns(): DataTableColumns<MapPair> {
           <div>
             <b>{`${row.property.propertyname}`}</b>
             <br></br>
-            {`${getPropertyTypeName(row.property.propertytypecode)} 
+            {`${getPropertyTypeName(row.property.propertytypecode)}
             ${getPropertyTypeEmoji(Number(row.property.propertytypecode))}`}
+            {/* <br style={}></br> */}
+            {flyStore.tableDataMap.get(flyStore.columnDataMap.get(mapPair.value[index]?.property?.propertycode)?.relationobjectcode)?.objectname}
           </div>
         )
       },
@@ -239,6 +241,7 @@ function createColumns(): DataTableColumns<MapPair> {
             onUpdateValue={(v) => {
               mapPair.value[index].column = v
               mapPair.value[index].remark = remarkMap.get(v)
+              columnNames.value = columnNames.value.filter(() => true)
             }}
             options={columnNames.value
               .map((item) => {
@@ -275,7 +278,7 @@ function createColumns(): DataTableColumns<MapPair> {
           <NSelect
             value={row.reverseQueryField}
             onUpdateValue={(v) => {
-              mapPair.value[index].property.name = v
+              mapPair.value[index].field = v
               mapPair.value[index].reverseQueryField = v
             }}
             status={
@@ -302,7 +305,7 @@ function createColumns(): DataTableColumns<MapPair> {
               ?.properties?.map((item) => {
                 if (item.propertyname == row.column) {
                   //自动选择
-                  row.property.name = item.columnname
+                  row.field = item.columnname
                   row.reverseQueryField = item.columnname
                 }
                 return {

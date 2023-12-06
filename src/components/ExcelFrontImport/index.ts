@@ -8,7 +8,7 @@ import { read } from "xlsx";
 import { excelExportTemplate } from "../../data/excelExportTemplate";
 import { excelImportTemplate } from "../../data/excelImportTemplate";
 import { message } from "../../util/message";
-import { excelFrontImportTemplate, paramDocTempalte } from "../../data/excelFrontImportTemplate";
+import { excelFrontImportTemplate, objDocDefTempalte, paramDocTempalte, propertyDocTempalte } from "../../data/excelFrontImportTemplate";
 import { SelectMixedOption } from "naive-ui/es/select/src/interface";
 
 type TitleMapping = {
@@ -39,13 +39,20 @@ export const generateCodeFunc = (mapPair: MapPair[], checkedRowKeys: RowKey[]) =
     code = code.concat(templet.excelRowDataHandle);
     const titlemappingsGenFunc = () => {
         const titlemappings: TitleMapping[] = [];
-        mapPair.forEach((pair) => {
-            titlemappings.push({
-                column: `${pair.column}`,
-                field: `${pair.field}`,
-                type: "string"
+        mapPair
+            .filter((pair) => {
+                return checkedRowKeys.includes(pair.property.propertycode);
             })
-        })
+            .forEach((pair) => {
+                if (pair.column != '' && pair.column != undefined && pair.column != undefined) {
+                    titlemappings.push({
+                        column: `${pair.column}`,
+                        field: `${pair.field}`,
+                        type: "string"
+                    })
+                }
+
+            })
         return titlemappings
     }
 
@@ -94,16 +101,22 @@ export const generateCodeFunc = (mapPair: MapPair[], checkedRowKeys: RowKey[]) =
                 .replaceAll("{{dictTableZhName}}", pair.property.propertyname);
             let callFunc =
                 `//反查字典对象 ${pair.property.propertyname}\n` +
-                `    rowData.${pair.property.name} 
-            =\n        get${toCamelCase(dictTableName)}DictIdByDicvalue(rowData.${pair.property.name},index)`
+                `    rowData.${pair.property.name} =\n        get${toCamelCase(dictTableName)}DictIdByDicvalue(rowData.${pair.field},index)`
+            if (pair.property.name !== pair.field) {
+                callFunc += `\n delete rowData.${pair.field}`
+
+            }
             callGetDictIdByDicvalueArray.push(callFunc)
             getDictIdByDicvalueArray.push(getDictIdByDicvalue);
         });
 
     checkMapPair
         .filter((pair) => {
+            return pair.column != "---";
+        })
+        .filter((pair) => {
             return (
-                Number(pair.property.propertytypecode) == PropertyTypeCode.BusinessObject
+                Number(pair.property.propertytypecode) == PropertyTypeCode.BusinessObject || Number(pair.property.propertytypecode) == PropertyTypeCode.LongInteger
             );
         })
         .forEach((pair) => {
@@ -118,7 +131,7 @@ export const generateCodeFunc = (mapPair: MapPair[], checkedRowKeys: RowKey[]) =
                 templet.getBusinessObjectIdByValue;
 
             getBusinessObjectIdByValue = getBusinessObjectIdByValue
-                .replaceAll("{{required}}", templet.requiredCode.replace("{{data}}", pair.reverseQueryField).replace("{{text}}", pair.property.propertyname))
+                .replaceAll("{{required}}", templet.requiredCode.replace("{{data}}", pair.reverseQueryField).replace("{{text}}", pair.field))
                 .replaceAll("{{CamelTableName}}", toCamelCase(tableName))
                 .replaceAll("{{CamelColumnName}}", toCamelCase(pair.reverseQueryField))
                 .replaceAll("{{columnName}}", pair.reverseQueryField)
@@ -131,28 +144,31 @@ export const generateCodeFunc = (mapPair: MapPair[], checkedRowKeys: RowKey[]) =
 
             getBusinessObjectIdByValueArray.push(getBusinessObjectIdByValue);
             let callFunc =
-                `反查 ${pair.property.propertyname}\n` +
-                `rowData.${pair.property.name} =\n        get${toCamelCase(tableName)}IdBy${toCamelCase(pair.reverseQueryField)}(rowData.${pair.property.name},index)`
+                `//反查对象 ${pair.property.propertyname}\n` +
+                `rowData.${pair.property.name} =\n        get${toCamelCase(tableName)}IdBy${toCamelCase(pair.reverseQueryField)}(rowData.${pair.field},index)`
+            if (pair.property.name !== pair.field) {
+                callFunc += `\n delete rowData.${pair.field}`
 
+            }
             callGetBusinessObjectIdByValueArray.push(callFunc)
         });
 
-    checkMapPair
-        .filter(pair => pair.reverseQueryMannal)
-        .forEach((pair) => {
+    // checkMapPair
+    //     .filter(pair => pair.reverseQueryMannal)
+    //     .forEach((pair) => {
 
 
-            let getBusinessObjectIdByValue =
-                templet.getBusinessObjectIdByValueManual;
+    //         let getBusinessObjectIdByValue =
+    //             templet.getBusinessObjectIdByValueManual;
 
-            getBusinessObjectIdByValue = getBusinessObjectIdByValue
-                .replaceAll("{{columnName}}", pair.reverseQueryField)
+    //         getBusinessObjectIdByValue = getBusinessObjectIdByValue
+    //             .replaceAll("{{columnName}}", pair.reverseQueryField)
 
-            getBusinessObjectIdByValueArray.push(getBusinessObjectIdByValue);
-            // let callFunc =
-            // `${flyStore.protocol?.input[0]?.name} =\n        get${toCamelCase(tableName)}IdBy${toCamelCase(pair.reverseQueryField)}(rowData${pair.property.name})`
-            // callGetBusinessObjectIdByValueArray.push(callFunc)
-        });
+    //         getBusinessObjectIdByValueArray.push(getBusinessObjectIdByValue);
+    //         // let callFunc =
+    //         // `${flyStore.protocol?.input[0]?.name} =\n        get${toCamelCase(tableName)}IdBy${toCamelCase(pair.reverseQueryField)}(rowData${pair.property.name})`
+    //         // callGetBusinessObjectIdByValueArray.push(callFunc)
+    //     });
 
     const callReverseQueryFuncs = callGetDictIdByDicvalueArray.concat(callGetBusinessObjectIdByValueArray).join("\n\n    ")
 
@@ -163,7 +179,7 @@ export const generateCodeFunc = (mapPair: MapPair[], checkedRowKeys: RowKey[]) =
         if (pair.property.required) {
             let callValidation = templet.validationFunc
                 .replaceAll("{{column}}", toCamelCase(pair.field))
-                .replaceAll("{{text}}", pair.property.propertyname)
+                .replaceAll("{{text}}", pair.column)
             switch (PropertyTypeCode[pair.property.propertytypecode]) {
                 case PropertyTypeCode.PrimaryKey:
                     break;
@@ -263,17 +279,46 @@ export const generateCodeFunc = (mapPair: MapPair[], checkedRowKeys: RowKey[]) =
         return checkMapPair.map((pair) => {
             let data = {
                 paramName: pair.field,
-                paramDesc: pair.property.propertyname
+                paramDesc: pair.column
             }
             return paramDocTempalte
                 .replace("{{paramName}}", data.paramName)
                 .replace("{{paramDesc}}", data.paramDesc)
         })
     }
-    const paramDoc = genParamDocArray().join("\n")
+    const genPropertyDocArray = () => {
+        return checkMapPair.map((pair) => {
+            let data = {
+                paramName: pair.field,
+                paramDesc: pair.column
+            }
+            return propertyDocTempalte
+                .replace("{{propertyName}}", data.paramName)
+                .replace("{{propertyDesc}}", data.paramDesc)
+        })
+    }
+    const inputRowDataJsDoc = objDocDefTempalte.replace("{{desc}}", "Excel行数据")
+        .replace("{{objctName}}", "inputRowData")
+        .replace("{{propertyDocArray}}", genPropertyDocArray().join("\n"))
+
+    const outRowDataJsDoc = objDocDefTempalte.replace("{{desc}}", tableName + "对象")
+        .replace("{{objctName}}", "outRowData")
+        .replace("{{propertyDocArray}}", checkMapPair.map((pair) => {
+            return propertyDocTempalte
+                .replace("{{propertyName}}", pair.property.name)
+                .replace("{{propertyDesc}}", pair.property.propertyname)
+        }).join("\n"))
+    code += '\n'
+    code += '\n'
+    code += inputRowDataJsDoc
+    code += '\n'
+    code += outRowDataJsDoc
+    code += '\n'
+    code += '\n'
+    // const paramDoc = genParamDocArray().join("\n")
     code = code.concat(templet.callValidation
         .replace("{{rowDataDesc}}", "Excel行数据")
-        .replace("{{paramDocArray}}", paramDoc)
+        // .replace("{{paramDocArray}}", paramDoc)
         .replace("{{tableName}}", tableName)
         .replace("{{callFunctions}}", callValidationFuncs.join("\n\n    ")));
 
@@ -281,7 +326,7 @@ export const generateCodeFunc = (mapPair: MapPair[], checkedRowKeys: RowKey[]) =
     code = code.concat(templet.callReverseQuery
         .replace("{{tableName}}", tableName)
         .replace("{{rowDataDesc}}", "Excel行数据")
-        .replace("{{paramDocArray}}", paramDoc)
+        // .replace("{{paramDocArray}}", paramDoc)
         .replace("{{callFunctions}}", callReverseQueryFuncs));
 
     code = code.concat(ValidationFuncs.join("\n"));

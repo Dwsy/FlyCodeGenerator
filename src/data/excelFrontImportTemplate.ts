@@ -14,7 +14,7 @@ var outDataList = [];
 const main = `
 excelImpSettingAndExecuteFunc()
 for (var index = 0; index < excelDataList.length; index++) {
-    // 行数据是否校验切 反查成功
+    // 行数据是否校验 反查成功
     var rowDataFail = false
     var rowData = excelDataList[index];
     validation(rowData,index)
@@ -80,8 +80,7 @@ function validation{{column}}(data,index) {
 const callValidation = `
 /**
  * 统一校验函数
- * @param {Object} rowData - {{rowDataDesc}}
- {{paramDocArray}}
+ * @param {inputRowData} rowData - {{rowDataDesc}}
 */
 function validation(rowData,index) {
     {{callFunctions}}
@@ -91,14 +90,21 @@ function validation(rowData,index) {
 }
 
 `
+// {{paramDocArray}}
 export const paramDocTempalte = ` * @param {string} rowData.{{paramName}} - {{paramDesc}}`
 
+export const propertyDocTempalte = ` * @property {string} rowData.{{propertyName}} - {{propertyDesc}}`
+
+export const objDocDefTempalte = `/**
+ * {{desc}}
+ * @typedef {Object} {{objctName}}
+{{propertyDocArray}}
+*/`
 
 const callReverseQuery = `
 /**
  * 统一反查函数
- * @param {Object} rowData - {{rowDataDesc}}
- {{paramDocArray}}
+* @param {inputRowData} rowData - {{rowDataDesc}}
 */
 function reverseQuery(rowData,index) {
     {{callFunctions}}
@@ -139,10 +145,10 @@ const getBusinessObjectIdByValue = `/**
 function get{{CamelTableName}}IdBy{{CamelColumnName}}({{columnName}},{{tableName}}_bo) {
     {{required}}
     var temp = select {{primaryKey}} from {{tableName}} where {{columnName}} = { {{columnName}} } NORULE;
-    if (temp.length != 0) {
-        return temp[0].dictionaryid
+    if (temp.length == 0) {
+        return ''
     }else{
-        return {{columnName}}
+        return temp[0].{{primaryKey}}
         appendErrmsg("业务对象({{BusinessObjectTableZhName}})：" + value  + "不存在；")
     }
 }
