@@ -1,7 +1,25 @@
 // 这里提供完整的TypeScript定义文件代码:
 
+
 /**
- * 数组控制器类
+ * 赋值规则接口
+ */
+interface ArrayCtrlSetter {
+
+    /**
+     * 赋值规则
+     * @param fromKey 来源字段
+     * @param toKey 目标字段
+     */
+    append(fromKey: string, toKey: string): void;
+
+}
+
+// 这个是完整的TypeScript定义文件内容,包含了类和接口定义以及方法参数和返回值的中文注释说明。
+
+
+/**
+ * 表示数组型控件，像 List、Table 之类的由数组型数据驱动显示的控件。
  */
 declare class ArrayCtrl {
 
@@ -67,30 +85,6 @@ declare class ArrayCtrl {
      * @param setter 赋值规则
      */
     selectRows(rowsData: any[], setter?: ArrayCtrlSetter);
-
-}
-
-/**
- * 赋值规则接口
- */
-interface ArrayCtrlSetter {
-
-    /**
-     * 赋值规则
-     * @param fromKey 来源字段
-     * @param toKey 目标字段
-     */
-    append(fromKey: string, toKey: string): void;
-
-}
-
-// 这个是完整的TypeScript定义文件内容,包含了类和接口定义以及方法参数和返回值的中文注释说明。
-
-
-/**
- * 表示数组型控件，像 List、Table 之类的由数组型数据驱动显示的控件。
- */
-declare class ArrayCtrl {
     /**
      * 获取数组型控件勾选的数量。
      */

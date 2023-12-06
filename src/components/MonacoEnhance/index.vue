@@ -12,7 +12,7 @@ import { el, it } from 'date-fns/locale';
 import { PropertyTypeCode } from '../../type/model/propertyTypeCodeRef';
 import { useGenStore } from '../../store/genStore';
 import { pushTempBoNewDtsList } from '../../flycodeDts';
-import { addBoNewAction } from './index'
+import { addAutoAutoAutoAutoAuto, addBoNewAction } from './index'
 import { applyCustomFlycode, MonarchTokensProvider, LanguageConfiguration } from "./monaco.languages.conf";
 onMounted(() => {
     //@ts-ignore
@@ -28,6 +28,7 @@ onMounted(() => {
 
             monaco.editor.onDidCreateEditor((editor) => {
                 addBoNewAction(editor)
+                addAutoAutoAutoAutoAuto(editor)
                 applyCustomFlycode()
             })
         })

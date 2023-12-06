@@ -41,7 +41,7 @@ export const generateCodeFunc = (mapPair: MapPair[], checkedRowKeys: RowKey[]) =
         });
         return temp;
     };
-    debugger
+    // debugger
     dataBind = dataBind.replace(
         "{{bindMap}}",
         JSON.stringify(bindMap(), null, 4)

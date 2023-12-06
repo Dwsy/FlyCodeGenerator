@@ -6,15 +6,29 @@ var errMsg = "";
 
 var validateFail = false;
 
-//结果数据
-var outdata = [];
+var excelDataList = []
+var outDataList = [];
 `
 
 
 const main = `
-excelImpSettingFunc()
-EXCELIMP.execute()
-OUT.{{boName}} = outdata
+excelImpSettingAndExecuteFunc()
+for (var index = 0; index < excelDataList.length; index++) {
+    // 行数据是否校验切 反查成功
+    var rowDataFail = false
+    var rowData = excelDataList[index];
+    validation(rowData,index)
+    reverseQuery(rowData,index)
+    if (!rowDataFail){
+        outDataList.push(rowData)
+    }else{
+
+    }
+}
+
+FLY.info("共" + excelDataList.length + "行" +"成功导入" + outDataList.length + "行")
+
+OUT.{{boName}} = outDataList
 OUT.errMsg = errMsg
 
 
@@ -22,7 +36,7 @@ OUT.errMsg = errMsg
 
 
 
-export const ExcelImpSettingFunc = `function excelImpSettingFunc (){
+export const ExcelImpSettingFunc = `function excelImpSettingAndExecuteFunc (){
     //标题列映射定义
     var titleMappings = {{titleMappings}}
     //设置标题映射
@@ -32,18 +46,15 @@ export const ExcelImpSettingFunc = `function excelImpSettingFunc (){
     //批次号获取
     var dynamicid = EXCELIMP.dynamicid;
     EXCELIMP.setExcelRowDataHandle(excelRowDataHandle)
+    //execute
+    EXCELIMP.execute()
 }
 
 `
 
 export const excelRowDataHandle = `function excelRowDataHandle (exceldata, customdata){
-    //读取exceldata转换为要输出的列表的数据集
-    //业务处理 把excel数据
-    validation(exceldata)
-    
-    reverseQuery(exceldata)
-
-    outdata.push(exceldata)
+    //读取exceldata
+    excelDataList.push(exceldata)
 }
 
 `
@@ -52,9 +63,9 @@ export const excelRowDataHandle = `function excelRowDataHandle (exceldata, custo
 
 const validationFunc = `
 /**
-* 校验 {{column}}-{{text}}
+ * 校验 {{column}}-{{text}}
 */
-function validation{{column}}(data) {
+function validation{{column}}(data,index) {
     if (String.isBlank(data)) {
         appendErrmsg("({{text}})：不能为空")
     }
@@ -70,9 +81,9 @@ const callValidation = `
 /**
  * 统一校验函数
  * @param {Object} rowData - {{rowDataDesc}}
-{{paramDocArray}}
+ {{paramDocArray}}
 */
-function validation(rowData) {
+function validation(rowData,index) {
     {{callFunctions}}
     // if (validateFail) {
     //     throw new ERROR(errMsg);
@@ -87,9 +98,9 @@ const callReverseQuery = `
 /**
  * 统一反查函数
  * @param {Object} rowData - {{rowDataDesc}}
-{{paramDocArray}}
+ {{paramDocArray}}
 */
-function reverseQuery(rowData) {
+function reverseQuery(rowData,index) {
     {{callFunctions}}
     // if (validateFail) {
     //     throw new ERROR(errMsg);
@@ -99,9 +110,9 @@ function reverseQuery(rowData) {
 `
 
 const getDictIdByDicvalue = `/**
-* 根据字典值获取 {{dictTableName}} 的 dictionaryid
-* @param {string} dicvalue - 字典值
-* @returns {number} {{dictTableName}} 的 dictionaryid
+ * 根据字典值获取 {{dictTableName}} 的 dictionaryid
+ * @param {string} dicvalue - 字典值
+ * @returns {number} {{dictTableName}} 的 dictionaryid
 */
 function get{{CamelTableName}}DictIdByDicvalue(dicvalue) {
     var temp = select dictionaryid from {{dictTableName}} where dicvalue = { dicvalue } NORULE;
@@ -121,9 +132,9 @@ const requiredCode = `if (String.isBlank({{data}})) {
 
 
 const getBusinessObjectIdByValue = `/**
-* 根据 {{columnName}} 获取 {{tableName}} 的 {{primaryKey}}
-* @param {string} - {{tableName}} 的 {{columnName}} 的值
-* @returns {number} {{tableName}} 的 {{primaryKey}}
+ * 根据 {{columnName}} 获取 {{tableName}} 的 {{primaryKey}}
+ * @param {string} - {{tableName}} 的 {{columnName}} 的值
+ * @returns {number} {{tableName}} 的 {{primaryKey}}
 */
 function get{{CamelTableName}}IdBy{{CamelColumnName}}({{columnName}},{{tableName}}_bo) {
     {{required}}
@@ -139,7 +150,7 @@ function get{{CamelTableName}}IdBy{{CamelColumnName}}({{columnName}},{{tableName
 `
 
 const getBusinessObjectIdByValueManual = `/**
-* 反查业务对象ID
+ * 反查业务对象ID
 */
 function getIdBy (columnName) {
     {{required}}

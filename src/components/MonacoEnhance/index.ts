@@ -1,11 +1,8 @@
-import { useMessage } from "naive-ui";
 import { pushTempBoNewDtsList } from "../../flycodeDts";
 import { useFlyStore } from "../../store/flyStore";
 import { PropertyTypeCode } from "../../type/model/propertyTypeCodeRef";
 import { getTableShortName } from "../../util";
 import { getMonacoModel } from "../../util/monacoUtil";
-import { GM_setClipboard } from "$";
-import { format } from 'sql-formatter';
 import { formatFquery } from "../../util/formateFquery";
 
 
@@ -59,7 +56,7 @@ export const addBoNewAction = (editor) => {
                 }
 
                 var setLine = flyStore.tableNameDataMap.get(boName).properties.map((item) => {
-                    debugger
+                    // debugger
                     if (item.propertytypecode == PropertyTypeCode.PrimaryKey.toString()) {
                         return `${shortName}.${item.columnname} = FLY.genId()`
                     }
@@ -179,4 +176,108 @@ export function formatEditotFqueryFunc() {
     } else {
         console.log("No matching SQL statements found in the text.");
     }
+}
+
+
+
+export const addAutoAutoAutoAutoAuto = (editor) => {
+    const flyStore = useFlyStore()
+    setTimeout(() => {
+        editor.addAction({
+            id: "🥰AutoAutoAuto🥰",
+            label: "🥰AutoAutoAuto🥰",
+            keybindings: [
+                monaco.KeyMod.CtrlCmd | monaco.KeyCode.F6,
+            ],
+            // A precondition for this action.
+            precondition: null,
+            // A rule to evaluate on top of the precondition in order to dispatch the keybindings.
+            keybindingContext: null,
+            contextMenuGroupId: "navigation",
+            contextMenuOrder: 1.5,
+            // Method that will be executed when the action is triggered.
+            // @param editor The editor instance is passed in as a convenience
+            run: function (ed) {
+                // let lines = formatEditotFqueryFunc()
+
+                // ed.executeEdits('name-of-edit', [
+                //     {
+                //         range: editor.getModel().getFullModelRange(), // full range
+                //         text: lines, // target value here
+                //     },
+                // ]);
+                const lineContent = getMonacoModel().getLineContent(ed.getPosition().lineNumber);
+                var type = matchAutoType(lineContent)
+
+                let regex = /for\s+.*/;
+
+                let matchResult = lineContent.match(regex);
+
+                if (matchResult) {
+                    let extractedText = matchResult[0].split(" ")[1];
+                    let template = `for(var i = 0; i < ${extractedText}.length; i++) {
+                        var element = ${extractedText}[i];
+                        
+                    }`
+                    console.log("for匹配成功:", extractedText);
+                    // 删除当前行
+                    ed.executeEdits("source", [{
+                        range: new monaco.Range(ed.getPosition().lineNumber, 1, ed.getPosition().lineNumber + 1, 1),
+                        text: ""
+                    }])
+                    ed.executeEdits("source", [{
+                        range: new monaco.Range(ed.getPosition().lineNumber, 1, ed.getPosition().lineNumber, 1),
+                        text: template + '\n'
+                    }])
+                } else {
+                    console.log("for匹配失败");
+                }
+                // debugger
+
+            },
+        });
+    }, 1);
+}
+
+
+
+type AutoAutoAutoType = "fori" | "while" | "NewBO"
+
+function matchAutoType(lineContent: string): AutoAutoAutoType {
+    let regex = /for\s+.*/;
+
+    let matchResult = lineContent.match(regex);
+
+    if (matchResult) {
+        return "fori"
+    }
+
+
+}
+
+function AutoAutoAuto(type: AutoAutoAutoType, matchResult): Function {
+    if (type == "fori") {
+        return (ed) => {
+            if (matchResult) {
+                let extractedText = matchResult[0].split(" ")[1];
+                let template = `for(var i = 0; i < ${extractedText}.length; i++) {
+                    var element = ${extractedText}[i];
+                    
+                }`
+                console.log("for匹配成功:", extractedText);
+                // 删除当前行
+                ed.executeEdits("source", [{
+                    range: new monaco.Range(ed.getPosition().lineNumber, 1, ed.getPosition().lineNumber + 1, 1),
+                    text: ""
+                }])
+                ed.executeEdits("source", [{
+                    range: new monaco.Range(ed.getPosition().lineNumber, 1, ed.getPosition().lineNumber, 1),
+                    text: template + '\n'
+                }])
+            } else {
+                console.log("for匹配失败");
+            }
+        }
+    }
+    return () => { }
 }

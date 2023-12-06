@@ -9,6 +9,7 @@ import { excelExportTemplate } from "../../data/excelExportTemplate";
 import { excelImportTemplate } from "../../data/excelImportTemplate";
 import { message } from "../../util/message";
 import { excelFrontImportTemplate, paramDocTempalte } from "../../data/excelFrontImportTemplate";
+import { SelectMixedOption } from "naive-ui/es/select/src/interface";
 
 type TitleMapping = {
     column: string,
@@ -91,8 +92,10 @@ export const generateCodeFunc = (mapPair: MapPair[], checkedRowKeys: RowKey[]) =
                 .replaceAll("{{tableName}}", tableName)
                 .replaceAll("{{CamelTableName}}", toCamelCase(dictTableName))
                 .replaceAll("{{dictTableZhName}}", pair.property.propertyname);
-            let callFunc = `rowData.${pair.property.name} 
-            =\n        get${toCamelCase(dictTableName)}DictIdByDicvalue(rowData.${pair.property.name})`
+            let callFunc =
+                `//反查字典对象 ${pair.property.propertyname}\n` +
+                `    rowData.${pair.property.name} 
+            =\n        get${toCamelCase(dictTableName)}DictIdByDicvalue(rowData.${pair.property.name},index)`
             callGetDictIdByDicvalueArray.push(callFunc)
             getDictIdByDicvalueArray.push(getDictIdByDicvalue);
         });
@@ -128,7 +131,9 @@ export const generateCodeFunc = (mapPair: MapPair[], checkedRowKeys: RowKey[]) =
 
             getBusinessObjectIdByValueArray.push(getBusinessObjectIdByValue);
             let callFunc =
-                `rowData.${pair.property.name} =\n        get${toCamelCase(tableName)}IdBy${toCamelCase(pair.reverseQueryField)}(rowData.${pair.property.name})`
+                `反查 ${pair.property.propertyname}\n` +
+                `rowData.${pair.property.name} =\n        get${toCamelCase(tableName)}IdBy${toCamelCase(pair.reverseQueryField)}(rowData.${pair.property.name},index)`
+
             callGetBusinessObjectIdByValueArray.push(callFunc)
         });
 
@@ -229,7 +234,9 @@ export const generateCodeFunc = (mapPair: MapPair[], checkedRowKeys: RowKey[]) =
             }
             callValidation = callValidation.replace("{{requiredCode}}", ``)
             ValidationFuncs.push(callValidation)
-            callValidationFuncs.push(`validation${toCamelCase(pair.field)}(rowData.${pair.field})`)
+            callValidationFuncs.push(
+                `//校验 ${pair.property.propertyname}\n` +
+                `    validation${toCamelCase(pair.field)}(rowData.${pair.field},index)`)
         }
 
     })
@@ -291,8 +298,18 @@ export const generateCodeFunc = (mapPair: MapPair[], checkedRowKeys: RowKey[]) =
 };
 
 export const autoMapFunc = (excelColumnName: string[], sheetLine: []) => {
+    console.log("----")
+    console.log(excelColumnName)
+    console.log(sheetLine)
+    console.log("----")
     const flyStore = useFlyStore()
     const tempMapPair: MapPair[] = [];
+    const remarkMap = new Map<string, string>();
+    excelColumnName.forEach((item) => {
+        remarkMap.set(item, sheetLine[item] ? sheetLine[item] : '未填写备注')
+    })
+    console.log(remarkMap)
+    const usedColumn = new Map<string, string>();
     const temp = flyStore.protocol.input[0].properties;
     temp.forEach((property) => {
         if (property.propertycode == "") {
@@ -314,7 +331,7 @@ export const autoMapFunc = (excelColumnName: string[], sheetLine: []) => {
             // todo 自动反向查询 Reverse query field
 
             const tablename = relationobject.tablename;
-            debugger
+            //debugger
             if (tablename == "pl_region") {
                 reverseQueryField = "regionname";
             } else if (tablename == "pl_dictionary") {
@@ -345,21 +362,40 @@ export const autoMapFunc = (excelColumnName: string[], sheetLine: []) => {
         // }
 
         const column = levenMap.get(similarity);
-        const remark = sheetLine[column];
-        // 必填 todo
-        if (remark.indexOf("必填") != -1 && remark.indexOf("非必填") == -1) {
-            property.required = true;
+        // debugger
+        if (usedColumn.get(column) == undefined) {
+            usedColumn.set(column, '!');
+            const remark = remarkMap.get(column)
+            // remarkMap.set(column, remark);
+            // 必填 todo
+            if (remark.indexOf("必填") != -1 && remark.indexOf("非必填") == -1) {
+                property.required = true;
+            }
+            //debugger
+            tempMapPair.push({
+                field: property.name,
+                column,
+                property,
+                remark,
+                reverseQueryField,
+                queryOperator,
+            });
+        } else {
+            tempMapPair.push({
+                field: property.name,
+                column: '',
+                property,
+                remark: '未匹配列',
+                reverseQueryField,
+                queryOperator,
+            });
         }
-        debugger
-        tempMapPair.push({
-            field: property.name,
-            column,
-            property,
-            remark,
-            reverseQueryField,
-            queryOperator,
-        });
+
+
     });
+    if (temp.length != tempMapPair.length) {
+        message.info("有未匹配的列")
+    }
     const tempMap = new Map<string, string>();
     const allSelect = tempMapPair.map((row: MapPair) => {
         if (tempMap.has(row.column)) {
@@ -371,7 +407,7 @@ export const autoMapFunc = (excelColumnName: string[], sheetLine: []) => {
     });
     return {
         allSelect,
-        tempMapPair
+        tempMapPair, remarkMap
     }
     const SystemTable = ["pl_region", "pl_dictionary", "pl_orgstruct"];
     const input = flyStore.protocol.input[0];
@@ -412,5 +448,16 @@ export function readExcelFileFunc(file: File) {
         };
 
         reader.readAsArrayBuffer(file);
+    });
+}
+
+
+
+export const retrunSortOption = (options: SelectMixedOption[], rowName: string) => {
+
+    return options.sort((a, b) => {
+        const aDistance = levenshteinDistance(a.label as string, rowName);
+        const bDistance = levenshteinDistance(b.label as string, rowName);
+        return aDistance - bDistance; // 按照相似度排序，最相似的在上面
     });
 }

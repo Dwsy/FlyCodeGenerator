@@ -1,3 +1,26 @@
+// TX.begin(); // 开启事务
+// TX.commit(); // 提交事务
+// TX.rollback(); // 回滚事务（可以不写，出现异常平台会自动回滚事务）
+
+/**
+ * 事务
+ */
+declare class TX {
+    /**
+     * 开启事务
+     */
+    static begin(): void;
+
+    /**
+     * 提交事务
+     */
+    static commit(): void;
+
+    /**
+     * 回滚事务（可以不写，出现异常平台会自动回滚事务）
+     */
+    static rollback(): void;
+}
 /**
  * DB 数据库操作
  */
