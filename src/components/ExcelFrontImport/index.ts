@@ -56,7 +56,13 @@ export const generateCodeFunc = (mapPair: MapPair[], checkedRowKeys: RowKey[]) =
         return titlemappings
     }
 
+    // const titleMappingsStr = JSON.stringify(titlemappingsGenFunc())
+    //     .replaceAll(`},{`, `},\n{`)
+    //     .replace("[", "[\n")
+    //     .replace("]", "\n]")
+    //     .replaceAll("{", "       {")
     code = code.concat(templet.ExcelImpSettingFunc)
+        // .replace("{{titleMappings}}", titleMappingsStr);
         .replace("{{titleMappings}}", JSON.stringify(titlemappingsGenFunc(), null, 4));
 
 
@@ -121,11 +127,21 @@ export const generateCodeFunc = (mapPair: MapPair[], checkedRowKeys: RowKey[]) =
         })
         .forEach((pair) => {
             const columnData = flyStore.columnDataMap.get(pair.property.propertycode);
-            const primaryKey = getPrimaryKey(columnData.relationobjectcode);
-            const tableName = flyStore.tableDataMap.get(
-                flyStore.columnDataMap.get(pair.property.propertycode)
-                    .relationobjectcode
-            ).objectmark;
+            let primaryKey: string
+            try {
+                primaryKey = getPrimaryKey(columnData.relationobjectcode)
+            } catch (error) {
+                message.error(`字段${pair.property.name}未设置关联表`)
+            };
+            let tableName
+            try {
+                tableName = flyStore.tableDataMap.get(
+                    flyStore.columnDataMap.get(pair.property.propertycode)
+                        .relationobjectcode
+                ).objectmark;
+            } catch (error) {
+                message.error(`字段${pair.property.name}${error}`)
+            }
 
             let getBusinessObjectIdByValue =
                 templet.getBusinessObjectIdByValue;
