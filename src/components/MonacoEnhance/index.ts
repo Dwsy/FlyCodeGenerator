@@ -12,7 +12,7 @@ export const addBoNewAction = (editor) => {
     setTimeout(() => {
         console.log("--", editor)
         const linesContent = getMonacoModel().getLinesContent()
-        console.log(linesContent)
+        // console.log(linesContent)
         linesContent.filter((lineContent) => { lineContent.indexOf("BO.new") > -1 })
             .map((line) => {
                 const match = line.match(/BO.new\((.*?)\)/);

@@ -11,19 +11,22 @@ import { message } from "../../util/message";
 import { excelFrontImportTemplate, objDocDefTempalte, paramDocTempalte, propertyDocTempalte } from "../../data/excelFrontImportTemplate";
 import { SelectMixedOption } from "naive-ui/es/select/src/interface";
 
+// 定义标题映射类型
 type TitleMapping = {
-    column: string,
-    field: string,
-    type: string
+    column: string,  // 列名
+    field: string,   // 字段名
+    type: string     // 类型
 }
+
+// 导出映射对类型
 export type MapPair = {
-    field: string;
-    column: string;
-    property: Property;
-    remark: string;
-    reverseQueryField?: string;
-    reverseQueryMannal?: true;
-    queryOperator?: Operator;
+    field: string;               // 字段名
+    column: string;              // 列名
+    property: Property;          // 属性
+    remark: string;              // 备注
+    reverseQueryField?: string;  // 反向查询字段（可选）
+    reverseQueryMannal?: true;   // 手动反向查询（可选）
+    queryOperator?: Operator;    // 查询操作符（可选）
 };
 export const generateCodeFunc = (mapPair: MapPair[], checkedRowKeys: RowKey[]) => {
     const flyStore = useFlyStore()
