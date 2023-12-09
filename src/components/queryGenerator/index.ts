@@ -17,12 +17,8 @@ import { Output, Property, Protocol } from "../../type/protocol";
 import { message } from "../../util/message";
 
 
-let protocol: Protocol
-let tableDatas: tableData[];
 
 
-let tableDataMap = new Map<string, tableData>();
-let columnDataMap = new Map<string, columnData>();
 
 /**
  * 初始化函数，用于设置和监视flyStore的状态。
@@ -32,11 +28,7 @@ let columnDataMap = new Map<string, columnData>();
 export const init = () => {
   const flyStore = useFlyStore()
   watchEffect(() => {
-    protocol = flyStore.protocol
-    tableDatas = flyStore.tableDatas
-    tableDataMap = flyStore.tableDataMap
-    columnDataMap = flyStore.columnDataMap
-    console.log("modellogicname:", protocol.modellogicname);
+    console.log("modellogicname:", flyStore.protocol.modellogicname);
   })
 }
 
@@ -51,9 +43,11 @@ export const init = () => {
  * 否则，使用输出数组的第一个元素和转换后的 Map 对象生成查询模型。
  */
 export function genQueryModel(outputArray: Output[]): QueryModel {
+  const flyStore = useFlyStore()
   const queryArgumentArrayMap = new Map<string, Property[]>();
+
   // 将 query 对象转换为 Map 对象
-  protocol.input.forEach((input) => {
+  flyStore.protocol.input.forEach((input) => {
     queryArgumentArrayMap.set(input.name, input.properties);
   })
 
@@ -94,8 +88,8 @@ export function genQueryModel(outputArray: Output[]): QueryModel {
 function gen(output: Output, queryArgumentArrayMap: Map<string, Property[]>): QueryModel {
   // 定义 fquery 变量
   let fquery = "select\n{{selectColumns}}"
-
-  const mainTableName = protocol.input[0].name;
+  const flyStore = useFlyStore()
+  const mainTableName = flyStore.protocol.input[0].name;
   const columnModelArray = new Array<ColumnModel>()
   const conditionModelArray = new Array<ConditionModel>()
   const joinModelArray = new Array<JoinModel>()
@@ -114,16 +108,16 @@ function gen(output: Output, queryArgumentArrayMap: Map<string, Property[]>): Qu
 
 
   // 获取 output 对应的表格数据
-  const outputTable = tableDataMap.get(output.objectcode);
+  const outputTable = flyStore.tableDataMap.get(output.objectcode);
   // 创建 relationTableMap 和 outPropertiesDataMap 两个 Map 对象
 
   const outPropertiesDataMap = output.properties.map((data) => {
-    const columnData = columnDataMap.get(data.propertycode);
+    const columnData = flyStore.columnDataMap.get(data.propertycode);
     if (data.name.indexOf("__") !== -1) {
       const parts = data.name.split("__");
       if (parts.length === 2) {
         relationTableColumnMap.set(data.propertycode, data.name);
-        needJoinRelationTableMap.set(parts[0], tableDataMap.get(data.objectcode))
+        needJoinRelationTableMap.set(parts[0], flyStore.tableDataMap.get(data.objectcode))
         // needJoinColumnTableNameMap.set(data.propertycode, columnData.columnname)
       }
     }

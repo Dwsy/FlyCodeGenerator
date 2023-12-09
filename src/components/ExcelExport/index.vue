@@ -102,7 +102,7 @@ function createColumns({ play }: { play: (row: Bind) => void }): DataTableColumn
     {
       title: 'column',
       key: 'column',
-      render(row, index) {
+      render(row: { column: any }, index: string | number) {
         return h(NInput, {
           value: row.column,
           onUpdateValue(v) {
@@ -126,7 +126,7 @@ function createColumns({ play }: { play: (row: Bind) => void }): DataTableColumn
  *
  * @returns {string} 生成的代码
  */
-const codeGenerator = (preview?: boolean) => {
+const codeGenerator = (preview?: boolean): string => {
   console.log(checkedRowKeysRef.value)
   const bindDataArray = rowData.value.filter((data) => checkedRowKeysRef.value.includes(data.propertycode))
 

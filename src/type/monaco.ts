@@ -952,9 +952,10 @@ declare namespace monaco.editor {
     /**
      * Emitted when an editor is created.
      * Creating a diff editor might cause this listener to be invoked with the two editors.
-     * @event
+     * @event 
+     * cange by dwsy
      */
-    export function onDidCreateEditor(listener: (codeEditor: ICodeEditor) => void): IDisposable;
+    export function onDidCreateEditor(listener: (codeEditor: IStandaloneCodeEditor) => void): IDisposable;
 
     /**
      * Emitted when an diff editor is created.
