@@ -123,19 +123,36 @@ import SaveProtocolWatch from '../saveProtocolWatch.vue'
 import { copyToClipboard } from '../../util/index'
 import { GM_setClipboard } from '$'
 import { FormValidationStatus } from 'naive-ui/es/form/src/interface'
+// 使用FlyStore的实例
 const flyStore = useFlyStore()
+
+// 操作员选择选项的引用
 const OperatorSelectOptions = ref([])
 
+// 显示选择引用实体的引用
 const showSelectRefEntity = ref(false)
+
+// 设置引用实体的函数
 let setRefEntity: Function = null
+
+// 选择引用实体的引用
 const selectRefEntity = ref()
 
+// 映射对的引用
 const mapPair = ref<MapPair[]>([])
 
+// 已选行键的引用
 const checkedRowKeysRef = ref<DataTableRowKey[]>([])
+
+// 创建列
 const columns = createColumns()
+
+// 备注映射
 let remarkMap = new Map<string, string>()
+
+// 挂载后的钩子函数
 onMounted(() => {
+  // 添加按钮
   addButton(
     null,
     '生成Flycode(前端导入)',
@@ -147,19 +164,47 @@ onMounted(() => {
     1
   )
 })
+
+// 显示表格的引用
 const showTable = ref(false)
+
+// 所有选择的引用
 const allSelect = ref([])
+
+// 文件列表的引用
 const fileList = ref<Array<UploadFileInfo>>()
+
+// 显示模态的引用
 const showModal = ref(false)
+
+// 工作表名称的引用
 const sheetNames = ref([])
+
+// 列名称的引用
 const columnNames = ref([])
+
+// 工作表的引用
 const Sheets = ref()
+
+// 选择工作表模态的引用
 const selectSheetModal = ref()
+
+// 选择工作表的引用
 const selectSheet = ref()
+
+// 文件数据的引用
 const fileData = ref<File | null>(null)
+
+// 使用消息的实例
 const Message = useMessage()
+
+// 显示代码的引用
 const showCode = ref()
+
+// FlyCode的引用
 const flyCode = ref()
+
+// 工作表行的引用
 const sheetLine = ref()
 const showModalFunc = () => {
   showModal.value = !showModal.value
@@ -195,8 +240,8 @@ function createColumns(): DataTableColumns<MapPair> {
               row.field == '' || row.field == null
                 ? 'error'
                 : mapPair.value.filter((item) => item.field === row.field).length > 1
-                ? 'error'
-                : 'success'
+                  ? 'error'
+                  : 'success'
             }
           />
         )
@@ -427,6 +472,15 @@ const generateCode = (previewCode?: boolean) => {
   }
 }
 
+/**
+ * 监听 selectSheet 的变化，当其变化时，执行以下操作：
+ * 1. 打印当前选中的表格
+ * 2. 将选中的表格转换为 JSON 格式
+ * 3. 获取表格的第一行数据，并将其作为列名
+ * 4. 将列名存储在 columnNames 中
+ * 5. 关闭选择表格的模态框
+ * 6. 自动映射列名
+ */
 watch(selectSheet, async () => {
   console.log('Sheets.value[selectSheet.value]', Sheets.value[selectSheet.value])
   const temp = utils.sheet_to_json(Sheets.value[selectSheet.value])
@@ -440,6 +494,11 @@ watch(selectSheet, async () => {
   await autoMap(columnNames.value)
 })
 
+/**
+ * 自动映射函数
+ * @param {string[]} excelColumnName - Excel 列名数组
+ * 该函数会根据传入的列名数组，自动映射并设置相关的值
+ */
 const autoMap = async (excelColumnName: string[]) => {
   const pair = autoMapFunc(excelColumnName, sheetLine.value)
   remarkMap = pair.remarkMap
@@ -451,8 +510,9 @@ const autoMap = async (excelColumnName: string[]) => {
 }
 
 /**
- * 读取 Excel 文件
+ * 读取 Excel 文件函数
  * @param {File} file - 要读取的 Excel 文件
+ * 该函数会读取传入的 Excel 文件，并将其解析为可用的数据格式
  */
 function readExcelFile(file: File) {
   readExcelFileFunc(file).then((data: any) => {

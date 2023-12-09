@@ -6,6 +6,26 @@ import { useFlyStore } from "../../store/flyStore";
 import { Input } from "../../type/protocol";
 import { GM_setClipboard } from "$";
 import { MessageApiInjection } from "naive-ui/es/message/src/MessageProvider";
+
+
+
+/**
+ * ValidateBuilder 类用于构建验证逻辑。
+ * 
+ * @property {string} propertyZhName - 属性的中文名称。
+ * @property {string} propertyName - 属性的名称。
+ * @property {string} propertyTypeCode - 属性的类型代码。
+ * @property {string} propertyCode - 属性的代码。
+ * @property {string} validateLogic - 验证逻辑。
+ * @property {string} errMsg - 错误消息。
+ * @property {boolean} required - 属性是否必需。
+ * @property {boolean} validateBusinessObjectExist - 是否验证业务对象存在。
+ * @property {boolean} validateDictidExist - 是否验证字典ID存在。
+ * @property {string[]} businessPropertyTypeCodes - 业务属性类型代码数组。
+ * @property {string} primaryKey - 主键。
+ * @property {string} tableName - 表名。
+ * @property {MessageApiInjection} message - 消息API注入。
+ */
 export class ValidateBuilder {
     private propertyZhName: string;
     private propertyName: string;
@@ -170,8 +190,19 @@ ${this.validateLogic}
 
 
 
-export function generatorCode
-    (enableValidateDictId = false, enableValidateBusinessObjectId = false) {
+/**
+ * 生成代码的函数
+ * @param {boolean} enableValidateDictId - 是否启用字典ID验证，默认为false
+ * @param {boolean} enableValidateBusinessObjectId - 是否启用业务对象ID验证，默认为false
+ * @returns {string} 返回生成的代码
+ * 
+ * 此函数主要用于生成代码，包括插入和更新功能。它首先从flyStore获取输入，然后根据输入的属性生成验证函数。
+ * 如果属性有验证逻辑，它会根据属性类型生成相应的验证函数，并将其添加到验证函数列表中。
+ * 然后，它会生成调用验证函数的代码，并替换模板中的占位符。
+ * 最后，它会生成插入和更新函数的代码，并替换模板中的占位符。
+ * 最后，它将所有生成的代码片段连接在一起，返回最终的代码。
+ */
+export function generatorCode(enableValidateDictId: boolean = false, enableValidateBusinessObjectId: boolean = false): string {
     const flyStore = useFlyStore()
     const input: Input[] = flyStore.protocol.input
     let validateFunctions: string[] = new Array()

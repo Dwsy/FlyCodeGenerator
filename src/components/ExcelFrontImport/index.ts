@@ -28,6 +28,18 @@ export type MapPair = {
     reverseQueryMannal?: true;   // 手动反向查询（可选）
     queryOperator?: Operator;    // 查询操作符（可选）
 };
+/**
+ * 生成代码的函数
+ * 
+ * @param {MapPair[]} mapPair - 映射对数组
+ * @param {RowKey[]} checkedRowKeys - 已选中的行键数组
+ * 
+ * 此函数首先获取模板和表名，然后根据表名生成代码。
+ * 然后，它创建一个标题映射数组，该数组包含所有选中的行键对应的映射对。
+ * 然后，它将标题映射数组转换为字符串，并将其添加到代码中。
+ * 最后，它检查每个映射对，如果映射对的属性类型代码是字典对象，它将生成一个获取字典ID的函数并将其添加到代码中。
+ * 如果映射对的属性类型代码是业务对象或长整数，它将生成一个获取业务对象ID的函数并将其添加到代码中。
+ */
 export const generateCodeFunc = (mapPair: MapPair[], checkedRowKeys: RowKey[]) => {
     const flyStore = useFlyStore()
     const templet = excelFrontImportTemplate
@@ -361,6 +373,16 @@ export const generateCodeFunc = (mapPair: MapPair[], checkedRowKeys: RowKey[]) =
     return code
 };
 
+/**
+ * 此函数用于自动将 Excel 列映射到协议中的相应属性。
+ * 它使用 Jaro-Winkler 距离找到每个属性最相似的列名。
+ * 如果属性与关系对象相关联，它还确定反向查询字段。
+ * 该函数还检查是否有任何未匹配的列，并在存在时发出警告。
+ * 最后，它返回一个包含所有选定属性及其相应映射对的对象。
+ *
+ * @param {string[]} excelColumnName - Excel 表格中的列名数组。
+ * @param {[]} sheetLine - Excel 表格中的行。
+ */
 export const autoMapFunc = (excelColumnName: string[], sheetLine: []) => {
     console.log("----")
     console.log(excelColumnName)

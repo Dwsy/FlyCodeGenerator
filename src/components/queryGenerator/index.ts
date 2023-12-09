@@ -23,6 +23,12 @@ let tableDatas: tableData[];
 
 let tableDataMap = new Map<string, tableData>();
 let columnDataMap = new Map<string, columnData>();
+
+/**
+ * 初始化函数，用于设置和监视flyStore的状态。
+ * 
+ * 当flyStore的状态发生变化时，会自动更新相关的变量，并在控制台打印modellogicname。
+ */
 export const init = () => {
   const flyStore = useFlyStore()
   watchEffect(() => {
@@ -32,10 +38,18 @@ export const init = () => {
     columnDataMap = flyStore.columnDataMap
     console.log("modellogicname:", protocol.modellogicname);
   })
-
-
 }
 
+/**
+ * 生成查询模型
+ * 
+ * @param outputArray - 输出数组
+ * @returns 返回查询模型
+ * 
+ * 此函数首先将 query 对象转换为 Map 对象，然后检查输出数组的长度。
+ * 如果输出数组的长度为 0，则显示错误消息并返回。
+ * 否则，使用输出数组的第一个元素和转换后的 Map 对象生成查询模型。
+ */
 export function genQueryModel(outputArray: Output[]): QueryModel {
   const queryArgumentArrayMap = new Map<string, Property[]>();
   // 将 query 对象转换为 Map 对象
@@ -51,6 +65,32 @@ export function genQueryModel(outputArray: Output[]): QueryModel {
 }
 
 
+/**
+ * 生成查询模型并构建查询语句。
+ * 
+ * @param {Output} output - 输出对象，包含了需要查询的表格和字段信息。
+ * @param {Map<string, Property[]>} queryArgumentArrayMap - 查询参数映射，键是表名，值是属性数组。
+ * 
+ * @returns {QueryModel} 返回构建好的查询模型。
+ * 
+ * @example
+ * 
+ * const output = {
+ *   objectcode: 'table1',
+ *   properties: [
+ *     { propertycode: 'column1', name: 'column1' },
+ *     { propertycode: 'column2', name: 'column2' }
+ *   ]
+ * };
+ * 
+ * const queryArgumentArrayMap = new Map();
+ * queryArgumentArrayMap.set('table1', [
+ *   { propertycode: 'column1', name: 'column1' },
+ *   { propertycode: 'column2', name: 'column2' }
+ * ]);
+ * 
+ * const queryModel = gen(output, queryArgumentArrayMap);
+ */
 function gen(output: Output, queryArgumentArrayMap: Map<string, Property[]>): QueryModel {
   // 定义 fquery 变量
   let fquery = "select\n{{selectColumns}}"
@@ -289,6 +329,29 @@ function gen(output: Output, queryArgumentArrayMap: Map<string, Property[]>): Qu
 
 
 
+/**
+ * 生成 SQL 查询语句。
+ * 
+ * @param {QueryModel} queryModel - 查询模型对象，包含了生成 SQL 语句所需的所有信息。
+ * 
+ * @returns {string} 返回生成的 SQL 查询语句。
+ * 
+ * @example
+ * 
+ * const queryModel = {
+ *   columns: [
+ *     {tableShortName: 't', columnName: 'name', queryName: 'username'},
+ *     {tableShortName: 't', columnName: 'age'}
+ *   ],
+ *   tableName: 'users',
+ *   tableShortName: 't',
+ *   joins: [],
+ *   conditions: []
+ * };
+ * 
+ * const sql = generateSql(queryModel);
+ * console.log(sql); // SELECT t.name as username, t.age FROM users as t;
+ */
 export function generateSql(queryModel: QueryModel): string {
   // debugger
   // 生成 SELECT 子句
@@ -319,6 +382,24 @@ export function generateSql(queryModel: QueryModel): string {
 }
 
 
+/**
+ * 根据提供的关联表信息生成SQL JOIN子句。
+ * 
+ * @returns 一个回调函数，该函数接收一个对象，该对象包含关联表的信息，并返回一个字符串，该字符串是SQL JOIN子句。
+ * 
+ * @example
+ * const joinCallback = getJoinCallbackfn();
+ * const joinClause = joinCallback({
+ *   relationTable: {
+ *     name: 'orders',
+ *     shortName: 'o',
+ *     idField: 'id'
+ *   },
+ *   tableShortName: 'u',
+ *   columnName: 'orderId'
+ * });
+ * console.log(joinClause); // "LEFT JOIN orders as o ON o.id = u.orderId"
+ */
 function getJoinCallbackfn() {
   return (j) => {
     let lj: string
@@ -334,7 +415,17 @@ function getJoinCallbackfn() {
   };
 }
 
-function getWhereCallback() {
+/**
+ * 生成一个回调函数，该函数根据给定的条件模型生成一个 WHERE 子句模板。
+ * 
+ * @returns {(c: ConditionModel) => string} 返回一个函数，该函数接收一个条件模型作为参数，返回一个 WHERE 子句模板。
+ * 
+ * @example
+ * const callback = getWhereCallback();
+ * const conditionModel = new ConditionModel();
+ * const whereClauseTemplate = callback(conditionModel);
+ */
+function getWhereCallback(): (c: ConditionModel) => string {
   return (c: ConditionModel) => {
     // 定义模板字符串
     let whereTemplate = `{#if {{if}}}\n  // {{commit}}\n  and {{condition}}\n{#endif}\n`;

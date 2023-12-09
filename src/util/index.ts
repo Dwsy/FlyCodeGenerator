@@ -1,6 +1,15 @@
 import { useFlyStore } from "../store/flyStore";
 
-export function getTableShortName(tableName: string, relationTableColumnName?: string, seq?) {
+/**
+ * 获取表的简称。
+ * 
+ * @param {string} tableName - 表名。
+ * @param {string} [relationTableColumnName] - 关联表列名。如果提供，将在简称后添加该列名的前三个字符。
+ * @param {number} [seq] - 序列号。如果提供，将在简称后添加此序列号。
+ * 
+ * @returns {string} 表的简称。如果提供了序列号，简称将包含序列号。否则，如果提供了关联表列名，简称将包含该列名的前三个字符。
+ */
+export function getTableShortName(tableName: string, relationTableColumnName?: string, seq?: number): string {
   const words = tableName.split("_");
   const firstLetters = words.map((word) => word.charAt(0));
   let name = firstLetters.join("");
@@ -32,16 +41,20 @@ export const copyToClipboard = (text: string) => {
 let getButtonSeq = (seq = 1) => {
   return () => seq++
 }
+
 /**
- * 添加一个按钮到指定的选择器中
- * @param {string} selector - 指定的选择器
- * @param {string} text - 按钮的文本
- * @param {string} iconClass - 按钮的图标 CSS 类名
- * @param {Function} clickHandler - 按钮的点击事件处理函数
- * @param {number} seq - 按钮的序号
- * @param {string} [hoverText] - 按钮的悬停文本
+ * 添加一个新的按钮到指定的元素上。
+ * 
+ * @param {string | any} selector - 选择器或任何其他类型的参数，用于确定在哪里添加新的按钮。
+ * @param {string} text - 新按钮的文本。
+ * @param {string} iconClass - 新按钮的图标类名。
+ * @param {() => void} clickHandler - 当点击新按钮时要执行的函数。
+ * @param {number} [seq] - 按钮的序列号，用于确定新按钮的位置。如果未提供，将使用默认值。
+ * @param {string} [hoverText] - 当鼠标悬停在新按钮上时显示的文本。如果未提供，将使用默认值。
+ * 
+ * @returns {ChildNode | undefined} - 如果成功添加了新按钮，返回新按钮的节点。如果未找到指定的元素或已存在相同序列号的按钮，返回 undefined。
  */
-export const addButton = (selector: string | any, text: string, iconClass: string, clickHandler: () => void, seq?: number, hoverText?: string) => {
+export const addButton = (selector: string | any, text: string, iconClass: string, clickHandler: () => void, seq?: number, hoverText?: string): ChildNode | undefined => {
   if (selector == undefined) {
     selector = "#beSetting > div.main-content > div.tab-operation > button:nth-child(2)"
   }
@@ -64,7 +77,7 @@ export const addButton = (selector: string | any, text: string, iconClass: strin
   newButton.appendChild(newButtonSpan);
   newButton.addEventListener("click", clickHandler);
   hoverText ? newButton.title = hoverText : newButton.title = 'dwsy'
-  originalButton.parentNode!.appendChild(newButton);
+  return originalButton.parentNode!.appendChild(newButton);
 }
 
 
@@ -141,6 +154,16 @@ export function levenshteinDistance(str1: string, str2: string): number {
   return dp[m][n];
 }
 
+/**
+ * 计算两个字符串的 Jaro-Winkler 相似度。
+ * Jaro-Winkler 相似度是一种字符串相似度度量方法，适用于短字符串。
+ * 它是 Jaro 相似度的变体，对字符串前缀的匹配给予更高的权重。
+ *
+ * @param s1 - 第一个字符串
+ * @param s2 - 第二个字符串
+ * @param p - 前缀权重因子，默认为 0.1
+ * @returns 返回两个字符串的 Jaro-Winkler 相似度，范围在 0 到 1 之间，1 表示完全相同，0 表示完全不同
+ */
 export function jaroWinkler(s1: string, s2: string, p = 0.1): number {
   const m = Math.min(s1.length, s2.length);
   let range = Math.floor(Math.max(s1.length, s2.length) / 2) - 1;

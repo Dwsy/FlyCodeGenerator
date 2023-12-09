@@ -54,6 +54,15 @@ interface MonacoInitializedUtil {
     addInitializedCallback(callback: () => void): void;
 }
 
+/**
+ * 创建一个Monaco初始化工具对象。
+ * 这个工具对象提供了一个方法来检查Monaco是否已经初始化，
+ * 并且允许你添加一个回调函数，当Monaco初始化完成时，这个回调函数会被调用。
+ * 
+ * @returns {MonacoInitializedUtil} 返回一个包含两个方法的对象：
+ * - `isInitialized`：返回一个布尔值，表示Monaco是否已经初始化。
+ * - `addInitializedCallback`：接受一个回调函数，当Monaco初始化完成时，这个回调函数会被调用。
+ */
 function createMonacoInitializedUtil(): MonacoInitializedUtil {
     const callbacks: (() => void)[] = [];
     let initialized = false;
