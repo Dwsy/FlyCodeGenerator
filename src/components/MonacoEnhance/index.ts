@@ -272,10 +272,10 @@ function getAutoFn(type: AutoAutoAutoType, matchResult: string): Function {
             const primaryKey = getPrimaryKey(tableData.objectcode)
             const shortName = getTableShortName(matchResult)
             const columns = tableData.properties.map((item) => {
-                return `\n  ${shortName}.${item.columnname} // ${item.propertyname}`
+                return `\n  ${shortName}.${item.columnname},  // ${item.propertyname}`
             })
 
-            const sql = `var temp = SELECT ${columns.join(",")}\nFROM ${matchResult} ${shortName}\nWHERE ${shortName}.${primaryKey} = \nNORULE;`
+            const sql = `var temp = SELECT ${columns.join()}\nFROM ${matchResult} ${shortName}\nWHERE ${shortName}.${primaryKey} = \nNORULE;`
             console.log(sql)
             debugger
             ed.executeEdits("source", [{
