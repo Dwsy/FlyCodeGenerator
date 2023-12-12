@@ -224,10 +224,10 @@ export const addAutoAutoAutoAutoAuto = (editor: monaco.editor.IStandaloneCodeEdi
             contextMenuGroupId: "navigation",
             contextMenuOrder: 1.5,
             run: function (ed) {
-
+                console.timeLog("autoGen")
                 const lineContent = getMonacoModel().getLineContent(ed.getPosition().lineNumber);
                 autoGen(lineContent, ed)
-
+                console.timeEnd("autoGen")
 
             },
         });
@@ -239,6 +239,7 @@ export const addAutoAutoAutoAutoAuto = (editor: monaco.editor.IStandaloneCodeEdi
 type AutoAutoAutoType = "fori" | "while" | "NewBO" | "select"
 
 function autoGen(lineContent: string, ed: monaco.editor.ICodeEditor) {
+
     let regexFor = /for\s+.*/;
     let regexSelect = /(sel|select)\s+.*/;
 
@@ -262,6 +263,7 @@ function autoGen(lineContent: string, ed: monaco.editor.ICodeEditor) {
         return getAutoFn("NewBO", matchResultBoNew[1])(ed)
     }
 
+
 }
 
 function getAutoFn(type: AutoAutoAutoType, matchResult: string): Function {
@@ -274,8 +276,9 @@ function getAutoFn(type: AutoAutoAutoType, matchResult: string): Function {
             const columns = tableData.properties.map((item) => {
                 return `\n  ${shortName}.${item.columnname},  // ${item.propertyname}`
             })
+            columns[columns.length - 1] = columns[columns.length - 1].replace(",", "")
 
-            const sql = `var temp = SELECT ${columns.join()}\nFROM ${matchResult} ${shortName}\nWHERE ${shortName}.${primaryKey} = \nNORULE;`
+            const sql = `var temp = SELECT ${columns.join('')}\nFROM ${matchResult} ${shortName}\nWHERE ${shortName}.${primaryKey} = \nNORULE;`
             console.log(sql)
             debugger
             ed.executeEdits("source", [{
@@ -291,13 +294,13 @@ function getAutoFn(type: AutoAutoAutoType, matchResult: string): Function {
     if (type == "fori") {
         return (ed: monaco.editor.ICodeEditor) => {
             if (matchResult) {
-                let extractedText = matchResult[0].split(" ")[1];
-                let template = `for(var i = 0; i < ${extractedText}.length; i++) {
-    var element = ${extractedText}[i];
+
+                let template = `for(var i = 0; i < ${matchResult}.length; i++) {
+    var element = ${matchResult}[i];
 
 
-    }`
-                console.log("for匹配成功:", extractedText);
+}`
+                console.log("for匹配成功:", matchResult);
                 // 删除当前行
                 ed.executeEdits("source", [{
                     range: new monaco.Range(ed.getPosition().lineNumber, 1, ed.getPosition().lineNumber + 1, 1),
