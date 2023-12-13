@@ -38,6 +38,10 @@ export interface ColumnModel {
      */
     columnName: string;
     /**
+     * 列名
+     */
+    zhColumnName?: string;
+    /**
      * 表别名
      */
     tableShortName: string;

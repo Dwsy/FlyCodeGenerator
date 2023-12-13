@@ -190,6 +190,7 @@ function gen(output: Output, queryArgumentArrayMap: Map<string, Property[]>): Qu
         const columnModel: ColumnModel = {
           tableShortName: tableShortName,
           columnName: data.columnname,
+          zhColumnName: data.propertyname,
         }
         columnModelArray.push(columnModel)
         return `  ${tableShortName}.${data.columnname}`;
@@ -200,6 +201,7 @@ function gen(output: Output, queryArgumentArrayMap: Map<string, Property[]>): Qu
         const columnModel: ColumnModel = {
           tableShortName: relationTableShortName,
           columnName: relationColumnName,
+          zhColumnName: data.propertyname,
           queryName: queryname,
           relationTable: {//todo 
             name: relationTableName,
@@ -352,11 +354,11 @@ export function generateSql(queryModel: QueryModel): string {
   const selectClause = `SELECT\n  ${queryModel.columns.map((c) => {
 
     if (c.queryName == null) {
-      return `${c.tableShortName}.${c.columnName}`
+      return `${c.tableShortName}.${c.columnName},  //${c.zhColumnName}`
     } else {
-      return `${c.tableShortName}.${c.columnName} as ${c.queryName}`
+      return `${c.tableShortName}.${c.columnName} as ${c.queryName},  //${c.zhColumnName}`
     }
-  }).join(",\n  ")}`;
+  }).join("\n  ")}`;
 
   // 生成 FROM 子句
   const fromClause = `FROM\n  ${queryModel.tableName} as ${queryModel.tableShortName}`;
@@ -395,7 +397,7 @@ export function generateSql(queryModel: QueryModel): string {
  * console.log(joinClause); // "LEFT JOIN orders as o ON o.id = u.orderId"
  */
 function getJoinCallbackfn() {
-  return (j) => {
+  return (j: JoinModel) => {
     let lj: string
     let on: string
     if (j.relationTable.name != null || j.relationTable.name != undefined) {
@@ -422,7 +424,7 @@ function getJoinCallbackfn() {
 function getWhereCallback(): (c: ConditionModel) => string {
   return (c: ConditionModel) => {
     // 定义模板字符串
-    let whereTemplate = `{#if {{if}}}\n  // {{commit}}\n  and {{condition}}\n{#endif}\n`;
+    let whereTemplate = `// {{commit}}\n{#if {{if}}}\n  and {{condition}}\n{#endif}\n`;
     const generator = new ConditionGenerator(c);
     if (c.operator == Operator.Equal) {
       const juede = `!String.isBlank(IN.${c.tableName}.${c.columnName})`
@@ -448,7 +450,8 @@ function getWhereCallback(): (c: ConditionModel) => string {
         .replace('{{if}}', juede)
         .replace('{{condition}}', whereClause);
     }
-    whereTemplate = whereTemplate.replace("{{commit}}", '')
+    whereTemplate = whereTemplate
+      .replace("{{commit}}", `${c.zh_columnName}`)
     return whereTemplate;
   };
 }

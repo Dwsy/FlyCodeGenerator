@@ -109,7 +109,7 @@ const operators = [
 const PropertyRegex = /\.(\w+)(?=\s|[" + operators.join("|") + "])/
 const PropertyRegexPre = /\w+(?=\.)/;
 
-MonarchTokensProvider.tokenizer.root.unshift([/\/\/\s*TODO\b/i, 'comment.todo'])
+MonarchTokensProvider.tokenizer.root.unshift([/\/\/\s*TODO\b/i, 'comment.fixme'])
 MonarchTokensProvider.tokenizer.root.unshift([/\/\/\s*FIXME\b/i, 'comment.fixme'])
 MonarchTokensProvider.tokenizer.root.unshift([/\/\/\s*NOTE\b/i, 'comment.fixme'])
 MonarchTokensProvider.tokenizer.root.unshift([/\/\/\s*todo\b/i, 'comment.todo'])

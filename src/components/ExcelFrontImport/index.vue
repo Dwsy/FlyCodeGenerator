@@ -85,7 +85,6 @@
       </NSpace>
     </NCard>
   </NModal>
-  <SaveProtocolWatch> </SaveProtocolWatch>
 </template>
 
 <script setup lang="tsx">
@@ -119,7 +118,6 @@ import { message } from '../../util/message'
 
 import CodePreview from '../common/CodePreview.vue'
 import { autoMapFunc, generateCodeFunc, readExcelFileFunc, MapPair } from './index'
-import SaveProtocolWatch from '../saveProtocolWatch.vue'
 import { copyToClipboard } from '../../util/index'
 import { GM_setClipboard } from '$'
 import { FormValidationStatus } from 'naive-ui/es/form/src/interface'

@@ -29,7 +29,6 @@
     <n-modal v-model:show="showCode" preset="card" title="Flycode" style="width: 900px" :bordered="false">
       <CodePreview :fly-code="flyCode" :showCode="showCode"></CodePreview>
     </n-modal>
-    <SaveProtocolWatch> </SaveProtocolWatch>
   </div>
 </template>
 
@@ -46,7 +45,6 @@ import { genQueryModel, generateSql, init } from '../queryGenerator'
 import { GM_setClipboard } from '$'
 import { message } from '../../util/message'
 import { getRandomEmojiByUnicode } from '../../type/model/propertyTypeCodeRef'
-import SaveProtocolWatch from '../saveProtocolWatch.vue'
 const showModal = ref()
 const showCode = ref()
 const flyCode = ref('')

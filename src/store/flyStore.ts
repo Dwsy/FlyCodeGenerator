@@ -9,6 +9,7 @@ import { GM_getValue } from "$";
 import { monacoInitializedUtil } from "../util/monacoUtil";
 import { getPropertyTypeName } from "../type/model/propertyTypeCodeRef";
 import { useGenStore } from "./genStore";
+import { el, tr } from "date-fns/locale";
 
 export const useFlyStore = defineStore('flyStore', () => {
 
@@ -32,9 +33,6 @@ export const useFlyStore = defineStore('flyStore', () => {
 
     async function init() {
         tableDatas.value = (await getBizObjectsData())?.resp_data
-        if (document.URL.indexOf("modeledit") != -1 && document.URL.split("/").length == 6) {
-            await updateProtocol(0)
-        }
 
         // 遍历 tableDatas 数组
         tableDatas.value.forEach((data) => {
@@ -48,8 +46,13 @@ export const useFlyStore = defineStore('flyStore', () => {
                 //     debugger
                 // }
                 if (undefined != columnDataMap.value.get(columnData.propertycode)) {
-                    if (data.tablename.startsWith("xxw"))
+                    if (data.tablename.startsWith("xxw")) {
+
+                        console.log("存在重复columnData.propertycode", columnDataMap.value.get(columnData.propertycode))
                         console.log("存在重复columnData.propertycode", columnData.propertycode, data.tablename, data.objectname, columnData.columnname)
+
+                    }
+
                 }
                 columnDataMap.value.set(columnData.propertycode, columnData);
                 // if (columnData.propertycode == "1729296870011978034") {
@@ -59,56 +62,57 @@ export const useFlyStore = defineStore('flyStore', () => {
             });
         });
 
-
+        if (document.URL.indexOf("modeledit") != -1 && document.URL.split("/").length == 6) {
+            return await updateProtocol(0)
+        }
+        return 0
     }
     watch(protocol, async () => {
-        console.log(` watchcprotocol`, protocol.value, appMounted.value, codeGeneratorInitStatus.value)
-        if (appMounted.value) {
-            console.log("if (appMounted.value) {")
-            codeGeneratorInitStatus.value = false
-            await nextTick()
-            refresh()
-            codeGeneratorInitStatus.value = true
+        // debugger
+        if (protocol.value == null) {
+
+
         } else {
-            refresh()
+            console.log(` watchcprotocol`, protocol.value, appMounted.value, codeGeneratorInitStatus.value)
+            if (appMounted.value) {
+                console.log("re codeGeneratorInitStatus.value")
+                codeGeneratorInitStatus.value = false
+                await nextTick()
+                refresh()
+                codeGeneratorInitStatus.value = true
+            } else {
+                refresh()
+            }
         }
 
-        // const markdownTableHeadTemplate =
-        //     `|对象|字段|字段类型|长度|必填|说明|备注|\n|--|--|--|--|--|--|--|\n`
-        // const markdownTableRowTemplate =
-        //     `|{{对象}}|{{字段类型}}|{{长度}}|{{必填}}|{{说明}}|{{备注}}|`
-        // `||||||||`
-
-        // ---
-        // const ApiDocModel = protocol.value.output
-        // // ---
-        // console.log(ApiDocModel)
-        // const document = ApiDocModel.map((model, index) => {
-        //     const rows = model.properties.map((outPut, index2) => {
-        //         let rowText = markdownTableRowTemplate
-        //         if (index2 == 0) {
-        //             rowText = rowText.replace("{{对象}}", model.name)
-        //         } else {
-        //             rowText = rowText.replace("{{对象}}", " ")
-        //         }
-        //         // const desc = columnDataMap.value.get(outPut.propertycode)?.propertydescr.replace(/\n/g, " ");
-        //         // rowText = rowText.replace("{{字段}}", outPut.name)
-        //         rowText = rowText.replace("{{字段类型}}", "varchar")
-        //         rowText = rowText.replace("{{长度}}", ' ')
-        //         rowText = rowText.replace("{{必填}}", ' ')
-        //         rowText = rowText.replace("{{说明}}", outPut.propertyname)
-        //         // rowText = rowText.replace("{{备注}}", desc)
-        //         rowText = rowText.replace("{{备注}}", " ")
-        //         console.log(rowText)
-        //         return rowText
-        //     }).join("\n")
-        //     return rows
-        // }).join("\n")
-        // console.log(markdownTableHeadTemplate + document)
     })
+    function checkSaveProtocol() {
+        // 监听元素的点击事件
+        const button = document.querySelector('#beSetting > div.main-content > div.tab-footer > button.ant-btn.ant-btn-primary')
+        button.addEventListener('click', async () => {
+            console.log('updateProtocol')
+            await updateProtocol(1)
+        })
+        // 监听 Ctrl + S 键盘事件
+        document.addEventListener('keydown', async (event) => {
+            if (event.ctrlKey && event.key === 's') {
+                console.log('updateProtocol')
+                await updateProtocol(1)
+                event.preventDefault()
+            }
+        })
+    }
     async function updateProtocol(Timeout = 1000) {
-        setTimeout(async () => {
-            protocol.value = (await getProtocol()).resp_data
+        const _ = async () => {
+            const r = (await getProtocol())
+            if (!r) {
+                protocol.value = null
+                console.log("可能为新增领域 等待下一次保存操作");
+                // checkSaveProtocol()
+                return false
+            }
+            protocol.value = r.resp_data
+
             if (addDtsEnable) {
                 const genStore = useGenStore()
                 genStore.tempBoNewDtsList = []
@@ -117,8 +121,14 @@ export const useFlyStore = defineStore('flyStore', () => {
                     () => RefreshExtraLib()
                 )
             }
+            return true
+        }
+        if (Timeout == 0) {
 
-        }, Timeout);
+            return _()
+        } else {
+            setTimeout(_, Timeout);
+        }
     }
 
 
