@@ -31,6 +31,7 @@ onMounted(() => {
         addAutoAutoAutoAutoAuto(editor)
         applyCustomFlycode()
       } else if (window.location.href.indexOf('uiedit') > -1) {
+        return
         addAutoAutoAutoAutoAuto(editor)
         applyCustomFlycode()
         const UiProtocolData: UiProtocol = (await getUiProtocol())?.resp_data
