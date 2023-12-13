@@ -9,6 +9,7 @@ import { monacoInitializedUtil } from '../../util/monacoUtil'
 import { addAutoAutoAutoAutoAuto } from '../MonacoEnhance'
 import { applyCustomFlycode } from '../MonacoEnhance/monaco.languages.conf'
 import set from 'date-fns/set'
+import { watch } from 'vue'
 
 const open = ref(false)
 const x = ref(0)
@@ -19,7 +20,11 @@ type CodeType = {
   name: string
   type: string
 }
-const nowSelectCodeType: Ref<CodeType> = ref()
+const nowSelectCodeType: Ref<CodeType> = ref({
+  code: '',
+  name: '',
+  type: ''
+})
 let nowEditor: monaco.editor.ICodeEditor
 monacoInitializedUtil.addInitializedCallback(async () => {
   monaco.editor.onDidCreateEditor(async (editor) => {
@@ -120,7 +125,7 @@ function debounce(func: Function, delay: number) {
     if (isFirstShowMenu) {
       // func.apply(context, args)
       isFirstShowMenu = false
-      delay = 200
+      delay = 100
       // return
     }
 
@@ -128,7 +133,7 @@ function debounce(func: Function, delay: number) {
     timeoutId = setTimeout(() => {
       func.apply(context, args)
     }, delay)
-    delay = 300
+    delay = 200
   }
 }
 
@@ -140,7 +145,11 @@ function showMenu(e: MouseEvent, codeType?: CodeType) {
   // x.value = e.clientX + document.body.scrollLeft - document.body.clientLeft - 20
   // y.value = e.clientY + document.body.scrollTop - document.body.clientTop - 30
   //@ts-ignore
-  let xy = getElementRightUpperXY(e.toElement)
+  let element: Element = e.toElement
+  if (element.tagName == 'span'.toUpperCase()) {
+    element = element.parentElement
+  }
+  let xy = getElementRightUpperXY(element)
   x.value = xy.x
   y.value = xy.y
   open.value = true
@@ -151,6 +160,12 @@ function showMenu(e: MouseEvent, codeType?: CodeType) {
 function hideMenu() {
   // Hide the multi-level menu
 }
+watch(nowSelectCodeType, (newVal) => {
+  console.log('nowSelectCodeType', newVal)
+
+  options[2].label = newVal.name
+  options[2].key = newVal.code
+})
 
 const options: DropdownMixedOption[] = [
   {
@@ -162,8 +177,8 @@ const options: DropdownMixedOption[] = [
     key: 'jay gatsby'
   },
   {
-    label: '其他',
-    key: 'others1',
+    label: nowSelectCodeType.value.name,
+    key: nowSelectCodeType.value.code,
     children: [
       {
         label: '乔丹·贝克',
@@ -217,7 +232,8 @@ function handelCtrlList(item, nameCodeTypeMap) {
     })
     // hover 弹出个菜单
     item.parentElement.addEventListener('mouseover', (e) => {
-      const func = debounce(showMenu, 500)
+      open.value = false
+      const func = debounce(showMenu, 200)
       func.apply(this, [e, nowSelectCodeTypeInner])
     })
   }
@@ -240,31 +256,28 @@ function getElementRightUpperXY(element) {
   <button @click="open = true">Open Modal</button>
 
   <Teleport to="body">
-    <!-- <div v-if="open" class="modal"> -->
-    <!-- <p>Hello from the modal!</p>
+    <div class="modal">
+      <!-- <p>Hello from the modal!</p>
       <button @click="open = false">Close</button> -->
-    <n-dropdown
-      placement="bottom-start"
-      trigger="manual"
-      :x="x"
-      :y="y"
-      :options="options"
-      :show="open"
-      :on-clickoutside="onClickoutside"
-      @select="handleSelect"
-    />
-    <!-- </div> -->
+      <n-dropdown
+        class="Ddropdown"
+        placement="bottom-start"
+        trigger="manual"
+        :x="x"
+        :y="y"
+        :options="options"
+        :show="open"
+        :on-clickoutside="onClickoutside"
+        @select="handleSelect"
+      />
+    </div>
   </Teleport>
 </template>
 
 <style scoped>
-/* .modal {
-  border: 1px solid #ccc;
-  position: fixed;
-  z-index: 999;
-  top: v-bind(y);
-  left: v-bind(x);
-  width: 300px;
-  margin-left: -150px;
-} */
+.modal {
+  /* 添加transform x y改变时的动画 */
+  transition: transform 0.3s;
+  transform-origin: 0 0;
+}
 </style>
