@@ -332,10 +332,10 @@ export function randomImg() {
   // document.body.style.setProperty('--theme-primary-color',color)
   const urls = [
     'https://api.paugram.com/wallpaper/?source=sina',
-    'https://api.yimian.xyz/img?type=moe&size=1920x1080',
-    'https://api.likepoems.com/img/pc/',
+    // 'https://api.yimian.xyz/img?type=moe&size=1920x1080',
+    // 'https://api.likepoems.com/img/pc/',
     // 'https://api.lyiqk.cn/api',
-    'https://api.lyiqk.cn/acg',
+    // 'https://api.lyiqk.cn/acg',
     // 'https://api.lyiqk.cn/dfproject',
     // 'https://api.lyiqk.cn/menhera',
     'https://api.lyiqk.cn/miku'
@@ -348,5 +348,5 @@ export function randomImg() {
   let randomUrl = urls[Math.floor(Math.random() * urls.length)]
   // debugger
   //@ts-ignore
-  window.addBimg(randomUrl, '0.9')
+  window.addBimg(randomUrl, '0.92')
 }

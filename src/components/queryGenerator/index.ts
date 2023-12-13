@@ -351,15 +351,19 @@ function gen(output: Output, queryArgumentArrayMap: Map<string, Property[]>): Qu
 export function generateSql(queryModel: QueryModel): string {
   // debugger
   // 生成 SELECT 子句
-  const selectClause = `SELECT\n  ${queryModel.columns.map((c) => {
-
+  let selectClause = `SELECT\n  ${queryModel.columns.map((c, index) => {
+    let q
     if (c.queryName == null) {
-      return `${c.tableShortName}.${c.columnName},  //${c.zhColumnName}`
+      q = `${c.tableShortName}.${c.columnName}`
     } else {
-      return `${c.tableShortName}.${c.columnName} as ${c.queryName},  //${c.zhColumnName}`
+      q = `${c.tableShortName}.${c.columnName} as ${c.queryName}`
+    }
+    if (index == queryModel.columns.length - 1) {
+      return q + `  //${c.zhColumnName}`
+    } else {
+      return q + `,  //${c.zhColumnName}`
     }
   }).join("\n  ")}`;
-
   // 生成 FROM 子句
   const fromClause = `FROM\n  ${queryModel.tableName} as ${queryModel.tableShortName}`;
 

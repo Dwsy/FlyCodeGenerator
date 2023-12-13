@@ -1,3 +1,4 @@
+
 /**
  * 表示用于表单操作和控制的 Page 对象。
  */
@@ -225,16 +226,16 @@ declare class Page {
  * 表示对话框的类型。
  * @enum
  */
-declare enum AlertType {
+declare const AlertType =
     /**
      * 信息对话框。
      */
-    info,
+    "info" |
 
     /**
      * 错误对话框。
      */
-    error,
-}
+    "error"
+
 
 

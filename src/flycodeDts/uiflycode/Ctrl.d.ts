@@ -1,3 +1,4 @@
+declare function CtrlValueSetter(params: string)
 declare class Ctrl {
     /**
      * 控件编码，只读。

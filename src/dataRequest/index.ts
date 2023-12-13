@@ -1,4 +1,5 @@
 import axios from "axios";
+import { UiProtocol } from "../type/formProtocol";
 
 function getHeader() {
     // 获取用户 Token 从 sessionStorage 中
@@ -49,34 +50,45 @@ function getHeader() {
 
 export async function getBizObjectsData() {
     try {
-
-
         const exeIp = sessionStorage.getItem("exeIp")
         const ip = sessionStorage.getItem("IP")
         const { data } = await axios.post(ip + '/bizserv/biz/getBizObjects', {}, {
             headers: getHeader()
         })
         return data
-        // bizObjects = response.data;
-        // // 输出 tableDatas 的长度
-        // tableDatas = bizObjects.resp_data
-        // console.log("datasNum:", tableDatas.length);
-        // // 遍历 tableDatas 数组
-        // tableDatas.forEach((data) => {
-        //     // 将 data 对象添加到 tableDataMap 中
-        //     tableDataMap.set(data.objectcode, data);
-        //     // 遍历 data.properties 数组
-        //     // console.log("data.properties",data.properties)
-        //     data.properties.forEach((columnData) => {
-        //         // 将 columnData 对象添加到 columnDataMap 中
-        //         columnDataMap.set(columnData.propertycode, columnData);
-        //     });
-        // });
     }
     catch (error) {
         // 处理错误
         console.error('axios error:', error);
     }
+}
+export const getUiProtocol = async (pagecode: string = null) => {
+    // http://139.155.96.158:8001/bizserv/bizpage/getPage
+    const temp = document.URL.split("/")
+    if (temp.length == 6) {
+        pagecode = pagecode || temp[5]
+        try {
+            // 获取用户 Token 从 sessionStorage 中
+            const userToken = sessionStorage.getItem('userToken');
+            if (!userToken) {
+                console.error('User token not found in sessionStorage');
+                return;
+            }
+            const ip = sessionStorage.getItem("IP")
+            // debugger
+            const { data } = await axios.post(ip + '/bizserv/bizpage/getPage', {
+                "code": pagecode
+            }, {
+                headers: getHeader()
+            })
+
+            return data
+        }
+        catch (error) {
+            console.error('axios error:', error);
+        }
+    }
+
 }
 
 export async function getProtocol() {

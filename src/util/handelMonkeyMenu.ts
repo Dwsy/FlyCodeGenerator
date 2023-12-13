@@ -49,5 +49,12 @@ export const registerMenuCommand = () => {
 
         // setTimeout(() => { window.location.reload() }, 100)
     });
+    GM_registerMenuCommand(`${GM_getValue("szzrx", false) ? "关闭" : "开启"}私斋蒸鹅心模式❤`, () => {
+        // @ts-ignore
+
+        GM_setValue("szzrx", GM_getValue("szzrx", false))
+
+        // setTimeout(() => { window.location.reload() }, 100)
+    });
 
 }

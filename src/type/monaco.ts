@@ -2595,10 +2595,11 @@ declare namespace monaco.editor {
          */
         getPosition(): Position | null;
         /**
-         * Set the primary position of the cursor. This will remove any secondary cursors.
-         * @param position New primary cursor's position
-         * @param source Source of the call that caused the position
+         * 设置光标的主要位置。这将删除任何次要光标。
+         * @param position 新的主要光标位置
+         * @param source 调用该位置的源
          */
+        setPosition(position: IPosition, source?: string): void;
         setPosition(position: IPosition, source?: string): void;
         /**
          * Scroll vertically as necessary and reveal a line.
