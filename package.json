@@ -10,8 +10,8 @@
     "mergedts": "cd ./src/flycodeDts/ && node merge.js"
   },
   "dependencies": {
+    "@vueuse/core": "^10.7.0",
     "axios": "^1.5.1",
-    "date-fns": "^2.30.0",
     "fs": "^0.0.1-security",
     "glob": "^10.3.10",
     "monaco-editor": "^0.44.0",
@@ -20,6 +20,9 @@
     "pretty-format": "^29.7.0",
     "sql-formatter": "^13.1.0",
     "terser": "^5.21.0",
+    "unplugin-icons": "^0.18.1",
+    "unplugin-vue-components": "^0.26.0",
+    "vite-plugin-style-import": "^2.0.0",
     "vue": "^3.3.4",
     "vuetify": "^3.3.19",
     "xlsx": "^0.18.5"
@@ -30,7 +33,7 @@
     "naive-ui": "^2.34.4",
     "prettier": "3.1.0",
     "typescript": "^5.1.6",
-    "unplugin-auto-import": "^0.16.6",
+    "unplugin-auto-import": "^0.16.7",
     "vfonts": "^0.0.3",
     "vite": "^4.4.8",
     "vite-plugin-monkey": "^3.4.0",

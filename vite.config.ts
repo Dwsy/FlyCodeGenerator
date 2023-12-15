@@ -3,6 +3,9 @@ import vue from '@vitejs/plugin-vue';
 import jsx from '@vitejs/plugin-vue-jsx';
 import monkey, { cdn } from 'vite-plugin-monkey';
 import AutoImport from 'unplugin-auto-import/vite';
+
+import Components from "unplugin-vue-components/vite";
+
 // https://vitejs.dev/config/
 export default defineConfig({
   build: {
@@ -12,7 +15,8 @@ export default defineConfig({
   plugins: [
     jsx({}),
     AutoImport({
-      imports: [],
+      imports: ["vue", "pinia", "@vueuse/core"],//这里是自动引入api的项目
+      dts: "./src/auto-imports.d.ts",//在这创建.d.ts文件
     }),
     vue(),
     monkey({
@@ -34,6 +38,11 @@ export default defineConfig({
         },
       },
 
+    }),
+    Components({
+      dts: "./src/components.d.ts",//创建ts文件
+      extensions: ['vue'],//指定文件的后缀
+      dirs: ["src/components"],//指定路径，自动导入自定义组件
     }),
   ],
 });

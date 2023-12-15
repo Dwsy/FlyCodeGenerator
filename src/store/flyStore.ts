@@ -1,15 +1,13 @@
-import { defineStore } from "pinia"
-import { computed, nextTick, ref, watch, watchEffect } from "vue"
+
 import { getBizObjectsData, getProtocol } from "../dataRequest"
 import { Output, Protocol } from "../type/protocol"
 import { ActionType } from "../type/actionType";
-import { GeneratorName } from "../components";
+import { GeneratorName } from "../components/index";
 import { RefreshExtraLib } from "../flycodeDts";
 import { GM_getValue } from "$";
 import { monacoInitializedUtil } from "../util/monacoUtil";
 import { getPropertyTypeName } from "../type/model/propertyTypeCodeRef";
 import { useGenStore } from "./genStore";
-import { el, tr } from "date-fns/locale";
 
 export const useFlyStore = defineStore('flyStore', () => {
 
@@ -67,7 +65,7 @@ export const useFlyStore = defineStore('flyStore', () => {
         });
 
         if (document.URL.indexOf("modeledit") != -1 && document.URL.split("/").length == 6) {
-            return await updateProtocol(0)
+            return await updateProtocol(100)
         }
         return 0
     }
@@ -90,22 +88,7 @@ export const useFlyStore = defineStore('flyStore', () => {
         }
 
     })
-    function checkSaveProtocol() {
-        // 监听元素的点击事件
-        const button = document.querySelector('#beSetting > div.main-content > div.tab-footer > button.ant-btn.ant-btn-primary')
-        button.addEventListener('click', async () => {
-            console.log('updateProtocol')
-            await updateProtocol(1)
-        })
-        // 监听 Ctrl + S 键盘事件
-        document.addEventListener('keydown', async (event) => {
-            if (event.ctrlKey && event.key === 's') {
-                console.log('updateProtocol')
-                await updateProtocol(1)
-                event.preventDefault()
-            }
-        })
-    }
+
     async function updateProtocol(Timeout = 1000) {
         const _ = async () => {
             const r = (await getProtocol())
@@ -146,7 +129,6 @@ export const useFlyStore = defineStore('flyStore', () => {
         const Export = actionType == ActionType.Export
         if (actionType == ActionType.ListQuery || actionType == ActionType.SingleQuery) {
             ActiveGenerator.value = GeneratorName.queryGenerator
-            console.log(`ActiveGenerator.value = "queryGenerator"`);
 
         } else if (actionType == ActionType.DataSubmit) {
             const modellogicname = protocol.value.modellogicname
@@ -173,6 +155,7 @@ export const useFlyStore = defineStore('flyStore', () => {
         if (Import && protocol.value.modellogicname.includes("前端导入")) {
             ActiveGenerator.value = GeneratorName.ExcelFrontImport
         }
+        console.log("ActiveGenerator", ActiveGenerator.value)
 
     }
 

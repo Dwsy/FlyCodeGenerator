@@ -5,6 +5,7 @@
 </template>
 
 <script setup lang="ts">
+import { GM_getValue } from '$'
 import { nextTick, onMounted, ref, onUnmounted } from 'vue'
 type Props = {
   flyCode: string
@@ -15,7 +16,7 @@ onMounted(async () => {
   await nextTick(() => {
     // @ts-ignore
     monaco.editor.colorizeElement(document.getElementById('flyCode'), {
-      // theme: "vs-dark",
+      theme: GM_getValue('bracketPairColorizationEnable', null) ? 'mytheme' : ''
     })
   })
   // @ts-ignore

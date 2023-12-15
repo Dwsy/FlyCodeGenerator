@@ -5,38 +5,23 @@
         <SaveProtocolWatch></SaveProtocolWatch>
         <component :is="Generator[flyStore.ActiveGenerator]"></component>
       </div>
-      <Ftheme></Ftheme>
+      <Theme></Theme>
       <MonacoEnhance></MonacoEnhance>
       <demo></demo>
+      <Otaku v-if="GM_getValue('szzrx', false)"></Otaku>
     </n-config-provider>
   </n-message-provider>
 </template>
 
 <script setup lang="tsx">
-import demo from './components/demo/index.vue'
-
-import { onMounted, onBeforeUnmount, h } from 'vue'
 import { darkTheme, lightTheme, useMessage } from 'naive-ui'
-import { Generator } from './components'
-import Ftheme from './components/Theme/index.vue'
-import MonacoEnhance from './components/MonacoEnhance/index.vue'
-import { ref } from 'vue'
+import { Generator } from './components/index'
 import type { GlobalTheme } from 'naive-ui'
 import { useFlyStore } from './store/flyStore'
-
-import { nextTick } from 'vue'
 import { RefreshExtraLib } from './flycodeDts'
 import { getMonacoModel, monacoInitializedUtil } from './util/monacoUtil'
-import { GM_getValue } from '$'
 import { getFqueryModel } from './flycodeDts/FQuery/test'
-import SaveProtocolWatch from './components/common/saveProtocolWatch.vue'
-import { randomImg, setIdeTheme } from './util'
-import da from 'date-fns/locale/da'
-import axios from 'axios'
-import { message } from './util/message'
-import { render } from 'vue'
-import { getUiProtocol } from './dataRequest'
-import { UiProtocol } from './type/formProtocol'
+import { GM_getValue } from '$'
 
 const theme = ref<GlobalTheme | null>(darkTheme)
 const flyStore = useFlyStore()
@@ -84,7 +69,7 @@ const init = async () => {
 
       clearInterval(c)
     } else {
-      // console.log('wait...')
+      console.log('wait...')
     }
   }, 1000)
 }
@@ -133,84 +118,6 @@ function checkURLChangeThenUpdateProtocol() {
     }
   }
 }
-
-onMounted(async () => {
-  const szzrx = GM_getValue('szzrx', false)
-  if (!szzrx) {
-    return
-  }
-  // @ts-ignore
-  window.addBimg = (url, opacity) => {
-    var body = document.body
-    url =
-      url ||
-      'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fi1.hdslb.com%2Fbfs%2Farchive%2F0bed5abed95248abf565cf5c09ecfb4d5a8e3a2a.jpg&refer=http%3A%2F%2Fi1.hdslb.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1664353324&t=fb85505eb17535b08da4704cd180ad44'
-    body.style.backgroundImage = `url(${url})`
-    body.style.backgroundSize = 'cover'
-    body.style.opacity = opacity || '0.9'
-  }
-
-  setTimeout(async () => {
-    var opacity = 0.1
-    //@ts-ignore
-    // var sit = setInterval(() => {
-    //   opacity += 0.2
-    //@ts-ignore
-    window.addBimg(null, 0.7)
-    setTimeout(() => {
-      randomImg()
-    }, 2000)
-    //   if (opacity >= 0.85) {
-    //     randomImg()
-    //     clearInterval(sit)
-    //   }
-    // }, 100)
-  }, 200)
-  let yy = (await axios.post('https://v1.hitokoto.cn/?c=b ')).data
-  // debugger
-  // const message = useMessage()
-  // message.success(yy.hitokoto)
-  message.success(
-    () => {
-      return h(
-        <div>
-          <div>{yy.hitokoto}</div>
-          <div style="float:right">-{yy.from}</div>
-        </div>
-      )
-    },
-    { duration: 3010 }
-  )
-  //添加键盘事件 command + s
-  setTimeout(() => {
-    document.addEventListener('keydown', async (event) => {
-      if (event.ctrlKey && event.key === 'z') {
-        // let xxx = (await axios.get('https://api.likepoems.com/ana/dujitang/')).data
-        // message.success(xxx)
-        let yy = (await axios.get('https://v1.hitokoto.cn/? ')).data
-        message.success(
-          () => {
-            return h(
-              <div>
-                <div>{yy.hitokoto}</div>
-                <div style="float:right">by:{yy.from}</div>
-              </div>
-            )
-          },
-          { duration: 3010, showIcon: false }
-        )
-        randomImg()
-        event.preventDefault()
-      }
-      if (event.ctrlKey && event.key === 'x') {
-        //@ts-ignore
-        window.addBimg('null', '0.9')
-        // randomImg()
-        event.preventDefault()
-      }
-    })
-  }, 2000)
-})
 </script>
 
 <style>

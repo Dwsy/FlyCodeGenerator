@@ -15,6 +15,7 @@ import { NButton, useMessage } from 'naive-ui'
 import { render } from 'naive-ui/es/_utils'
 import { getRandomEmojiByUnicode } from '../../type/model/propertyTypeCodeRef'
 import { onUnmounted } from 'vue'
+import { GM_getValue } from '$'
 
 const message = useMessage()
 const flyStore = useFlyStore()
@@ -53,7 +54,7 @@ function addGenQueryElement() {
     message.success(() => {
       return h(
         <>
-          <span>{`FlyQuery生成成功已复制到剪切板。${getRandomEmojiByUnicode()}`}</span>
+          <span>{`FlyQuery生成成功已复制到剪切板。${getRandomEmojiByUnicode()} `}</span>
           {/* {() => {
             console.log(fquery.value)
           }} */}
@@ -65,7 +66,7 @@ function addGenQueryElement() {
               await nextTick(() => {
                 // @ts-ignore
                 monaco.editor.colorizeElement(document.getElementById('flyCode'), {
-                  //                                theme: "vs-dark",
+                  theme: GM_getValue('bracketPairColorizationEnable', null) ? 'mytheme' : ''
                 })
               })
             }}
