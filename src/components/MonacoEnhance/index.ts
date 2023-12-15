@@ -270,7 +270,14 @@ function getAutoFn(type: AutoAutoAutoType, matchResult: string): Function {
     if (type == "select") {
         return (ed: monaco.editor.ICodeEditor) => {
             const flyStore = useFlyStore()
-            const tableData = flyStore.tableNameDataMap.get(matchResult)
+            let tableData = flyStore.tableNameDataMap.get(matchResult)
+            if (!tableData) {
+                tableData = flyStore.dictNameDataMap.get(matchResult)
+            }
+            if (!tableData) {
+                message.warning("未找到表或字典")
+                return
+            }
             const primaryKey = getPrimaryKey(tableData.objectcode)
             const shortName = getTableShortName(matchResult)
             const columns = tableData.properties.map((item) => {

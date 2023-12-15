@@ -141,6 +141,7 @@ const changeTheme = (name: string = 'default') => {
         rules.push({ token: 'comment.remind', foreground: '00bcf2', fontStyle: 'bold' })
 
         rules.push({ token: 'flylog', foreground: 'c12c1f', fontStyle: 'underline' })
+        rules.push({ token: 'function', foreground: '0070C1', fontStyle: 'bold' })
         // AD3DA4
         // debugger
         // if (name == 'Monokai') {

@@ -20,6 +20,7 @@ export const useFlyStore = defineStore('flyStore', () => {
     const tableDatas = ref<tableData[]>()
     const tableDataMap = ref(new Map<string, tableData>);
     const tableNameDataMap = ref(new Map<string, tableData>);
+    const dictNameDataMap = ref(new Map<string, tableData>);
     const columnDataMap = ref(new Map<string, columnData>);
 
 
@@ -39,6 +40,9 @@ export const useFlyStore = defineStore('flyStore', () => {
             // 将 data 对象添加到 tableDataMap 中
             tableDataMap.value.set(data.objectcode, data);
             tableNameDataMap.value.set(data.tablename, data);
+            if (data.tablename == "pl_dictionary") {
+                dictNameDataMap.value.set(data.objectmark, data);
+            }
             // 遍历 data.properties 数组
             data.properties.forEach((columnData) => {
                 // 将 columnData 对象添加到 columnDataMap 中
@@ -181,6 +185,7 @@ export const useFlyStore = defineStore('flyStore', () => {
         columnDataMap,
         tableDataMap,
         tableNameDataMap,
+        dictNameDataMap,
         // data
 
         // status

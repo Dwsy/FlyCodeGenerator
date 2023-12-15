@@ -118,6 +118,7 @@ MonarchTokensProvider.tokenizer.root.unshift([/\/\/\s*remind\b/i, 'comment.remin
 MonarchTokensProvider.tokenizer.root.unshift([PropertyRegex, 'code.property'])
 MonarchTokensProvider.tokenizer.root.unshift([PropertyRegexPre, 'code.propertypre'])
 MonarchTokensProvider.tokenizer.root.unshift([/FLY\.log/, 'flylog'])
+MonarchTokensProvider.tokenizer.root.unshift([/\b(\w+)\(/, 'function'])
 export const applyCustomFlycode = (monarchTokensProvider = MonarchTokensProvider, languageConfiguration = LanguageConfiguration) => {
   console.log("apply MonarchTokensProvider and setLanguageConfiguration");
   monaco.languages.setMonarchTokensProvider("flycode", monarchTokensProvider);

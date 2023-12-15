@@ -26,7 +26,14 @@ const nowSelectCodeType: Ref<CodeType> = ref({
   type: ''
 })
 let nowEditor: monaco.editor.ICodeEditor
+/**
+ * 初始化monaco编辑器，并添加回调函数
+ */
 monacoInitializedUtil.addInitializedCallback(async () => {
+  /**
+   * 当创建编辑器时触发回调函数
+   * @param {monaco.editor.IStandaloneCodeEditor} editor - 当前创建的编辑器实例
+   */
   monaco.editor.onDidCreateEditor(async (editor) => {
     nowEditor = editor
     if (window.location.href.indexOf('uiedit') > -1) {
@@ -64,10 +71,18 @@ monacoInitializedUtil.addInitializedCallback(async () => {
       )
 
       if (input) {
+        /**
+         * 监听输入框的值变化
+         * @param {Event} event - 输入框变化事件
+         */
         input.addEventListener('input', handleInputChange)
       }
 
       let changedTimeout: ReturnType<typeof setTimeout> | null = null
+      /**
+       * 处理输入框值变化的回调函数
+       * @param {Event} event - 输入框变化事件
+       */
       function handleInputChange(event) {
         const newValue = event.target.value
         if (changedTimeout) {
@@ -80,7 +95,6 @@ monacoInitializedUtil.addInitializedCallback(async () => {
           console.log('handelCtrlList changed:', newValue)
           ctrl_list.forEach((item) => handelCtrlList(item, nameCodeTypeMap))
         }, 500)
-        ctrl_list.forEach((item) => handelCtrlList(item, nameCodeTypeMap))
         // Handle the new value here
       }
 
@@ -231,10 +245,14 @@ function handelCtrlList(item, nameCodeTypeMap) {
       getCtrFunc(editor)
     })
     // hover 弹出个菜单
-    item.parentElement.addEventListener('mouseover', (e) => {
+    //     element.addEventListener('contextmenu', function(e) {
+    //   e.preventDefault();
+    // });
+    item.parentElement.addEventListener('contextmenu', (e) => {
       open.value = false
       const func = debounce(showMenu, 200)
       func.apply(this, [e, nowSelectCodeTypeInner])
+      e.preventDefault()
     })
   }
 }
@@ -253,10 +271,10 @@ function getElementRightUpperXY(element) {
 </script>
 
 <template>
-  <button @click="open = true">Open Modal</button>
+  <!-- <button @click="open = true">Open Modal</button> -->
 
   <Teleport to="body">
-    <div class="modal">
+    <div class="modal" v-show="open">
       <!-- <p>Hello from the modal!</p>
       <button @click="open = false">Close</button> -->
       <n-dropdown

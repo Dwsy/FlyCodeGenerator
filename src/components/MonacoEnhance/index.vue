@@ -26,7 +26,7 @@ onMounted(() => {
   window.getMonacoModel0 = getMonacoModel
   monacoInitializedUtil.addInitializedCallback(async () => {
     monaco.editor.onDidCreateEditor(async (editor) => {
-      if (window.location.href.indexOf('modellist') > -1) {
+      if (window.location.href.indexOf('modeledit') > -1) {
         addBoNewAction(editor)
         addAutoAutoAutoAutoAuto(editor)
         applyCustomFlycode()
