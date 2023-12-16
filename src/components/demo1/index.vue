@@ -71,20 +71,21 @@ window.customGenSql = (tname: string) => {
 }
 
 let nowEditor: monaco.editor.ICodeEditor
-onMounted(async () => {
+// onMounted(async () => {
+/**
+ * 初始化monaco编辑器，并添加回调函数
+ */
+monacoInitializedUtil.addInitializedCallback(async () => {
   /**
-   * 初始化monaco编辑器，并添加回调函数
+   * 当创建编辑器时触发回调函数
+   * @param {monaco.editor.IStandaloneCodeEditor} editor - 当前创建的编辑器实例
    */
-  monacoInitializedUtil.addInitializedCallback(async () => {
-    /**
-     * 当创建编辑器时触发回调函数
-     * @param {monaco.editor.IStandaloneCodeEditor} editor - 当前创建的编辑器实例
-     */
-    monaco.editor.onDidCreateEditor(async (editor) => {
-      nowEditor = editor
-    })
+  monaco.editor.onDidCreateEditor(async (editor) => {
+    nowEditor = editor
+    console.log('nowEditor', nowEditor)
   })
 })
+// })
 const genSql = () => {
   checkedRowKeysRef.value.forEach((key) => {
     const row = EntityRowDatas.value.filter((row) => row.name == key)[0]

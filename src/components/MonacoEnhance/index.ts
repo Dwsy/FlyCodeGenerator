@@ -315,19 +315,22 @@ function getAutoFn(type: AutoAutoAutoType, matchResult: string): Function {
 
                 let template = `for(var i = 0; i < ${matchResult}.length; i++) {
     var element = ${matchResult}[i];
-
+    
 
 }`
                 console.log("for匹配成功:", matchResult);
+                const position = ed.getPosition()
                 // 删除当前行
                 ed.executeEdits("source", [{
-                    range: new monaco.Range(ed.getPosition().lineNumber, 1, ed.getPosition().lineNumber + 1, 1),
+                    range: new monaco.Range(position.lineNumber, 1, position.lineNumber + 1, 1),
                     text: ""
                 }])
                 ed.executeEdits("source", [{
-                    range: new monaco.Range(ed.getPosition().lineNumber, 1, ed.getPosition().lineNumber, 1),
+                    range: new monaco.Range(position.lineNumber, 1, position.lineNumber, 1),
                     text: template + '\n'
                 }])
+
+                ed.setPosition(new monaco.Position(position.lineNumber + 2, 4 + 1))
             } else {
                 console.log("for匹配失败");
             }
