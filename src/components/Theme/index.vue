@@ -22,7 +22,6 @@
 <script setup lang="ts">
 import { GM_getValue, GM_setValue } from '$'
 import { getMonacoModel, monacoInitializedUtil } from '../../util/monacoUtil'
-import { useFlyStore } from '../../store/flyStore'
 import { themeList } from '.'
 const showChangeTheme = ref(false)
 const MonacoTheme = GM_getValue('bracketPairColorizationEnable', null)

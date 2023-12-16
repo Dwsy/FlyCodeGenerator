@@ -46,6 +46,7 @@ const EntityColumnsTemplate = `    /**
  * @returns {string} 输入输出类型定义。
  */
 const generateEntityDts = (entiy: Entiy): string => {
+    if (!entiy) return
     let entiyColumns = []
     entiy.EntiyColumns.forEach(entiyColumn => {
         entiyColumns.push(
@@ -74,11 +75,14 @@ const generateEntityDts = (entiy: Entiy): string => {
 export const generateEntityInterfaceDtsByProtocol = (tableDatas: tableData[]): string => {
     // 筛选tableDatas 的objectmark 在 inoutNameArray 中的数据
 
-    return tableDatas.map(generateFullEntityInterfaceDtsFunc).map(generateEntityDts).join("\n")
+    return tableDatas
+        .map(generateFullEntityInterfaceDtsFunc).map(generateEntityDts).join("\n")
 
 }
 
 export const generateFullEntityInterfaceDtsFunc = (entity: tableData): Entiy => {
+    if (!entity)
+        return
     let EntityName
     if (entity && typeof entity.objectmark !== 'undefined') {
         EntityName = entity.objectmark

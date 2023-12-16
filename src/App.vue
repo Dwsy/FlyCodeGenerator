@@ -7,7 +7,8 @@
       </div>
       <Theme></Theme>
       <MonacoEnhance></MonacoEnhance>
-      <demo></demo>
+      <demo1></demo1>
+      <!-- <demo2></demo2> -->
       <Otaku v-if="GM_getValue('szzrx', false)"></Otaku>
     </n-config-provider>
   </n-message-provider>

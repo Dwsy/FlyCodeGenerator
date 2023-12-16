@@ -16,22 +16,23 @@ export interface Operations {
 }
 
 export interface Property {
-  name: string;
-  propertyname: string;
-  propertytypecode: string;
-  objectcode: string;
-  propertycode: string;
-  marktype: string;
+  name?: string;
+  propertyname?: string;
+  propertytypecode?: string;
+  objectcode?: string;
+  propertycode?: string;
+  marktype?: string;
   validation?: boolean;
   required?: boolean;
 }
 
 export interface Input {
   customcode?: string;
-  name: string;
-  objectcode: string;
-  objectname: string;
-  datatype: string;
+  name?: string;
+  propertytypecode?: string
+  objectcode?: string;
+  objectname?: string;
+  datatype?: string;
   marktype: string;
   properties: Property[];
 }

@@ -13,6 +13,8 @@ export const useFlyStore = defineStore('flyStore', () => {
 
     const codeGeneratorInitStatus = ref(false)
     const appMounted = ref(false)
+    const waitAppMountedFn = ref<Function[]>()
+
     const ActiveGenerator = ref()
     const protocol = ref<Protocol>()
     const tableDatas = ref<tableData[]>()
@@ -22,6 +24,27 @@ export const useFlyStore = defineStore('flyStore', () => {
     const columnDataMap = ref(new Map<string, columnData>);
 
 
+
+    watch(appMounted, () => {
+        if (appMounted.value) {
+            if (waitAppMountedFn.value) {
+                waitAppMountedFn.value.forEach((fn) => {
+                    fn()
+                })
+                waitAppMountedFn.value = null
+            }
+        }
+    })
+    function addWaitAppMountedFn(fn: Function) {
+        if (appMounted.value) {
+            fn()
+        } else {
+            if (!waitAppMountedFn.value) {
+                waitAppMountedFn.value = []
+            }
+            waitAppMountedFn.value.push(fn)
+        }
+    }
 
 
     // const addDtsEnable = true
@@ -160,7 +183,6 @@ export const useFlyStore = defineStore('flyStore', () => {
     }
 
 
-
     return {
         // data
         protocol,
@@ -176,11 +198,12 @@ export const useFlyStore = defineStore('flyStore', () => {
         ActiveGenerator,
         codeGeneratorInitStatus,
         // statis
-
+        waitAppMountedFn,
 
         // fuc
         init,
         updateProtocol,
+        addWaitAppMountedFn,
 
         // fuc
 

@@ -55,7 +55,7 @@ export function genQueryModel(outputArray: Output[]): QueryModel {
     message.error("未设置输出参数")
     return
   }
-  return gen(outputArray[0], queryArgumentArrayMap)
+  return genQueryModel_(outputArray[0], queryArgumentArrayMap)
 }
 
 
@@ -85,11 +85,12 @@ export function genQueryModel(outputArray: Output[]): QueryModel {
  * 
  * const queryModel = gen(output, queryArgumentArrayMap);
  */
-function gen(output: Output, queryArgumentArrayMap: Map<string, Property[]>): QueryModel {
+export function genQueryModel_(output: Output, queryArgumentArrayMap: Map<string, Property[]>): QueryModel {
   // 定义 fquery 变量
   let fquery = "select\n{{selectColumns}}"
   const flyStore = useFlyStore()
-  const mainTableName = flyStore.protocol.input[0].name;
+  // const mainTableName = flyStore.protocol.input[0].name;
+  const mainTableName = output.name;
   const columnModelArray = new Array<ColumnModel>()
   const conditionModelArray = new Array<ConditionModel>()
   const joinModelArray = new Array<JoinModel>()

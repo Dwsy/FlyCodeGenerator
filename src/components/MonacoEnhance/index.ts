@@ -236,16 +236,18 @@ export const addAutoAutoAutoAutoAuto = (editor: monaco.editor.IStandaloneCodeEdi
 
 
 
-type AutoAutoAutoType = "fori" | "while" | "NewBO" | "select"
+type AutoAutoAutoType = "fori" | "while" | "NewBO" | "select" | "selectc"
 
 function autoGen(lineContent: string, ed: monaco.editor.ICodeEditor) {
 
     let regexFor = /for\s+.*/;
     let regexSelect = /(sel|select)\s+.*/;
+    let regexSelectc = /(selc|selectc)\s+.*/;
 
 
     let matchResultFor = lineContent.match(regexFor);
     let matchResultSelect = lineContent.match(regexSelect);
+    let matchResultSelectc = lineContent.match(regexSelectc);
     let matchResultBoNew = lineContent.match(/BO.new\((.*?)\)/);
     if (!matchResultBoNew) {
         matchResultBoNew = lineContent.match(/new\s+(.*)/);
@@ -261,6 +263,11 @@ function autoGen(lineContent: string, ed: monaco.editor.ICodeEditor) {
     if (matchResultBoNew) {
         message.success("gen new")
         return getAutoFn("NewBO", matchResultBoNew[1])(ed)
+    }
+    if (matchResultSelectc) {
+        message.success("gen selectc")
+        return getAutoFn("selectc", matchResultSelectc[0].split(" ")[1])(ed)
+
     }
 
 
@@ -297,6 +304,10 @@ function getAutoFn(type: AutoAutoAutoType, matchResult: string): Function {
                 text: sql + '\n'
             }])
         }
+    }
+    if (type == "selectc") {
+        //@ts-ignore
+        window.customGenSql(matchResult)
     }
     if (type == "fori") {
         return (ed: monaco.editor.ICodeEditor) => {
