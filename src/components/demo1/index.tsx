@@ -66,7 +66,7 @@ function genInOutProtocol(tableData: tableData, EntityRowDatas: EntityRowData[])
           name: item.this.columnname + '__' + name,
           propertycode: item.relationobj.properties.filter((property) => property.columnname === name)[0].propertycode,
           propertyname: name,
-          objectcode: tableData.objectcode
+          objectcode: item.relationobj.objectcode
         })
       })
     }

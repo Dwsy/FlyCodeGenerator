@@ -57,6 +57,11 @@ const init = async () => {
   }
   // @ts-ignore
   window.getMonacoModel = getMonacoModel
+  //@ts-ignore
+  window.cr = () => {
+    flyStore.codeGeneratorInitStatus = false
+    flyStore.codeGeneratorInitStatus = true
+  }
   const c = setInterval(async () => {
     const button = document.querySelector('#beSetting > div.main-content > div.tab-operation > button:nth-child(2) > i')
     if (button != null) {
@@ -122,19 +127,15 @@ function checkURLChangeThenUpdateProtocol() {
 </script>
 
 <style>
-@keyframes fade {
-  0% {
-    opacity: 0.92;
-  }
-  50% {
-    opacity: 0.5;
-  }
-  100% {
-    opacity: 0;
-  }
+body {
+  transition: opacity 0.5s ease-in-out;
 }
 
-body {
-  animation: fade 2s;
+.fade-in {
+  opacity: 1;
+}
+
+.fade-out {
+  opacity: 0;
 }
 </style>
