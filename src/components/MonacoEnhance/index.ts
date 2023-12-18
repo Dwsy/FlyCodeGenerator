@@ -80,7 +80,7 @@ export const addBoNewAction = (editor: monaco.editor.IStandaloneCodeEditor) => {
                         return `${shortName}.${item.columnname} = SESSION.mbcode`
                     }
                     else if (item.propertytypecode == PropertyTypeCode.ModifiedTime.toString()) {
-                        return `${shortName}.${item.columnname} = NOEW.time()`
+                        return `${shortName}.${item.columnname} = NOW.time()`
                     }
                     else {
                         let temp = `${shortName}.${item.columnname} = foo.${item.columnname}`
@@ -363,7 +363,7 @@ function getAutoFn(type: AutoAutoAutoType, matchResult: string): Function {
                     return `${shortName}.${item.columnname} = SESSION.mbcode`
                 }
                 else if (item.propertytypecode == PropertyTypeCode.ModifiedTime.toString()) {
-                    return `${shortName}.${item.columnname} = NOEW.time()`
+                    return `${shortName}.${item.columnname} = NOW.time()`
                 }
                 else {
                     let temp = `${shortName}.${item.columnname} = foo.${item.columnname}`

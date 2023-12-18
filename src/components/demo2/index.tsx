@@ -1,16 +1,6 @@
-import { useFlyStore } from "../../store/flyStore"
+import { useFlyStore } from '../../store/flyStore'
 
-
-
-
-
-export const helloTsx = ()=>{
-    const flyStore = useFlyStore()
-    return h(
-        <h2>
-            Hello TSX
-        </h2>
-    )
+export const helloTsx = () => {
+  const flyStore = useFlyStore()
+  return h(<h2>Hello TSX</h2>)
 }
-
-

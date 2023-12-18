@@ -72,8 +72,8 @@ onMounted(() => {
   rowData.value = flyStore.protocol.output[0].properties.map((property: Property) => {
     return {
       field: property.name,
-      column: property.propertyname,
-      propertycode: property.propertycode
+      column: property.propertyname
+      // propertycode: property.propertycode
     } as Bind
   })
 })

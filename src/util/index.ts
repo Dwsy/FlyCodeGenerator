@@ -198,7 +198,7 @@ export function jaroWinkler(s1: string, s2: string, p = 0.1): number {
     if (s1[i] === s2[i]) prefix++;
     else break;
   }
-
+window.AbortController
   let jaro = (m1Len / s1.length + m2Len / s2.length + (m1Len - transpositions / 2) / m1Len) / 3;
   return jaro + Math.min(p, 1 / m) * prefix * (1 - jaro);
 }

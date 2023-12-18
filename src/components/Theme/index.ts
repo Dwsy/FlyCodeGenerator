@@ -7,14 +7,14 @@ export const themeList = [
     // 'Brilliance Black.json',
     // 'Brilliance Dull.json',
     // 'Chrome DevTools.json',
-    'Clouds Midnight.json',
-    'Clouds.json',
-    'Cobalt.json',
-    'Cobalt2.json',
+    // 'Clouds Midnight.json',
+    // 'Clouds.json',
+    // 'Cobalt.json',
+    // 'Cobalt2.json',
     // 'Dawn.json',
     // 'Dominion Day.json',
     // 'Dracula.json',
-    'Dreamweaver.json',
+    // 'Dreamweaver.json',
     // 'Eiffel.json',
     // 'Espresso Libre.json',
     'GitHub Dark.json',
@@ -24,21 +24,21 @@ export const themeList = [
     // 'idleFingers.json',
     // 'iPlastic.json',
     // 'Katzenmilch.json',
-    'krTheme.json',
+    // 'krTheme.json',
     // 'Kuroir Theme.json',
     // 'LAZY.json',
-    'MagicWB (Amiga).json',
+    // 'MagicWB (Amiga).json',
     // 'Merbivore Soft.json',
     // 'Merbivore.json',
     // 'monoindustrial.json',
-    'Monokai Bright.json',
-    'Monokai.json',
-    'Night Owl.json',
-    'Nord.json',
-    'Oceanic Next.json',
+    // 'Monokai Bright.json',
+    // 'Monokai.json',
+    // 'Night Owl.json',
+    // 'Nord.json',
+    // 'Oceanic Next.json',
     // 'Pastels on Dark.json',
     // 'Slush and Poppies.json',
-    'Solarized-dark.json',
+    // 'Solarized-dark.json',
     // 'Solarized-light.json',
     // 'SpaceCadet.json',
     // 'Sunburst.json',
@@ -52,6 +52,37 @@ export const themeList = [
     // 'Twilight.json',
     // 'Upstream Sunburst.json',
     // 'Vibrant Ink.json',
-    'Xcode_default.json'
+    'Xcode_default.json',
+    'Xcode_dark.json'
     // 'Zenburnesque.json'
 ]
+
+export const customRule = (data) => {
+    const rules = data.rules
+    rules.push({ token: 'flylog', foreground: '27ae60', fontStyle: 'underline' })
+    rules.push({ token: 'comment.todo', foreground: 'ecd452', fontStyle: 'bold' })
+
+    rules.push({ token: 'comment.fixme', foreground: 'd83b01', fontStyle: 'bold' })
+
+    rules.push({ token: 'comment.remind', foreground: '00bcf2', fontStyle: 'bold' })
+
+    rules.push({ token: 'flylog', foreground: 'c12c1f', fontStyle: 'underline' })
+    rules.push({ token: 'function', foreground: '0070C1', fontStyle: 'bold' })
+    // AD3DA4
+    // debugger
+    // if (name == 'Monokai') {
+    //     rules.push({ token: "code.property", foreground: "A2DB2E" })
+    //     rules.push({ token: "code.propertypre", foreground: "AD3DA4" })
+    // } else {
+    //     rules.push({ token: "code.property", foreground: "4B22B0" })
+    //     // rules.push({ token: "code.propertypre", foreground: "AD3DA4" })
+    // }
+    rules.push({ token: 'code.property', foreground: '4B22B0' })
+    // rules.push({ token: "code.property", foreground: "A2DB2E" })
+    // rules.push({ token: "code.propertypre", foreground: "AD3DA4" })
+
+    // @ts-ignore         "fontStyle": "underline",
+    monaco.editor.defineTheme('mytheme', data)
+    // @ts-ignore
+    monaco.editor.setTheme('mytheme')
+}
