@@ -1,4 +1,5 @@
-import { GM_getValue, GM_registerMenuCommand, GM_setValue } from "$";
+import { GM_getValue, GM_setValue } from "./index";
+import { GM_registerMenuCommand } from "$";
 
 
 
@@ -18,6 +19,10 @@ export const registerMenuCommand = () => {
     //     // @ts-ignore
     //     window.lightTheme(false);
     // });
+    if (Boolean(localStorage.getItem("isBrowserMode") === 'true')) {
+        localStorage.setItem("bracketPairColorization", "1")
+        return
+    }
 
 
     const codeGeneratorEnable = GM_getValue("codeGeneratorEnable", false)

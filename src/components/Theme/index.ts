@@ -1,3 +1,5 @@
+import { GM_setValue } from "../../util"
+
 export const themeList = [
     // 'Active4D.json',
     // 'All Hallows Eve.json',
@@ -56,7 +58,52 @@ export const themeList = [
     'Xcode_dark.json'
     // 'Zenburnesque.json'
 ]
+export const changeTheme = (name: string = 'default') => {
 
+    GM_setValue('MonacoTheme', name)
+    if (name == 'default') {
+        const themeSetting = localStorage.getItem("ide_theme");
+        const lightTheme = 'vs'; // 浅色主题
+        const darkTheme = 'vs-dark'; // 深色主题
+        //@ts-ignore
+        monaco.editor.setTheme(themeSetting === 'light' ? lightTheme : darkTheme);
+    } else {
+        fetch('http://xwide.dwsy.link/monaco-themes-master/themes/' + name)
+            .then((data) => data.json())
+            .then((data) => {
+                console.log('theme:'.concat(data))
+                const rules: Array<any> = data.rules
+                rules.push({ token: 'flylog', foreground: '27ae60', fontStyle: 'underline' })
+                rules.push({ token: 'comment.todo', foreground: 'ecd452', fontStyle: 'bold' })
+
+                rules.push({ token: 'comment.fixme', foreground: 'd83b01', fontStyle: 'bold' })
+
+                rules.push({ token: 'comment.remind', foreground: '00bcf2', fontStyle: 'bold' })
+
+                rules.push({ token: 'flylog', foreground: 'c12c1f', fontStyle: 'underline' })
+                rules.push({ token: 'function', foreground: '0070C1', fontStyle: 'bold' })
+                // AD3DA4
+                // debugger
+                // if (name == 'Monokai') {
+                //     rules.push({ token: "code.property", foreground: "A2DB2E" })
+                //     rules.push({ token: "code.propertypre", foreground: "AD3DA4" })
+                // } else {
+                //     rules.push({ token: "code.property", foreground: "4B22B0" })
+                //     // rules.push({ token: "code.propertypre", foreground: "AD3DA4" })
+                // }
+                rules.push({ token: 'code.property', foreground: '4B22B0' })
+                // rules.push({ token: "code.property", foreground: "A2DB2E" })
+                // rules.push({ token: "code.propertypre", foreground: "AD3DA4" })
+
+                // @ts-ignore         "fontStyle": "underline",
+                monaco.editor.defineTheme('mytheme', data)
+                // @ts-ignore
+                monaco.editor.setTheme('mytheme')
+            })
+        // GM_setValue('bracketPairColorizationEnable', name)
+        // showChangeTheme.value = !showChangeTheme.value
+    }
+}
 export const customRule = (data) => {
     const rules = data.rules
     rules.push({ token: 'flylog', foreground: '27ae60', fontStyle: 'underline' })

@@ -205,6 +205,27 @@ export function jaroWinkler(s1: string, s2: string, p = 0.1): number {
 }
 
 
+export const GM_getValue = (key: string, defaultValue: any) => {
+  let r = localStorage.getItem(key) || defaultValue
+  if (r === "true") {
+    r = true
+  }
+  if (r === "false") {
+    r = false
+  }
+  return r
+}
 
+export const GM_setValue = (key: string, value: any) => {
+  localStorage.setItem(key, value)
+}
 
+export const GM_registerMenuCommand = (name: string, callback: Function) => {
+  console.log(name)
+  console.log(callback)
+}
+
+export const GM_setClipboard = (string: string, type: string) => {
+  copyToClipboard(string)
+}
 

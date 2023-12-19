@@ -3,7 +3,6 @@
 </template>
 
 <script setup lang="ts">
-import { GM_getValue, GM_setValue } from '$'
 import { ref, onMounted } from 'vue'
 import { getMonacoModel, monacoInitializedUtil } from '../../util/monacoUtil'
 import { useFlyStore } from '../../store/flyStore'

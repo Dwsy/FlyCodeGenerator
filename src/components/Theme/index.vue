@@ -1,13 +1,40 @@
 <template>
   <div class="flycode-theme">
-    <n-modal v-model:show="showChangeTheme" preset="card" title="Flycode" style="width: 900px" :bordered="false" class="flycode-theme">
+    <n-modal
+      v-model:show="showChangeTheme"
+      preset="card"
+      title="Flycode"
+      style="width: 900px"
+      :bordered="false"
+      class="flycode-theme"
+    >
       <div class="flycode-theme">
-        <n-list hoverable clickable @click="changeTheme()">
+        <n-list
+          hoverable
+          clickable
+          @click="
+            () => {
+              //@ts-ignore
+              window.showChangeTheme()
+              changeTheme('default')
+            }
+          "
+        >
           <n-list-item>
             <n-tag :bordered="false" type="info" size="small"> 默认 </n-tag>
           </n-list-item>
         </n-list>
-        <n-list hoverable clickable v-for="themeName in themeList" @click="changeTheme(themeName)">
+        <n-list
+          hoverable
+          clickable
+          v-for="themeName in themeList"
+          @click="
+            () => {
+              showChangeTheme = false
+              changeTheme(themeName)
+            }
+          "
+        >
           <n-list-item>
             <n-tag :bordered="false" type="info" size="small">
               {{ themeName }}
@@ -20,11 +47,13 @@
 </template>
 
 <script setup lang="ts">
-import { GM_getValue, GM_setValue } from '$'
-import { getMonacoModel, monacoInitializedUtil } from '../../util/monacoUtil'
-import { themeList } from '.'
+import { GM_getValue, GM_setValue } from '../../util/index'
+import { monacoInitializedUtil } from '../../util/monacoUtil'
+import { changeTheme, themeList } from './index'
+
 const showChangeTheme = ref(false)
-const MonacoTheme = GM_getValue('MonacoTheme', null)
+const MonacoTheme = GM_getValue('MonacoTheme', 'Xcode_default.json')
+// changeTheme(MonacoTheme)
 onMounted(() => {
   // @ts-ignore
   window.showChangeTheme = () => {
@@ -35,7 +64,6 @@ onMounted(() => {
     if (MonacoTheme != null) {
       // @ts-ignore
       monaco.editor.onDidCreateEditor((editor: ICodeEditor) => {
-        // @ts-ignore
         changeTheme(MonacoTheme)
       })
       setTimeout(() => {
@@ -44,53 +72,6 @@ onMounted(() => {
     }
   })
 })
-
-const changeTheme = (name: string = 'default') => {
-  GM_setValue('MonacoTheme', name)
-  if (name == 'default') {
-    setTimeout(() => {
-      window.location.reload()
-    }, 100)
-  } else {
-    fetch('http://xwide.dwsy.link/monaco-themes-master/themes/' + name)
-      .then((data) => data.json())
-      .then((data) => {
-        if (showChangeTheme.value) {
-          showChangeTheme.value = false
-        }
-        console.log('theme:'.concat(data))
-        const rules: Array<any> = data.rules
-        rules.push({ token: 'flylog', foreground: '27ae60', fontStyle: 'underline' })
-        rules.push({ token: 'comment.todo', foreground: 'ecd452', fontStyle: 'bold' })
-
-        rules.push({ token: 'comment.fixme', foreground: 'd83b01', fontStyle: 'bold' })
-
-        rules.push({ token: 'comment.remind', foreground: '00bcf2', fontStyle: 'bold' })
-
-        rules.push({ token: 'flylog', foreground: 'c12c1f', fontStyle: 'underline' })
-        rules.push({ token: 'function', foreground: '0070C1', fontStyle: 'bold' })
-        // AD3DA4
-        // debugger
-        // if (name == 'Monokai') {
-        //     rules.push({ token: "code.property", foreground: "A2DB2E" })
-        //     rules.push({ token: "code.propertypre", foreground: "AD3DA4" })
-        // } else {
-        //     rules.push({ token: "code.property", foreground: "4B22B0" })
-        //     // rules.push({ token: "code.propertypre", foreground: "AD3DA4" })
-        // }
-        rules.push({ token: 'code.property', foreground: '4B22B0' })
-        // rules.push({ token: "code.property", foreground: "A2DB2E" })
-        // rules.push({ token: "code.propertypre", foreground: "AD3DA4" })
-
-        // @ts-ignore         "fontStyle": "underline",
-        monaco.editor.defineTheme('mytheme', data)
-        // @ts-ignore
-        monaco.editor.setTheme('mytheme')
-      })
-    // GM_setValue('bracketPairColorizationEnable', name)
-    // showChangeTheme.value = !showChangeTheme.value
-  }
-}
 </script>
 
 <style>

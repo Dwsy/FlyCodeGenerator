@@ -47,7 +47,7 @@
 
 <script setup lang="tsx">
 import { h, onMounted, ref } from 'vue'
-import { addButton } from '../../util'
+import { GM_setClipboard, addButton } from '../../util'
 import { read, utils } from 'xlsx'
 import { DataTableColumns, DataTableRowKey, NInput, NSelect, NSwitch, NText, UploadCustomRequestOptions, UploadFileInfo, useMessage } from 'naive-ui'
 import { watch } from 'vue'
@@ -56,7 +56,6 @@ import { Property } from '../../type/protocol'
 import { Operator } from '../../type/model/queryModel'
 import { getPropertyTypeEmoji, getPropertyTypeName, getRandomEmoji, getRandomEmojiByUnicode } from '../../type/model/propertyTypeCodeRef'
 import { message } from '../../util/message'
-import { GM, GM_setClipboard } from '$'
 import CodePreview from '../common/CodePreview.vue'
 import { autoMapFunc, generateCodeFunc, readExcelFileFunc } from '.'
 

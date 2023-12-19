@@ -113,13 +113,10 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { addButton, toCamelCase } from '../../util'
+import { GM_setClipboard, addButton, toCamelCase } from '../../util'
 import { useFlyStore } from '../../store/flyStore'
 import { PropertyTypeCode, getPropertyTypeName, ignorePropertyType } from '../../type/model/propertyTypeCodeRef'
 import { codeDark, useMessage } from 'naive-ui'
-//@ts-ignore
-import { GM_setClipboard } from '$'
-import { updateTemplate } from '../../data/updateFlycodeTemplet'
 import { nextTick } from 'vue'
 import { watch } from 'vue'
 import { getPropertyTypeEmoji, getRandomEmojiByUnicode, getRandomEmoji } from '../../type/model/propertyTypeCodeRef'

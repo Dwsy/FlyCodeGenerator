@@ -1,5 +1,4 @@
 <script setup lang="tsx">
-import { GM_getValue } from '$'
 import axios from 'axios'
 import { message } from '../../util/message'
 import { randomImg } from '.'

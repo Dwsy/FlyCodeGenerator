@@ -89,7 +89,7 @@
 
 <script setup lang="tsx">
 import { PropType, h, onMounted, ref } from 'vue'
-import { addButton, levenshteinDistance } from '../../util'
+import { GM_setClipboard, addButton, levenshteinDistance } from '../../util'
 import { read, utils } from 'xlsx'
 import {
   DataTableColumns,
@@ -118,8 +118,6 @@ import { message } from '../../util/message'
 
 import CodePreview from '../common/CodePreview.vue'
 import { autoMapFunc, generateCodeFunc, readExcelFileFunc, MapPair } from './index'
-import { copyToClipboard } from '../../util/index'
-import { GM_setClipboard } from '$'
 import { FormValidationStatus } from 'naive-ui/es/form/src/interface'
 // 使用FlyStore的实例
 const flyStore = useFlyStore()

@@ -1,4 +1,4 @@
-import { GM_setClipboard } from "$";
+import { GM_setClipboard } from "../../util";
 import { formatFquery } from "../../util/formateFquery";
 import { getMonacoModel, monacoInitializedUtil } from "../../util/monacoUtil";
 

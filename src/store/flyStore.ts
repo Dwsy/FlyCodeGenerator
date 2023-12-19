@@ -4,7 +4,7 @@ import { Output, Protocol } from "../type/protocol"
 import { ActionType } from "../type/actionType";
 import { GeneratorName } from "../components/index";
 import { RefreshExtraLib } from "../flycodeDts";
-import { GM_getValue } from "$";
+import { GM_getValue } from "../util/index";
 import { monacoInitializedUtil } from "../util/monacoUtil";
 import { getPropertyTypeName } from "../type/model/propertyTypeCodeRef";
 import { useGenStore } from "./genStore";

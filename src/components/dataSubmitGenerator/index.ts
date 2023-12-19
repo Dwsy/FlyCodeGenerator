@@ -4,7 +4,6 @@ import { PropertyTypeCode, getRandomEmojiByUnicode } from "../../type/model/prop
 import { getPrimaryKey, getTableShortName, toCamelCase } from "../../util";
 import { useFlyStore } from "../../store/flyStore";
 import { Input } from "../../type/protocol";
-import { GM_setClipboard } from "$";
 import { MessageApiInjection } from "naive-ui/es/message/src/MessageProvider";
 
 

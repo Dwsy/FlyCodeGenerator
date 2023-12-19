@@ -23,7 +23,7 @@ import { useFlyStore } from './store/flyStore'
 import { RefreshExtraLib } from './flycodeDts'
 import { getMonacoModel, monacoInitializedUtil } from './util/monacoUtil'
 import { getFqueryModel } from './flycodeDts/FQuery/test'
-import { GM_getValue } from '$'
+import { GM_getValue } from './util'
 
 const theme = ref<GlobalTheme | null>(darkTheme)
 const flyStore = useFlyStore()

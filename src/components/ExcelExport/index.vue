@@ -34,7 +34,7 @@
 
 <script setup lang="ts">
 import { h, onMounted, ref } from 'vue'
-import { addButton } from '../../util'
+import { GM_setClipboard, addButton } from '../../util'
 import { useFlyStore } from '../../store/flyStore'
 import { Input, Property } from '../../type/protocol'
 import { Bind, excelExportTemplate } from '../../data/excelExportTemplate'
@@ -42,7 +42,6 @@ import CodePreview from '../common/CodePreview.vue'
 import { DataTableColumns, DataTableRowKey, NButton, NInput } from 'naive-ui'
 import { format as prettyFormat } from 'pretty-format' // ES2015 modules
 import { genQueryModel, generateSql, init } from '../queryGenerator'
-import { GM_setClipboard } from '$'
 import { message } from '../../util/message'
 import { getRandomEmojiByUnicode } from '../../type/model/propertyTypeCodeRef'
 const showModal = ref()
