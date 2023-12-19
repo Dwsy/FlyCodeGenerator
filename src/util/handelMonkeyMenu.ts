@@ -30,7 +30,7 @@ export const registerMenuCommand = () => {
         GM_setValue("addDtsEnable", !addDtsEnable)
         setTimeout(() => { window.location.reload() }, 100)
     });
-    const bracketPairColorizationEnable = localStorage.getItem("bracketPairColorization") == "1"
+    const bracketPairColorizationEnable = localStorage.getItem("bracketPairColorization") < "0"
     GM_registerMenuCommand(`${bracketPairColorizationEnable ? '✅' : '❌'}彩虹括号`, () => {
         GM_setValue("bracketPairColorizationEnable", !bracketPairColorizationEnable)
         if (bracketPairColorizationEnable) {
@@ -52,7 +52,7 @@ export const registerMenuCommand = () => {
     GM_registerMenuCommand(`${GM_getValue("szzrx", false) ? "关闭" : "开启"}私斋蒸鹅心模式❤`, () => {
         // @ts-ignore
 
-        GM_setValue("szzrx", GM_getValue("szzrx", false))
+        GM_setValue("szzrx", !GM_getValue("szzrx", false))
 
         // setTimeout(() => { window.location.reload() }, 100)
     });

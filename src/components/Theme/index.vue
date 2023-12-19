@@ -24,7 +24,7 @@ import { GM_getValue, GM_setValue } from '$'
 import { getMonacoModel, monacoInitializedUtil } from '../../util/monacoUtil'
 import { themeList } from '.'
 const showChangeTheme = ref(false)
-const MonacoTheme = GM_getValue('bracketPairColorizationEnable', null)
+const MonacoTheme = GM_getValue('MonacoTheme', null)
 onMounted(() => {
   // @ts-ignore
   window.showChangeTheme = () => {
@@ -47,7 +47,7 @@ onMounted(() => {
 
 const changeTheme = (name: string = 'default') => {
   if (name == 'default') {
-    GM_setValue('bracketPairColorizationEnable', null)
+    // GM_setValue('bracketPairColorizationEnable', null)
     setTimeout(() => {
       window.location.reload()
     }, 100)
@@ -87,7 +87,7 @@ const changeTheme = (name: string = 'default') => {
         // @ts-ignore
         monaco.editor.setTheme('mytheme')
       })
-    GM_setValue('bracketPairColorizationEnable', name)
+    // GM_setValue('bracketPairColorizationEnable', name)
     // showChangeTheme.value = !showChangeTheme.value
   }
 }
