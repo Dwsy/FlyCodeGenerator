@@ -55,7 +55,7 @@ let getButtonSeq = (seq = 1) => {
  * 
  * @returns {ChildNode | undefined} - 如果成功添加了新按钮，返回新按钮的节点。如果未找到指定的元素或已存在相同序列号的按钮，返回 undefined。
  */
-export const addButton = (selector: string | any, text: string, iconClass: string, clickHandler: () => void, seq?: number, hoverText?: string): ChildNode | undefined => {
+export const addButton = (selector: string | any, text: string, iconClass: string, clickHandler: () => void, seq?: number, hoverText?: string): Element | undefined => {
   if (selector == undefined) {
     selector = "#beSetting > div.main-content > div.tab-operation > button:nth-child(2)"
   }
@@ -78,7 +78,8 @@ export const addButton = (selector: string | any, text: string, iconClass: strin
   newButton.appendChild(newButtonSpan);
   newButton.addEventListener("click", clickHandler);
   hoverText ? newButton.title = hoverText : newButton.title = 'dwsy'
-  return originalButton.parentNode!.appendChild(newButton);
+  originalButton.parentNode!.appendChild(newButton);
+  return newButton;
 }
 
 
@@ -198,7 +199,7 @@ export function jaroWinkler(s1: string, s2: string, p = 0.1): number {
     if (s1[i] === s2[i]) prefix++;
     else break;
   }
-window.AbortController
+  window.AbortController
   let jaro = (m1Len / s1.length + m2Len / s2.length + (m1Len - transpositions / 2) / m1Len) / 3;
   return jaro + Math.min(p, 1 / m) * prefix * (1 - jaro);
 }

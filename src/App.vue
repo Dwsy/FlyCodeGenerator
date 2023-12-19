@@ -9,6 +9,7 @@
       <MonacoEnhance></MonacoEnhance>
       <demo1></demo1>
       <!-- <demo2></demo2> -->
+      <Menu></Menu>
       <Otaku v-if="GM_getValue('szzrx', false)"></Otaku>
     </n-config-provider>
   </n-message-provider>
@@ -58,7 +59,7 @@ const init = async () => {
   // @ts-ignore
   window.getMonacoModel = getMonacoModel
   //@ts-ignore
-  window.cr = () => {
+  window.cr = function () {
     flyStore.codeGeneratorInitStatus = false
     flyStore.codeGeneratorInitStatus = true
   }

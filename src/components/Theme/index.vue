@@ -46,8 +46,8 @@ onMounted(() => {
 })
 
 const changeTheme = (name: string = 'default') => {
+  GM_setValue('MonacoTheme', name)
   if (name == 'default') {
-    // GM_setValue('bracketPairColorizationEnable', null)
     setTimeout(() => {
       window.location.reload()
     }, 100)

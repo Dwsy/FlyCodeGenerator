@@ -51,38 +51,48 @@ const flyCode = ref('')
 const flyStore = useFlyStore()
 const checkedRowKeysRef = ref<DataTableRowKey[]>([])
 const rowData = ref<Bind[]>()
+const genBtn = ref<Element>()
 const columns = createColumns({
   play(row) {
     console.log(row)
   }
 })
-
+const clickFunc = () => {
+  console.log('生成Flycode')
+  showModalFunc()
+}
 onMounted(() => {
-  addButton(
+  genBtn.value = addButton(
     null,
     '生成Flycode',
     'ideicon-share',
     () => {
-      console.log('生成Flycode')
-      showModalFunc()
+      // console.log('生成Flycode')
+      // showModalFunc()
     },
     1
   )
 
+  genBtn.value.addEventListener('click', clickFunc)
+
   rowData.value = flyStore.protocol.output[0].properties.map((property: Property) => {
     return {
       field: property.name,
-      column: property.propertyname
-      // propertycode: property.propertycode
+      column: property.propertyname,
+      propertycode: property.propertycode
     } as Bind
   })
+})
+onUnmounted(() => {
+  genBtn.value.removeEventListener('click', clickFunc)
 })
 
 const showModalFunc = () => {
   showModal.value = !showModal.value
 }
 function rowKey(row: Bind) {
-  return row.propertycode
+  // debugger
+  return row.column
 }
 function handleCheck(checkedRowKeys: DataTableRowKey[]) {
   checkedRowKeysRef.value = checkedRowKeys
@@ -126,7 +136,14 @@ function createColumns({ play }: { play: (row: Bind) => void }): DataTableColumn
  */
 const codeGenerator = (preview?: boolean): string => {
   console.log(checkedRowKeysRef.value)
-  const bindDataArray = rowData.value.filter((data) => checkedRowKeysRef.value.includes(data.propertycode))
+  const bindDataArray = rowData.value
+    .filter((data) => checkedRowKeysRef.value.includes(data.column))
+    .map((data) => {
+      return {
+        field: data.field,
+        column: data.column
+      }
+    })
 
   let code = `var _xlscolBind = ${JSON.stringify(bindDataArray, null, 4)}\n`
   init()
@@ -140,8 +157,9 @@ const codeGenerator = (preview?: boolean): string => {
     message.success('代码生成成功' + getRandomEmojiByUnicode())
     showModal.value = !showModal.value
   }
+
   //todo 字典以及系统对象自动获取关联查询值
-  return code
+  return code.replace('NORULE', 'NORULE PAGING')
 }
 
 const previewCode = () => {
