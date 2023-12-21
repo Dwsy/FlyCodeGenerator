@@ -1,69 +1,44 @@
-翻译下面的文本以表格形式输出第一列为中文第二列为英文 并且是下划线形式
-
-营销组织
-
-
-客户
-
-
-售达方
-
-
-送达方
-
-
-兑付方式
-
-
-产品范围
-
-
-活动产品
-
-
-业务活动类型
-
-
-计算口径
-
-
-支持力度(%)
-
-
-预估费用（元）
-
-
-公司承担费用（元）
-
-
-经销商承担费用（元）
-
-
-活动期间收入目标(元)
-
-
-活动期间收入目标(元)
-
-
-活动形式说明
-
-
-是否与合同返利互斥
-
-
-同期收入达成（元）
-
-
-收入同比增长(%)
-
-
-环比收入达成（元）
-
-
-环比同比增长(%)
-
-
-公司费用率(%)
-
-
-毛利率
+id	id	bigint	主键	
+促销活动ID	promotion_main_id	bigint	业务对象	
+序号	serial_number	int4	整数型	
+营销组织	salearea_id	bigint	业务对象	
+TPM客户id	customer_id	bigint	业务对象	
+售达方ID	channel_id	bigint	业务对象	
+送达方id	store_id	bigint	业务对象	
+剔除送达方id	no_store_id	bigint	业务对象	
+兑付方式	payment_method			字典（兑付方式）多选
+产品范围	product_range	bigint	字典	
+活动产品id	activity_product_id	bigint	长整型	
+活动产品物料编码	activity_product_code	varchar	文本	
+赠品id	gift_rpoduct_id	bigint	长整型	
+赠品物料编码	gift_rpoduct_code			
+活动期间	activity_period			
+活动开始时间	start_date			
+活动结束时间	end_date			
+搭赠规则	complimentary_rule	bigint	字典	
+产品组ID（固定组合）	product_group_id	bigint	业务对象	
+产品组名称	product_group_name	varchar	文本	
+搭赠方式	complimentary_type			
+是否按达成目标终止搭赠	achieve_target_terminate_complimentary			
+赠送条件≥X件起送（最小值）	min_quantity_for_gift	int4	整数型	
+赠送条件≥X件起送（最大值）	max_quantity_for_gift	int4	整数型	
+本品数量	product_quantity	int4	整数型	
+产品单位	product_unit	bigint	字典	
+赠品数量	gift_quantity	int4	整数型	
+赠品单位	gift_unit	bigint	字典	
+是否与合同返利互斥	mutually_exclusive_with_contract_rebate	int4	整数型	
+本期收入目标折后（元）	revenue_target	numeric	数字	
+同期收入达成折后（元）	achieve_same_period	numeric	数字	
+公司折扣率	company_discount_rate	numeric	数字	
+收入同比增长	revenue_yoy_growth	numeric	数字	
+本期销量目标	current_sales_target	numeric	数字	
+同期销量达成	same_period_sales_achievement	numeric	数字	
+销量同比增长	sales_volume_yoy_growth	numeric	数字	
+预计赠品总数	estimated_total_gifts	numeric	数字	
+本期折扣费用金额（元）	current_discount_expense_in_cny	numeric	数字	
+公司费用率	company_expense_ratio	numeric	数字	
+毛利率	gross_margin_ratio	numeric	数字	
+创建时间	createtime			
+创建人	createop			
+更新时间	updatetime			
+更新人	updateop			

@@ -62,6 +62,7 @@ export const changeTheme = (name: string = 'default') => {
 
     GM_setValue('MonacoTheme', name)
     if (name == 'default') {
+        localStorage.setItem("MonacoTheme", name)
         const themeSetting = localStorage.getItem("ide_theme");
         const lightTheme = 'vs'; // 浅色主题
         const darkTheme = 'vs-dark'; // 深色主题

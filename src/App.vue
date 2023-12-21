@@ -8,6 +8,7 @@
       <Theme></Theme>
       <MonacoEnhance></MonacoEnhance>
       <demo1></demo1>
+      <demo3></demo3>
       <!-- <demo2></demo2> -->
       <Menu></Menu>
       <Otaku v-if="GM_getValue('szzrx', false)"></Otaku>

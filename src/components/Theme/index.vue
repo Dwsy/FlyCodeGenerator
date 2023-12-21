@@ -15,7 +15,7 @@
           @click="
             () => {
               //@ts-ignore
-              window.showChangeTheme()
+              showChangeTheme = false
               changeTheme('default')
             }
           "
@@ -52,7 +52,7 @@ import { monacoInitializedUtil } from '../../util/monacoUtil'
 import { changeTheme, themeList } from './index'
 
 const showChangeTheme = ref(false)
-const MonacoTheme = GM_getValue('MonacoTheme', 'Xcode_default.json')
+const MonacoTheme = GM_getValue('MonacoTheme', 'default')
 // changeTheme(MonacoTheme)
 onMounted(() => {
   // @ts-ignore

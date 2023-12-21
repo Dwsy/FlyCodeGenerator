@@ -63,4 +63,10 @@ export const registerMenuCommand = () => {
         // setTimeout(() => { window.location.reload() }, 100)
     });
 
+    // generateTemporaryCode
+    GM_registerMenuCommand("生成暂存代码", () => {
+        //@ts-ignore
+        window.generateTemporaryCode()
+    });
+
 }
