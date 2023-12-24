@@ -82,6 +82,12 @@ monacoInitializedUtil.addInitializedCallback(async () => {
    */
   monaco.editor.onDidCreateEditor(async (editor) => {
     nowEditor = editor
+    editor.updateOptions({
+      fontFamily: 'Cascadia Code',
+      // fontSize: 14
+      formatOnPaste: true,
+      fixedOverflowWidgets: true
+    })
     console.log('nowEditor', nowEditor)
   })
 })

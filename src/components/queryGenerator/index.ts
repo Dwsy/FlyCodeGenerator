@@ -99,6 +99,15 @@ export function genQueryModel_(output: Output, queryArgumentArrayMap: Map<string
   const relationTableColumnMap = new Map<string, string>();
   const needJoinRelationTableMap = new Map<string, tableData>();
 
+
+
+  interface DeepJoinKey {
+    prefixName: string,
+    lastName: string,
+    level: number
+  }
+  const deepJoinRelationTableMap = new Map<DeepJoinKey, tableData>();
+
   const queryModel: QueryModel = {
     tableName: mainTableName,
     tableShortName: getTableShortName(mainTableName),
@@ -121,6 +130,14 @@ export function genQueryModel_(output: Output, queryArgumentArrayMap: Map<string
         needJoinRelationTableMap.set(parts[0], flyStore.tableDataMap.get(data.objectcode))
         // needJoinColumnTableNameMap.set(data.propertycode, columnData.columnname)
       }
+      if (parts.length > 2) {
+        const deepJoinKey: DeepJoinKey = {
+          prefixName: parts.slice(0, parts.length - 1).join("__"),
+          lastName: parts[parts.length - 1],
+          level: parts.length - 1
+        }
+        deepJoinRelationTableMap.set(deepJoinKey, flyStore.tableDataMap.get(data.objectcode))
+      }
     }
     return columnData;
   });
@@ -128,6 +145,8 @@ export function genQueryModel_(output: Output, queryArgumentArrayMap: Map<string
   const tableShortName = getTableShortName(outputTable.tablename);
   // 将 outPropertiesDataMap 中的数据添加到 fquery 中
   fquery += `\n  from ${outputTable.tablename} as ${tableShortName}`;
+
+
   // 遍历 relationTableMap，将关联表格的数据添加到 fquery 中
   // 需要join的表 1.关联查询字段2.关联查询where筛选
   needJoinRelationTableMap.forEach((relationTable, columnname) => {
@@ -172,6 +191,56 @@ export function genQueryModel_(output: Output, queryArgumentArrayMap: Map<string
     fquery += `\n  left join ${relationTable.tablename} as ${relationTableShortName} `;
     fquery += `on ${tableShortName}.${columnname} = ${relationTableShortName}.${idField}`;
   });
+
+  // 深度join
+  deepJoinRelationTableMap
+    .forEach((relationTable, deepJoinKey) => {
+      if (deepJoinKey.level == 2) {
+
+      }
+      let deepJoinTableName = relationTable.tablename;
+      if (deepJoinTableName === "pl_dictionary" || deepJoinTableName === "pl_orgstruct" || deepJoinTableName === "pl_region") {
+        deepJoinTableName = relationTable.objectmark;
+      }
+      let deepJoinTableShortName = getTableShortName(deepJoinTableName, deepJoinKey.lastName);
+
+      // 如果短表明重复，则重新生成
+      let seq = 1;
+      while (relationTableShortNameReverseMapReverse.get(deepJoinTableShortName) !== undefined) {
+        deepJoinTableShortName = getTableShortName(deepJoinTableName, deepJoinKey.lastName, seq);
+        seq++;
+      }
+      relationTableShortNameMap.set(deepJoinKey.prefixName + "__" + deepJoinKey.lastName, deepJoinTableShortName);
+      relationTableShortNameReverseMapReverse.set(deepJoinTableShortName, deepJoinTableName);
+      let idField = {
+        pl_dictionary: "dictionaryid",
+        pl_orgstruct: "orgstructid",
+        pl_region: "regionid",
+      }[deepJoinTableName] || true;
+      if (idField) {
+        for (const columnData of relationTable.properties) {
+          if (columnData.propertytypecode === "1") {
+            idField = columnData.columnname;
+            break;
+          }
+        }
+      }
+      const joinModel: JoinModel = {
+        tableName: tableShortName,
+        tableShortName: tableShortName,
+        relationTable: {
+          name: deepJoinTableName,
+          shortName: deepJoinTableShortName,
+          idField: idField,
+        },
+        columnName: deepJoinKey.prefixName + "__" + deepJoinKey.lastName,
+      };
+      joinModelArray.push(joinModel);
+      fquery += `\n  left join ${deepJoinTableName} as ${deepJoinTableShortName} `;
+      fquery += `on ${deepJoinKey.prefixName}.${deepJoinKey.lastName} = ${deepJoinTableShortName}.${idField}`;
+    });
+
+
   // console.log(relationTableShortNameReverseMapReverse)
   // 查询列
   let selectColumns = outPropertiesDataMap
@@ -359,12 +428,14 @@ export function generateSql(queryModel: QueryModel): string {
     } else {
       q = `${c.tableShortName}.${c.columnName} as ${c.queryName}`
     }
-    if (index == queryModel.columns.length - 1) {
-      return q + `  //${c.zhColumnName}`
-    } else {
-      return q + `,  //${c.zhColumnName}`
+    let boolean = index == queryModel.columns.length - 1
+    let temp = `${c.tableShortName}.${c.columnName}${boolean ? "" : ","}`
+    let len = temp.length
+    for (var i = 0; i < 35 - len; i++) {
+      temp += " "
     }
-  }).join("\n  ")}`;
+    return `\n  ${temp}//${c.zhColumnName}`
+  }).join("")}`;
   // 生成 FROM 子句
   const fromClause = `FROM\n  ${queryModel.tableName} as ${queryModel.tableShortName}`;
 

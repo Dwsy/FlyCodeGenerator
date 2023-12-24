@@ -106,7 +106,9 @@ const operators = [
 ]
 
 // const PropertyRegex = /\.(\w+).(?=\s|[" + operators.join("|") + "])/
-const PropertyRegex = /\.(\w+)(?=\s|[" + operators.join("|") + "])/
+// const PropertyRegex = /\.(\w+)(?=\s|[" + operators.join("|") + "])/
+const PropertyRegex = /\.(\w+)(.=\s|[" + operators.join("|") + "])/;
+
 const PropertyRegexPre = /\w+(?=\.)/;
 
 MonarchTokensProvider.tokenizer.root.unshift([/\/\/\s*TODO\b/i, 'comment.fixme'])
@@ -115,13 +117,18 @@ MonarchTokensProvider.tokenizer.root.unshift([/\/\/\s*NOTE\b/i, 'comment.fixme']
 MonarchTokensProvider.tokenizer.root.unshift([/\/\/\s*todo\b/i, 'comment.todo'])
 MonarchTokensProvider.tokenizer.root.unshift([/\/\/\s*fixme\b/i, 'comment.fixme'])
 MonarchTokensProvider.tokenizer.root.unshift([/\/\/\s*remind\b/i, 'comment.remind'])
-MonarchTokensProvider.tokenizer.root.unshift([PropertyRegex, 'code.property'])
+// MonarchTokensProvider.tokenizer.root.unshift([PropertyRegex, 'code.property'])
+// [, 'attribute'],
+MonarchTokensProvider.tokenizer.root.unshift([/\.[a-zA-Z_]\w*/, 'code.property'])
 MonarchTokensProvider.tokenizer.root.unshift([PropertyRegexPre, 'code.propertypre'])
 MonarchTokensProvider.tokenizer.root.unshift([/FLY\.log/, 'flylog'])
-// MonarchTokensProvider.tokenizer.root.unshift([/\b(\w+)\(/, 'function'])
-MonarchTokensProvider.tokenizer.root.unshift([/\b([a-zA-Z_]\w*)(?=\()/, 'function']);
+MonarchTokensProvider.tokenizer.root.unshift([/\b(\w+)\(/, 'function'])
+// MonarchTokensProvider.tokenizer.root.unshift([/[a-zA-Z_]\w*\(/, 'function']);
+// MonarchTokensProvider.tokenizer.root.unshift([/\b([a-zA-Z_]\w*)(?=\()/, 'function']);
 export const applyCustomFlycode = (monarchTokensProvider = MonarchTokensProvider, languageConfiguration = LanguageConfiguration) => {
   console.log("apply MonarchTokensProvider and setLanguageConfiguration");
   monaco.languages.setMonarchTokensProvider("flycode", monarchTokensProvider);
   monaco.languages.setLanguageConfiguration("flycode", languageConfiguration);
+  // monaco.editor.FontInfo
+  // monaco.editor.re
 };

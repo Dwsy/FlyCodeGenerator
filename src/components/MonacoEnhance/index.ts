@@ -241,8 +241,8 @@ type AutoAutoAutoType = "fori" | "while" | "NewBO" | "select" | "selectc"
 function autoGen(lineContent: string, ed: monaco.editor.ICodeEditor) {
 
     let regexFor = /for\s+.*/;
-    let regexSelect = /(sel|select)\s+.*/;
-    let regexSelectc = /(selc|selectc)\s+.*/;
+    let regexSelect = /(sel|select|sl)\s+.*/;
+    let regexSelectc = /(selc|selectc|sc)\s+.*/;
 
 
     let matchResultFor = lineContent.match(regexFor);
@@ -288,9 +288,15 @@ function getAutoFn(type: AutoAutoAutoType, matchResult: string): Function {
             const primaryKey = getPrimaryKey(tableData.objectcode)
             const shortName = getTableShortName(matchResult)
             const columns = tableData.properties.map((item) => {
-                return `\n  ${shortName}.${item.columnname},  // ${item.propertyname}`
+                let temp = `${shortName}.${item.columnname},`
+                let len = temp.length
+                for (var i = 0; i < 35 - len; i++) {
+                    temp += " "
+                }
+                return `\n  ${temp}// ${item.propertyname}`
+                // return `\n  ${shortName}.${item.columnname},  // ${item.propertyname}`
             })
-            columns[columns.length - 1] = columns[columns.length - 1].replace(",", "")
+            columns[columns.length - 1] = columns[columns.length - 1].replace(",", " ")
 
             const sql = `var temp = SELECT ${columns.join('')}\nFROM ${matchResult} ${shortName}\nWHERE ${shortName}.${primaryKey} = \nNORULE;`
             console.log(sql)
