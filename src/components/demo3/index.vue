@@ -10,6 +10,5 @@ onMounted(async () => {
 </script>
 
 <template>
-  {{ showModel }}
   <generateTemporaryCode :showModel="showModel"></generateTemporaryCode>
 </template>

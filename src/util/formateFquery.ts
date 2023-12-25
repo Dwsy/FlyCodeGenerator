@@ -17,7 +17,7 @@ export function formatFquery(sql: string, start: string): string {
     });
     sql = sql.split("\n").map(line => line.trim()).join("\n");
     let ifArray: Array<string> = [];
-    let endifArray: Array<string> = [];
+    let endifArray : Array<string> = [];
     let ifSqlArray: Array<string> = [];
     let delBigPairIfSqlArray: Array<string> = [];
 

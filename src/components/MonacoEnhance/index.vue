@@ -10,7 +10,7 @@ import { el, it } from 'date-fns/locale'
 import { PropertyTypeCode } from '../../type/model/propertyTypeCodeRef'
 import { useGenStore } from '../../store/genStore'
 import { pushTempBoNewDtsList } from '../../flycodeDts'
-import { addAutoAutoAutoAutoAuto, addBoNewAction } from './index'
+import { addAutoAutoAutoAutoAuto, addFomatSqlAction } from './index'
 import { applyCustomFlycode, MonarchTokensProvider, LanguageConfiguration } from './monaco.languages.conf'
 import { getUiProtocol } from '../../dataRequest'
 import { UiProtocol } from '../../type/formProtocol'
@@ -26,7 +26,8 @@ onMounted(() => {
   monacoInitializedUtil.addInitializedCallback(async () => {
     monaco.editor.onDidCreateEditor(async (editor) => {
       if (window.location.href.indexOf('modeledit') > -1) {
-        addBoNewAction(editor)
+        // addBoNewAction(editor)
+        addFomatSqlAction(editor)
         addAutoAutoAutoAutoAuto(editor)
         applyCustomFlycode()
       } else if (window.location.href.indexOf('uiedit') > -1) {
@@ -71,7 +72,9 @@ onMounted(() => {
             const ArrayCtrlNameList = ['editortable', 'infotable']
             const position = editor.getPosition()
             const isArrayCtrl = ArrayCtrlNameList.includes(CodeType.type)
-            const gendCode = `const ${isArrayCtrl ? 'table' : 'ctrl'}Rie = Page.get${isArrayCtrl ? 'Array' : ''}Ctrl("${CodeType.name}")`
+            const gendCode = `const ${isArrayCtrl ? 'table' : 'ctrl'}Rie = Page.get${isArrayCtrl ? 'Array' : ''}Ctrl("${
+              CodeType.name
+            }")`
 
             editor.executeEdits('source', [
               {
@@ -85,7 +88,10 @@ onMounted(() => {
             )
             const _ = (e?) => {
               //   console.log('goto editor lo', e)
-              const newPosition = new monaco.Position(position.lineNumber, position.column + `const ${isArrayCtrl ? 'table' : 'ctrl'}`.length)
+              const newPosition = new monaco.Position(
+                position.lineNumber,
+                position.column + `const ${isArrayCtrl ? 'table' : 'ctrl'}`.length
+              )
               editor.setPosition(newPosition)
               //   if (e.type == 'mouseover') {
               //     editorElement.removeEventListener('mouseover', _)

@@ -95,7 +95,7 @@ export const changeTheme = (name: string = 'default') => {
                 //     rules.push({ token: "code.property", foreground: "4B22B0" })
                 //     // rules.push({ token: "code.propertypre", foreground: "AD3DA4" })
                 // }
-                rules.push({ token: 'code.property', foreground: 'AE413D', fontStyle: '' })
+                rules.push({ token: 'code.property', foreground: 'E36208', fontStyle: '' })
                 // rules.push({ token: "code.property", foreground: "A2DB2E" })
                 rules.push({ token: "code.propertypre", foreground: "AD3DA4", fontStyle: 'Strikethrough' })
 

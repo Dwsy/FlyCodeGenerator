@@ -121,6 +121,7 @@ export function genQueryModel_(output: Output, queryArgumentArrayMap: Map<string
   const outputTable = flyStore.tableDataMap.get(output.objectcode);
   // 创建 relationTableMap 和 outPropertiesDataMap 两个 Map 对象
 
+  console.table(output.properties.map((data) => data.name))
   const outPropertiesDataMap = output.properties.map((data) => {
     const columnData = flyStore.columnDataMap.get(data.propertycode);
     if (data.name.indexOf("__") !== -1) {
@@ -192,53 +193,55 @@ export function genQueryModel_(output: Output, queryArgumentArrayMap: Map<string
     fquery += `on ${tableShortName}.${columnname} = ${relationTableShortName}.${idField}`;
   });
 
+  console.log(deepJoinRelationTableMap)
   // 深度join
-  deepJoinRelationTableMap
-    .forEach((relationTable, deepJoinKey) => {
-      if (deepJoinKey.level == 2) {
+  // /  deepJoinRelationTableMap
+  // .forEach((relationTable, deepJoinKey) => {
+  // return
+  //   if (deepJoinKey.level == 2) {
 
-      }
-      let deepJoinTableName = relationTable.tablename;
-      if (deepJoinTableName === "pl_dictionary" || deepJoinTableName === "pl_orgstruct" || deepJoinTableName === "pl_region") {
-        deepJoinTableName = relationTable.objectmark;
-      }
-      let deepJoinTableShortName = getTableShortName(deepJoinTableName, deepJoinKey.lastName);
+  //   }
+  //   let deepJoinTableName = relationTable.tablename;
+  //   if (deepJoinTableName === "pl_dictionary" || deepJoinTableName === "pl_orgstruct" || deepJoinTableName === "pl_region") {
+  //     deepJoinTableName = relationTable.objectmark;
+  //   }
+  //   let deepJoinTableShortName = getTableShortName(deepJoinTableName, deepJoinKey.lastName);
 
-      // 如果短表明重复，则重新生成
-      let seq = 1;
-      while (relationTableShortNameReverseMapReverse.get(deepJoinTableShortName) !== undefined) {
-        deepJoinTableShortName = getTableShortName(deepJoinTableName, deepJoinKey.lastName, seq);
-        seq++;
-      }
-      relationTableShortNameMap.set(deepJoinKey.prefixName + "__" + deepJoinKey.lastName, deepJoinTableShortName);
-      relationTableShortNameReverseMapReverse.set(deepJoinTableShortName, deepJoinTableName);
-      let idField = {
-        pl_dictionary: "dictionaryid",
-        pl_orgstruct: "orgstructid",
-        pl_region: "regionid",
-      }[deepJoinTableName] || true;
-      if (idField) {
-        for (const columnData of relationTable.properties) {
-          if (columnData.propertytypecode === "1") {
-            idField = columnData.columnname;
-            break;
-          }
-        }
-      }
-      const joinModel: JoinModel = {
-        tableName: tableShortName,
-        tableShortName: tableShortName,
-        relationTable: {
-          name: deepJoinTableName,
-          shortName: deepJoinTableShortName,
-          idField: idField,
-        },
-        columnName: deepJoinKey.prefixName + "__" + deepJoinKey.lastName,
-      };
-      joinModelArray.push(joinModel);
-      fquery += `\n  left join ${deepJoinTableName} as ${deepJoinTableShortName} `;
-      fquery += `on ${deepJoinKey.prefixName}.${deepJoinKey.lastName} = ${deepJoinTableShortName}.${idField}`;
-    });
+  //   // 如果短表明重复，则重新生成
+  //   let seq = 1;
+  //   while (relationTableShortNameReverseMapReverse.get(deepJoinTableShortName) !== undefined) {
+  //     deepJoinTableShortName = getTableShortName(deepJoinTableName, deepJoinKey.lastName, seq);
+  //     seq++;
+  //   }
+  //   relationTableShortNameMap.set(deepJoinKey.prefixName + "__" + deepJoinKey.lastName, deepJoinTableShortName);
+  //   relationTableShortNameReverseMapReverse.set(deepJoinTableShortName, deepJoinTableName);
+  //   let idField = {
+  //     pl_dictionary: "dictionaryid",
+  //     pl_orgstruct: "orgstructid",
+  //     pl_region: "regionid",
+  //   }[deepJoinTableName] || true;
+  //   if (idField) {
+  //     for (const columnData of relationTable.properties) {
+  //       if (columnData.propertytypecode === "1") {
+  //         idField = columnData.columnname;
+  //         break;
+  //       }
+  //     }
+  //   }
+  //   const joinModel: JoinModel = {
+  //     tableName: tableShortName,
+  //     tableShortName: tableShortName,
+  //     relationTable: {
+  //       name: deepJoinTableName,
+  //       shortName: deepJoinTableShortName,
+  //       idField: idField,
+  //     },
+  //     columnName: deepJoinKey.prefixName + "__" + deepJoinKey.lastName,
+  //   };
+  //   joinModelArray.push(joinModel);
+  //   fquery += `\n  left join ${deepJoinTableName} as ${deepJoinTableShortName} `;
+  //   fquery += `on ${deepJoinKey.prefixName}.${deepJoinKey.lastName} = ${deepJoinTableShortName}.${idField}`;
+  // });
 
 
   // console.log(relationTableShortNameReverseMapReverse)
@@ -421,23 +424,23 @@ export function genQueryModel_(output: Output, queryArgumentArrayMap: Map<string
 export function generateSql(queryModel: QueryModel): string {
   // debugger
   // 生成 SELECT 子句
-  let selectClause = `SELECT\n  ${queryModel.columns.map((c, index) => {
+  let selectClause = `SELECT  ${queryModel.columns.map((c, index) => {
     let q
-    if (c.queryName == null) {
+    if (!c.queryName) {
       q = `${c.tableShortName}.${c.columnName}`
     } else {
-      q = `${c.tableShortName}.${c.columnName} as ${c.queryName}`
+      q = `${c.tableShortName}.${c.columnName} AS ${c.queryName}`
     }
     let boolean = index == queryModel.columns.length - 1
-    let temp = `${c.tableShortName}.${c.columnName}${boolean ? "" : ","}`
+    let temp = `${q}${boolean ? "" : ","}`
     let len = temp.length
-    for (var i = 0; i < 35 - len; i++) {
+    for (var i = 0; i < Math.min(45 - len, 80); i++) {
       temp += " "
     }
     return `\n  ${temp}//${c.zhColumnName}`
   }).join("")}`;
   // 生成 FROM 子句
-  const fromClause = `FROM\n  ${queryModel.tableName} as ${queryModel.tableShortName}`;
+  const fromClause = `FROM\n  ${queryModel.tableName} AS ${queryModel.tableShortName}`;
 
   // 生成 JOIN 子句
   const joinClauses = queryModel.joins.map(getJoinCallbackfn());
@@ -477,10 +480,10 @@ function getJoinCallbackfn() {
     let lj: string
     let on: string
     if (j.relationTable.name != null || j.relationTable.name != undefined) {
-      lj = `LEFT JOIN ${j.relationTable.name} as ${j.relationTable.shortName} `
+      lj = `LEFT JOIN ${j.relationTable.name} AS ${j.relationTable.shortName} `
       on = `ON ${j.relationTable.shortName}.${j.relationTable.idField} = ${j.tableShortName}.${j.columnName}`
     } else {
-      lj = `LEFT JOIN ${j.relationTable.name} as ${j.relationTable.shortName} `
+      lj = `LEFT JOIN ${j.relationTable.name} AS ${j.relationTable.shortName} `
       on = `ON ${j.relationTable.name}.${j.columnName} = ${j.tableShortName}.${j.columnName}`
     }
     return lj.concat(on)

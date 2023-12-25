@@ -24,6 +24,10 @@ export interface Property {
   marktype?: string;
   validation?: boolean;
   required?: boolean;
+
+  level?: number;
+  joinField?: string;
+  key?: string;
 }
 
 export interface Input {

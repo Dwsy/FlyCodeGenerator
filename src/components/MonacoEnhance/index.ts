@@ -8,107 +8,6 @@ import { message } from "../../util/message";
 import { useMessage } from "naive-ui";
 
 
-// export const addBoNewAction = (editor: monaco.editor.IStandaloneCodeEditor) => {
-/**
- * 添加一个新的编辑器动作，用于处理特定的代码模式（BO.new）。
- * 当用户在编辑器中触发这个动作时，它会解析当前行的内容，找到匹配的模式，并生成相应的代码。
- * 
- * @param editor - 一个monaco.editor.IStandaloneCodeEditor实例，表示要添加动作的编辑器。
- */
-export const addBoNewAction = (editor: monaco.editor.IStandaloneCodeEditor) => {
-    const flyStore = useFlyStore()
-    setTimeout(() => {
-        console.log("--", editor)
-        const linesContent = getMonacoModel().getLinesContent()
-        // console.log(linesContent)
-        linesContent.filter((lineContent) => { lineContent.indexOf("BO.new") > -1 })
-            .map((line) => {
-                const match = line.match(/BO.new\((.*?)\)/);
-                if (!match) {
-                    return
-                }
-                const boName = match[1]
-                console.log("boName", boName);
-
-                pushTempBoNewDtsList(boName)
-            })
-
-
-        editor.addAction({
-            id: "BoNew",
-            label: "BoNewGen",
-            keybindings: [
-                monaco.KeyMod.CtrlCmd | monaco.KeyCode.F10,
-            ],
-            // A precondition for this action.
-            precondition: null,
-            // A rule to evaluate on top of the precondition in order to dispatch the keybindings.
-            keybindingContext: null,
-            contextMenuGroupId: "navigation",
-            contextMenuOrder: 1.5,
-            // Method that will be executed when the action is triggered.
-            // @param editor The editor instance is passed in as a convenience
-            run: function (ed) {
-
-                const lineContent = getMonacoModel().getLineContent(ed.getPosition().lineNumber);
-                let match = lineContent.match(/BO.new\((.*?)\)/);
-                if (!match) {
-                    match = lineContent.match(/new\s+(.*)/);
-                }
-                if (!match) {
-                    return
-                }
-                const boName = match[1]
-                let shortName = boName
-                if (shortName.length > 15) {
-                    shortName = getTableShortName(boName)
-                }
-
-                var setLine = flyStore.tableNameDataMap.get(boName).properties.map((item) => {
-                    // debugger
-                    if (item.propertytypecode == PropertyTypeCode.PrimaryKey.toString()) {
-                        return `${shortName}.${item.columnname} = FLY.genId()`
-                    }
-                    else if (item.propertytypecode == PropertyTypeCode.CreatedBy.toString()) {
-
-                        return `${shortName}.${item.columnname} = SESSION.mbcode`
-                    }
-                    else if (item.propertytypecode == PropertyTypeCode.CreatedTime.toString()) {
-                        return `${shortName}.${item.columnname} = NOW.time()`
-                    }
-                    else if (item.propertytypecode == PropertyTypeCode.ModifiedBy.toString()) {
-                        return `${shortName}.${item.columnname} = SESSION.mbcode`
-                    }
-                    else if (item.propertytypecode == PropertyTypeCode.ModifiedTime.toString()) {
-                        return `${shortName}.${item.columnname} = NOW.time()`
-                    }
-                    else {
-                        let temp = `${shortName}.${item.columnname} = foo.${item.columnname}`
-                        let len = temp.length
-                        for (var i = 0; i < 55 - len; i++) {
-                            temp += " "
-                        }
-                        return `${temp}//${item.propertyname}`
-                    }
-                })
-
-                setLine.unshift(`var ${shortName} = BO.new("${boName}")`)
-                console.log(setLine.join("\n"))
-                // 删除当前行
-                ed.executeEdits("source", [{
-                    range: new monaco.Range(ed.getPosition().lineNumber, 1, ed.getPosition().lineNumber + 1, 1),
-                    text: ""
-                }])
-                ed.executeEdits("source", [{
-                    range: new monaco.Range(ed.getPosition().lineNumber, 1, ed.getPosition().lineNumber, 1),
-                    text: setLine.join("\n") + "\n\n"
-                }])
-                pushTempBoNewDtsList(boName)
-            },
-        });
-        addFomatSqlAction(editor)
-    }, 1500);
-}
 
 /**
  * 添加格式化SQL操作到编辑器
@@ -267,137 +166,144 @@ function autoGen(lineContent: string, ed: monaco.editor.ICodeEditor) {
     if (matchResultSelectc) {
         message.success("gen selectc")
         return getAutoFn("selectc", matchResultSelectc[0].split(" ")[1])(ed)
-
     }
 
 
 }
-
 function getAutoFn(type: AutoAutoAutoType, matchResult: string): Function {
     if (type == "select") {
-        return (ed: monaco.editor.ICodeEditor) => {
-            const flyStore = useFlyStore()
-            let tableData = flyStore.tableNameDataMap.get(matchResult)
-            if (!tableData) {
-                tableData = flyStore.dictNameDataMap.get(matchResult)
-            }
-            if (!tableData) {
-                message.warning("未找到表或字典")
-                return
-            }
-            const primaryKey = getPrimaryKey(tableData.objectcode)
-            const shortName = getTableShortName(matchResult)
-            const columns = tableData.properties.map((item) => {
-                let temp = `${shortName}.${item.columnname},`
-                let len = temp.length
-                for (var i = 0; i < 35 - len; i++) {
-                    temp += " "
-                }
-                return `\n  ${temp}// ${item.propertyname}`
-                // return `\n  ${shortName}.${item.columnname},  // ${item.propertyname}`
-            })
-            columns[columns.length - 1] = columns[columns.length - 1].replace(",", " ")
-
-            const sql = `var temp = SELECT ${columns.join('')}\nFROM ${matchResult} ${shortName}\nWHERE ${shortName}.${primaryKey} = \nNORULE;`
-            console.log(sql)
-            debugger
-            ed.executeEdits("source", [{
-                range: new monaco.Range(ed.getPosition().lineNumber, 1, ed.getPosition().lineNumber + 1, 1),
-                text: ""
-            }])
-            ed.executeEdits("source", [{
-                range: new monaco.Range(ed.getPosition().lineNumber, 1, ed.getPosition().lineNumber, 1),
-                text: sql + '\n'
-            }])
-        }
+        return selectFn(matchResult);
     }
     if (type == "selectc") {
         //@ts-ignore
         window.customGenSql(matchResult)
     }
     if (type == "fori") {
-        return (ed: monaco.editor.ICodeEditor) => {
-            if (matchResult) {
-
-                let template = `for(var i = 0; i < ${matchResult}.length; i++) {
-    var element = ${matchResult}[i];
-    
-
-}`
-                console.log("for匹配成功:", matchResult);
-                const position = ed.getPosition()
-                // 删除当前行
-                ed.executeEdits("source", [{
-                    range: new monaco.Range(position.lineNumber, 1, position.lineNumber + 1, 1),
-                    text: ""
-                }])
-                ed.executeEdits("source", [{
-                    range: new monaco.Range(position.lineNumber, 1, position.lineNumber, 1),
-                    text: template + '\n'
-                }])
-
-                ed.setPosition(new monaco.Position(position.lineNumber + 2, 4 + 1))
-            } else {
-                console.log("for匹配失败");
-            }
-        }
+        return forFn(matchResult);
     }
     if (type == "NewBO") {
-        return (ed: monaco.editor.ICodeEditor) => {
-            const flyStore = useFlyStore()
-            const lineContent = getMonacoModel().getLineContent(ed.getPosition().lineNumber);
-
-            let shortName = matchResult
-            let boName = matchResult
-            if (shortName.length > 15) {
-                shortName = getTableShortName(boName)
-            }
-
-            var setLine = flyStore.tableNameDataMap.get(boName).properties.map((item) => {
-                // debugger
-                if (item.propertytypecode == PropertyTypeCode.PrimaryKey.toString()) {
-                    return `${shortName}.${item.columnname} = FLY.genId()`
-                }
-                else if (item.propertytypecode == PropertyTypeCode.CreatedBy.toString()) {
-
-                    return `${shortName}.${item.columnname} = SESSION.mbcode`
-                }
-                else if (item.propertytypecode == PropertyTypeCode.CreatedTime.toString()) {
-                    return `${shortName}.${item.columnname} = NOW.time()`
-                }
-                else if (item.propertytypecode == PropertyTypeCode.ModifiedBy.toString()) {
-                    return `${shortName}.${item.columnname} = SESSION.mbcode`
-                }
-                else if (item.propertytypecode == PropertyTypeCode.ModifiedTime.toString()) {
-                    return `${shortName}.${item.columnname} = NOW.time()`
-                }
-                else {
-                    let temp = `${shortName}.${item.columnname} = foo.${item.columnname}`
-                    let len = temp.length
-                    for (var i = 0; i < 55 - len; i++) {
-                        temp += " "
-                    }
-                    return `${temp}//${item.propertyname}`
-                }
-            })
-
-            setLine.unshift(`var ${shortName} = BO.new("${boName}")`)
-            console.log(setLine.join("\n"))
-            // 删除当前行
-            ed.executeEdits("source", [{
-                range: new monaco.Range(ed.getPosition().lineNumber, 1, ed.getPosition().lineNumber + 1, 1),
-                text: ""
-            }])
-            ed.executeEdits("source", [{
-                range: new monaco.Range(ed.getPosition().lineNumber, 1, ed.getPosition().lineNumber, 1),
-                text: setLine.join("\n") + "\n\n"
-            }])
-            pushTempBoNewDtsList(boName)
-        }
+        return newBoFn(matchResult);
     }
     return () => { }
 
 }
+
+function selectFn(matchResult: string) {
+    return (ed: monaco.editor.ICodeEditor) => {
+        const flyStore = useFlyStore()
+        let tableData = flyStore.tableNameDataMap.get(matchResult)
+        if (!tableData) {
+            tableData = flyStore.dictNameDataMap.get(matchResult)
+        }
+        if (!tableData) {
+            message.warning("未找到表或字典")
+            return
+        }
+        const primaryKey = getPrimaryKey(tableData.objectcode)
+        const shortName = getTableShortName(matchResult)
+        const columns = tableData.properties.map((item) => {
+            let temp = `${shortName}.${item.columnname},`
+            let len = temp.length
+            for (var i = 0; i < 35 - len; i++) {
+                temp += " "
+            }
+            return `\n  ${temp}// ${item.propertyname}`
+            // return `\n  ${shortName}.${item.columnname},  // ${item.propertyname}`
+        })
+        columns[columns.length - 1] = columns[columns.length - 1].replace(",", " ")
+
+        const sql = `var temp = SELECT ${columns.join('')}\nFROM ${matchResult} ${shortName}\nWHERE ${shortName}.${primaryKey} = \nNORULE;`
+        console.log(sql)
+        debugger
+        ed.executeEdits("source", [{
+            range: new monaco.Range(ed.getPosition().lineNumber, 1, ed.getPosition().lineNumber + 1, 1),
+            text: ""
+        }])
+        ed.executeEdits("source", [{
+            range: new monaco.Range(ed.getPosition().lineNumber, 1, ed.getPosition().lineNumber, 1),
+            text: sql + '\n'
+        }])
+    }
+}
+
+function forFn(matchResult: string) {
+    return (ed: monaco.editor.ICodeEditor) => {
+        if (matchResult) {
+
+            let template = `for(var i = 0; i < ${matchResult}.length; i++) {
+    var element = ${matchResult}[i];
+    
+
+}`
+            console.log("for匹配成功:", matchResult);
+            const position = ed.getPosition()
+            // 删除当前行
+            ed.executeEdits("source", [{
+                range: new monaco.Range(position.lineNumber, 1, position.lineNumber + 1, 1),
+                text: ""
+            }])
+            ed.executeEdits("source", [{
+                range: new monaco.Range(position.lineNumber, 1, position.lineNumber, 1),
+                text: template + '\n'
+            }])
+
+            ed.setPosition(new monaco.Position(position.lineNumber + 2, 4 + 1))
+        } else {
+            console.log("for匹配失败");
+        }
+    }
+}
+
+function newBoFn(matchResult: string) {
+    return (ed: monaco.editor.ICodeEditor) => {
+        const flyStore = useFlyStore()
+        const lineContent = getMonacoModel().getLineContent(ed.getPosition().lineNumber);
+
+        let shortName = matchResult
+        let boName = matchResult
+        if (shortName.length > 15) {
+            shortName = getTableShortName(boName)
+        }
+
+        var setLine = flyStore.tableNameDataMap.get(boName).properties.map((item) => {
+            // debugger
+            if (item.propertytypecode == PropertyTypeCode.PrimaryKey.toString()) {
+                return `${shortName}.${item.columnname} = FLY.genId()`
+            } else if (item.propertytypecode == PropertyTypeCode.CreatedBy.toString()) {
+
+                return `${shortName}.${item.columnname} = SESSION.mbcode`
+            } else if (item.propertytypecode == PropertyTypeCode.CreatedTime.toString()) {
+                return `${shortName}.${item.columnname} = NOW.time()`
+            } else if (item.propertytypecode == PropertyTypeCode.ModifiedBy.toString()) {
+                return `${shortName}.${item.columnname} = SESSION.mbcode`
+            } else if (item.propertytypecode == PropertyTypeCode.ModifiedTime.toString()) {
+                return `${shortName}.${item.columnname} = NOW.time()`
+            } else {
+                let temp = `${shortName}.${item.columnname} = foo.${item.columnname}`
+                let len = temp.length
+                for (var i = 0; i < 55 - len; i++) {
+                    temp += " "
+                }
+                return `${temp}//${item.propertyname}`
+            }
+        })
+
+        setLine.unshift(`var ${shortName} = BO.new("${boName}")`)
+        console.log(setLine.join("\n"))
+        // 删除当前行
+        ed.executeEdits("source", [{
+            range: new monaco.Range(ed.getPosition().lineNumber, 1, ed.getPosition().lineNumber + 1, 1),
+            text: ""
+        }])
+        ed.executeEdits("source", [{
+            range: new monaco.Range(ed.getPosition().lineNumber, 1, ed.getPosition().lineNumber, 1),
+            text: setLine.join("\n") + "\n\n"
+        }])
+        pushTempBoNewDtsList(boName)
+    }
+}
+
+
 
 function AutoAutoAuto(type: AutoAutoAutoType, matchResult): Function {
     if (type == "fori") {
@@ -425,3 +331,120 @@ function AutoAutoAuto(type: AutoAutoAutoType, matchResult): Function {
     }
     return () => { }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// export const addBoNewAction = (editor: monaco.editor.IStandaloneCodeEditor) => {
+/**
+ * 添加一个新的编辑器动作，用于处理特定的代码模式（BO.new）。
+ * 当用户在编辑器中触发这个动作时，它会解析当前行的内容，找到匹配的模式，并生成相应的代码。
+ *
+ * @param editor - 一个monaco.editor.IStandaloneCodeEditor实例，表示要添加动作的编辑器。
+ */
+// export const addBoNewAction = (editor: monaco.editor.IStandaloneCodeEditor) => {
+//     const flyStore = useFlyStore()
+//     setTimeout(() => {
+//         console.log("--", editor)
+//         const linesContent = getMonacoModel().getLinesContent()
+//         // console.log(linesContent)
+//         linesContent.filter((lineContent) => { lineContent.indexOf("BO.new") > -1 })
+//             .map((line) => {
+//                 const match = line.match(/BO.new\((.*?)\)/);
+//                 if (!match) {
+//                     return
+//                 }
+//                 const boName = match[1]
+//                 console.log("boName", boName);
+//
+//                 pushTempBoNewDtsList(boName)
+//             })
+//
+//
+//         editor.addAction({
+//             id: "BoNew",
+//             label: "BoNewGen",
+//             keybindings: [
+//                 monaco.KeyMod.CtrlCmd | monaco.KeyCode.F10,
+//             ],
+//             // A precondition for this action.
+//             precondition: null,
+//             // A rule to evaluate on top of the precondition in order to dispatch the keybindings.
+//             keybindingContext: null,
+//             contextMenuGroupId: "navigation",
+//             contextMenuOrder: 1.5,
+//             // Method that will be executed when the action is triggered.
+//             // @param editor The editor instance is passed in as a convenience
+//             run: function (ed) {
+//
+//                 const lineContent = getMonacoModel().getLineContent(ed.getPosition().lineNumber);
+//                 let match = lineContent.match(/BO.new\((.*?)\)/);
+//                 if (!match) {
+//                     match = lineContent.match(/new\s+(.*)/);
+//                 }
+//                 if (!match) {
+//                     return
+//                 }
+//                 const boName = match[1]
+//                 let shortName = boName
+//                 if (shortName.length > 15) {
+//                     shortName = getTableShortName(boName)
+//                 }
+//
+//                 var setLine = flyStore.tableNameDataMap.get(boName).properties.map((item) => {
+//                     // debugger
+//                     if (item.propertytypecode == PropertyTypeCode.PrimaryKey.toString()) {
+//                         return `${shortName}.${item.columnname} = FLY.genId()`
+//                     }
+//                     else if (item.propertytypecode == PropertyTypeCode.CreatedBy.toString()) {
+//
+//                         return `${shortName}.${item.columnname} = SESSION.mbcode`
+//                     }
+//                     else if (item.propertytypecode == PropertyTypeCode.CreatedTime.toString()) {
+//                         return `${shortName}.${item.columnname} = NOW.time()`
+//                     }
+//                     else if (item.propertytypecode == PropertyTypeCode.ModifiedBy.toString()) {
+//                         return `${shortName}.${item.columnname} = SESSION.mbcode`
+//                     }
+//                     else if (item.propertytypecode == PropertyTypeCode.ModifiedTime.toString()) {
+//                         return `${shortName}.${item.columnname} = NOW.time()`
+//                     }
+//                     else {
+//                         let temp = `${shortName}.${item.columnname} = foo.${item.columnname}`
+//                         let len = temp.length
+//                         for (var i = 0; i < 55 - len; i++) {
+//                             temp += " "
+//                         }
+//                         return `${temp}//${item.propertyname}`
+//                     }
+//                 })
+//
+//                 setLine.unshift(`var ${shortName} = BO.new("${boName}")`)
+//                 console.log(setLine.join("\n"))
+//                 // 删除当前行
+//                 ed.executeEdits("source", [{
+//                     range: new monaco.Range(ed.getPosition().lineNumber, 1, ed.getPosition().lineNumber + 1, 1),
+//                     text: ""
+//                 }])
+//                 ed.executeEdits("source", [{
+//                     range: new monaco.Range(ed.getPosition().lineNumber, 1, ed.getPosition().lineNumber, 1),
+//                     text: setLine.join("\n") + "\n\n"
+//                 }])
+//                 pushTempBoNewDtsList(boName)
+//             },
+//         });
+//         addFomatSqlAction(editor)
+//     }, 1500);
+// }
