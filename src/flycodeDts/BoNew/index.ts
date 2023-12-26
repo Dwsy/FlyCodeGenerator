@@ -5,6 +5,7 @@ import { Protocol } from "../../type/protocol"
 
 import { getPropertyTypeEmoji, getPropertyTypeName } from "../../type/model/propertyTypeCodeRef"
 import { internalSelectMenuDark } from "naive-ui"
+import { tableData } from "../../type/interface columnData"
 
 
 export interface Entiy {

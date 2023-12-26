@@ -315,9 +315,9 @@ export class ConditionGenerator {
         const { tableName, columnName } = this.condition;
         const percent = "'%'"
         if (matchType === LikeMatchType.Contains) {
-            likeValue = `{ ${percent} + {IN.${tableName}.${columnName}} + ${percent} }`;
+            likeValue = `{ ${percent} + IN.${tableName}.${columnName} + ${percent} }`;
         } else if (matchType === LikeMatchType.StartsWith) {
-            likeValue = `{ ${percent} + {${tableName}.${columnName}} }`;
+            likeValue = `{ ${percent} + ${tableName}.${columnName} }`;
         } else if (matchType === LikeMatchType.EndsWith) {
             likeValue = `{ ${tableName}.${columnName}} + ${percent} }`;
         }

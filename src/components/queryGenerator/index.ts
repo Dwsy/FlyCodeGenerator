@@ -15,6 +15,7 @@ import { useFlyStore } from "../../store/flyStore";
 import { watchEffect } from "vue";
 import { Output, Property, Protocol } from "../../type/protocol";
 import { message } from "../../util/message";
+import { tableData } from "../../type/interface columnData";
 
 
 
@@ -195,56 +196,6 @@ export function genQueryModel_(output: Output, queryArgumentArrayMap: Map<string
 
   console.log(deepJoinRelationTableMap)
   // 深度join
-  // /  deepJoinRelationTableMap
-  // .forEach((relationTable, deepJoinKey) => {
-  // return
-  //   if (deepJoinKey.level == 2) {
-
-  //   }
-  //   let deepJoinTableName = relationTable.tablename;
-  //   if (deepJoinTableName === "pl_dictionary" || deepJoinTableName === "pl_orgstruct" || deepJoinTableName === "pl_region") {
-  //     deepJoinTableName = relationTable.objectmark;
-  //   }
-  //   let deepJoinTableShortName = getTableShortName(deepJoinTableName, deepJoinKey.lastName);
-
-  //   // 如果短表明重复，则重新生成
-  //   let seq = 1;
-  //   while (relationTableShortNameReverseMapReverse.get(deepJoinTableShortName) !== undefined) {
-  //     deepJoinTableShortName = getTableShortName(deepJoinTableName, deepJoinKey.lastName, seq);
-  //     seq++;
-  //   }
-  //   relationTableShortNameMap.set(deepJoinKey.prefixName + "__" + deepJoinKey.lastName, deepJoinTableShortName);
-  //   relationTableShortNameReverseMapReverse.set(deepJoinTableShortName, deepJoinTableName);
-  //   let idField = {
-  //     pl_dictionary: "dictionaryid",
-  //     pl_orgstruct: "orgstructid",
-  //     pl_region: "regionid",
-  //   }[deepJoinTableName] || true;
-  //   if (idField) {
-  //     for (const columnData of relationTable.properties) {
-  //       if (columnData.propertytypecode === "1") {
-  //         idField = columnData.columnname;
-  //         break;
-  //       }
-  //     }
-  //   }
-  //   const joinModel: JoinModel = {
-  //     tableName: tableShortName,
-  //     tableShortName: tableShortName,
-  //     relationTable: {
-  //       name: deepJoinTableName,
-  //       shortName: deepJoinTableShortName,
-  //       idField: idField,
-  //     },
-  //     columnName: deepJoinKey.prefixName + "__" + deepJoinKey.lastName,
-  //   };
-  //   joinModelArray.push(joinModel);
-  //   fquery += `\n  left join ${deepJoinTableName} as ${deepJoinTableShortName} `;
-  //   fquery += `on ${deepJoinKey.prefixName}.${deepJoinKey.lastName} = ${deepJoinTableShortName}.${idField}`;
-  // });
-
-
-  // console.log(relationTableShortNameReverseMapReverse)
   // 查询列
   let selectColumns = outPropertiesDataMap
     .filter(predicate => predicate != undefined)
@@ -301,20 +252,39 @@ export function genQueryModel_(output: Output, queryArgumentArrayMap: Map<string
   queryArgumentArrayMap.forEach((properties, tableName) => {
     if (tableName === mainTableName) {
       properties.forEach((property) => {
-        // if (property.propertytypecode == "3") return
-        // 先完成 = 操作 todo
+        let conditionModel: ConditionModel
         const argName = property.name
         const operator = getOperator(property)
-        const conditionModel: ConditionModel = {
-          tableName: tableName,
-          tableShortName: tableShortName,
-          columnName: argName,
-          zh_columnName: property.propertyname,
-          operator: operator,
-          value: null,
-          secondValue: null,
-          like: null
+        if (property.name.split("__").length > 1) {
+          const [relationTableName, relationColumnName] = property.name.split("__");
+          const relationTableShortName = relationTableShortNameMap.get(relationTableName);
+          conditionModel = {
+            tableName: relationTableName,
+            tableShortName: relationTableShortName,
+            columnName: relationColumnName,
+            zh_columnName: property.propertyname,
+            operator: operator,
+            value: null,
+            secondValue: null,
+            like: null
+          }
+
+        } else {
+          conditionModel = {
+            tableName: tableName,
+            tableShortName: tableShortName,
+            columnName: argName,
+            zh_columnName: property.propertyname,
+            operator: operator,
+            value: null,
+            secondValue: null,
+            like: null
+          }
         }
+        // if (property.propertytypecode == "3") return
+        // 先完成 = 操作 todo
+
+
         let condition = `${tableShortName}.${argName} `
 
         if (operator == Operator.Equal) {

@@ -1,3 +1,4 @@
+import { tableData } from "../../type/interface columnData"
 import { getPropertyTypeEmoji, getPropertyTypeName } from "../../type/model/propertyTypeCodeRef"
 
 

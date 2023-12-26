@@ -123,11 +123,9 @@ export const addAutoAutoAutoAutoAuto = (editor: monaco.editor.IStandaloneCodeEdi
             contextMenuGroupId: "navigation",
             contextMenuOrder: 1.5,
             run: function (ed) {
-                console.timeLog("autoGen")
                 const lineContent = getMonacoModel().getLineContent(ed.getPosition().lineNumber);
                 autoGen(lineContent, ed)
                 console.timeEnd("autoGen")
-
             },
         });
     }, 1);

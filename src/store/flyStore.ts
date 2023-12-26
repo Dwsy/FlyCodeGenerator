@@ -8,6 +8,7 @@ import { GM_getValue } from "../util/index";
 import { monacoInitializedUtil } from "../util/monacoUtil";
 import { getPropertyTypeName } from "../type/model/propertyTypeCodeRef";
 import { useGenStore } from "./genStore";
+import { columnData, tableData } from "../type/interface columnData";
 
 export const useFlyStore = defineStore('flyStore', () => {
 

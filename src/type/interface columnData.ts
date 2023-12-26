@@ -1,8 +1,10 @@
+import { Property } from "./protocol";
+
 /**
  * 列数据
  * @interface
  */
-interface columnData {
+export interface columnData {
     /**
      * 属性名称
      */
@@ -59,13 +61,15 @@ interface columnData {
      * 状态
      */
     status: number;
+
+    inoutProperty?: Property;
 }
 
 /**
  * 表数据
  * @interface
  */
-interface tableData {
+export interface tableData {
     /**
      * 对象名称（中文）
      */

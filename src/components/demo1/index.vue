@@ -31,6 +31,7 @@ import { generateSql } from '../queryGenerator'
 import { message } from '../../util/message'
 import { getMonacoModel, monacoInitializedUtil } from '../../util/monacoUtil'
 import { RowData } from 'naive-ui/es/data-table/src/interface'
+import { tableData } from '../../type/interface columnData'
 
 const EntityRowDatas = ref<EntityRowData[]>([])
 const rowKey = (row: EntityRowData) => {
@@ -51,7 +52,7 @@ const handleCheck = (row: DataTableRowKey[]) => {
 const showModal = ref(false)
 const columns = createColumns()
 const flyStore = useFlyStore()
-const tableData = ref<tableData>(null)
+const mainTableData = ref<tableData>(null)
 const tableName = ref('')
 //@ts-ignore
 window.customGenSql = (tname: string) => {
@@ -59,15 +60,15 @@ window.customGenSql = (tname: string) => {
   EntityRowDatas.value = []
   tableName.value = tname
   showModal.value = true
-  tableData.value = flyStore.tableNameDataMap.get(tableName.value)
-  if (!tableData) {
-    tableData.value = flyStore.dictNameDataMap.get(tableName.value)
+  mainTableData.value = flyStore.tableNameDataMap.get(tableName.value)
+  if (!mainTableData) {
+    mainTableData.value = flyStore.dictNameDataMap.get(tableName.value)
   }
-  if (!tableData) {
+  if (!mainTableData) {
     message.warning('未找到表或字典')
     return
   }
-  tableData.value.properties.forEach((property) => {
+  mainTableData.value.properties.forEach((property) => {
     const temp = flyStore.tableDataMap.get(property.relationobjectcode)
     const row = {
       key: property.columnname,
@@ -100,17 +101,44 @@ monacoInitializedUtil.addInitializedCallback(async () => {
    * 当创建编辑器时触发回调函数
    * @param {monaco.editor.IStandaloneCodeEditor} editor - 当前创建的编辑器实例
    */
+  // monaco.languages.registerCodeActionProvider('flycode', {
+  //   provideCodeActions(, range, context, token)
+  // })
   monaco.editor.onDidCreateEditor(async (editor) => {
     nowEditor = editor
     editor.updateOptions({
-      fontFamily: 'Cascadia Code',
+      fontFamily: 'Cascadia Code PL',
       // fontSize: 14
-      formatOnPaste: true,
-      fixedOverflowWidgets: true
+      // formatOnPaste: true,
+      fixedOverflowWidgets: true,
+      cursorBlinking: 'smooth',
+      mouseWheelZoom: true,
+      cursorSmoothCaretAnimation: 'on',
+      fontLigatures: true,
+      // fontVariations: true,
+      smoothScrolling: true,
+      wordWrap: 'on',
+      wordWrapColumn: 100,
+      wrappingStrategy: 'advanced',
+      suggest: {
+        // showStatusBar: true,
+        showEvents: true,
+        shareSuggestSelections: true,
+        preview: true,
+        showInlineDetails: true,
+        showFunctions: true,
+        matchOnWordStartOnly: true,
+        showSnippets: true
+      },
+      inlineSuggest: {
+        enabled: true,
+        showToolbar: 'always'
+      }
     })
     console.log('nowEditor', nowEditor)
   })
 })
+
 // })
 const genSql = () => {
   checkedRowKeysRef.value.forEach((key) => {
@@ -133,7 +161,7 @@ const genSql = () => {
     }
     if (row) row.select = true
   })
-  const sql = generateSql(EntityRowData2QueryModel(tableData.value, EntityRowDatas.value))
+  const sql = generateSql(EntityRowData2QueryModel(mainTableData.value, EntityRowDatas.value))
   console.log(sql)
   // copyToClipboard(sql)
   message.success('生成成功')
@@ -166,8 +194,8 @@ const genSql = () => {
 }
 
 const title = computed(() => {
-  if (!tableData.value) return ''
-  return `SQL生成配置：${tableData.value.tablename}`
+  if (!mainTableData.value) return ''
+  return `SQL生成配置：${mainTableData.value.tablename}`
 })
 
 const rowClassName = (row: EntityRowData) => {
@@ -188,7 +216,7 @@ function createColumns(): DataTableColumns<EntityRowData> {
       key: 'level',
       width: 80,
       render: (row: EntityRowData) => {
-        return `${'->'.repeat(row.level)}[${row.level}]`
+        return `${' '.repeat(row.level - 1)}[${row.level}]`
       }
     },
     {
@@ -223,7 +251,7 @@ function createColumns(): DataTableColumns<EntityRowData> {
           console.log(value)
           row.joinField = value
         }
-        const options = tableData.value.properties.map((item) => {
+        const options = mainTableData.value.properties.map((item) => {
           return {
             label: `${item.columnname} ${item.propertyname}`,
             value: item.columnname
