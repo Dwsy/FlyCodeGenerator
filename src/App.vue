@@ -11,6 +11,7 @@
       <demo3></demo3>
       <!-- <demo2></demo2> -->
       <Menu></Menu>
+      <MacVideo v-if="macVideoEnbale"></MacVideo>
       <Otaku v-if="GM_getValue('szzrx', false)"></Otaku>
     </n-config-provider>
   </n-message-provider>
@@ -27,10 +28,9 @@ import { getFqueryModel } from './flycodeDts/FQuery/test'
 import { GM_getValue } from './util'
 import { registerProviders } from './components/MonacoEnhance/provider'
 import { applyCustomFlycode } from './components/MonacoEnhance/monaco.languages.conf'
-
 const theme = ref<GlobalTheme | null>(darkTheme)
 const flyStore = useFlyStore()
-
+const macVideoEnbale = ref(false)
 let previousURL = window.location.href
 let urlInterval: number | null = null
 
@@ -38,6 +38,7 @@ const themePrimaryColor = ref('#288eff')
 themePrimaryColor.value = '#446a37'
 
 onMounted(async () => {
+  macVideoEnbale.value = GM_getValue('macVideoEnbale', false)
   //@ts-ignore
   window.getFqueryModel = getFqueryModel
   localStorage.getItem('ide_theme') === 'light' ? (theme.value = lightTheme) : (theme.value = darkTheme)

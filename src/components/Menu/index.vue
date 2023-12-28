@@ -35,15 +35,17 @@
         <NListItem>
           <NSpace justify="space-between"
             >{{ SzzrxMenuText }}
-            <!-- <n-popconfirm @positive-click="" @negative-click="" style="z-index: 888888">
-              <template #trigger>
-                <NSwitch @update-value="" :value="szzrx"></NSwitch>
-              </template>
-              一切都将一去杳然，任何人都无法将其捕获。
-            </n-popconfirm> -->
             <NSwitch @update-value="switchSzzrx" :value="szzrx"></NSwitch>
           </NSpace>
         </NListItem>
+        <NList>
+          <NListItem>
+            <NSpace justify="space-between"
+              >{{ MacVideoMenuText }}
+              <NSwitch @update-value="switchMacVideo" :value="macVideoEnbale"></NSwitch>
+            </NSpace>
+          </NListItem>
+        </NList>
 
         <NListItem>
           <NSpace justify="space-between"
@@ -106,13 +108,17 @@ const BracketPairColorizationMenuText = computed(() => {
 const szzrx = ref(GM_getValue('szzrx', false))
 const switchSzzrx = () => {
   szzrx.value = !szzrx.value
+  if (szzrx.value) {
+    macVideoEnbale.value = false
+    GM_setValue('macVideoEnbale', false)
+  }
   GM_setValue('szzrx', szzrx.value)
   rcGenerate()
   window.document.body.style.backgroundImage = ''
   // setTimeout(() => { window.location.reload() }, 100)
 }
 const SzzrxMenuText = computed(() => {
-  return `${szzrx.value ? '关闭' : '开启'}私斋蒸鹅心模式❤`
+  return `${szzrx.value ? '关闭' : '开启'}背景壁纸模式`
 })
 const openChangeTheme = () => {
   // @ts-ignore
@@ -120,6 +126,21 @@ const openChangeTheme = () => {
 }
 const ChangeThemeMenuText = computed(() => {
   return `切换主题（Beta Version）`
+})
+
+const macVideoEnbale = ref(GM_getValue('macVideoEnbale', false))
+const switchMacVideo = () => {
+  macVideoEnbale.value = !macVideoEnbale.value
+  if (macVideoEnbale.value == true) {
+    GM_setValue('szzrx', false)
+    szzrx.value = false
+  }
+  GM_setValue('macVideoEnbale', macVideoEnbale.value)
+  rcGenerate()
+  // setTimeout(() => { window.location.reload() }, 100)
+}
+const MacVideoMenuText = computed(() => {
+  return `${macVideoEnbale.value ? '✅' : '❌'}Mac视频`
 })
 
 async function rcGenerate() {

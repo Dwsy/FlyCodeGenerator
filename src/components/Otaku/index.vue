@@ -12,7 +12,7 @@ onMounted(async () => {
       'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fi1.hdslb.com%2Fbfs%2Farchive%2F0bed5abed95248abf565cf5c09ecfb4d5a8e3a2a.jpg&refer=http%3A%2F%2Fi1.hdslb.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1664353324&t=fb85505eb17535b08da4704cd180ad44'
     body.style.backgroundImage = `url(${url})`
     body.style.backgroundSize = 'cover'
-    body.style.opacity = opacity || '0.9'
+    body.style!.opacity = opacity || '0.9'
   }
 
   setTimeout(async () => {

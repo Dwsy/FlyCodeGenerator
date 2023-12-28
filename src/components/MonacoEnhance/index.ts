@@ -154,41 +154,44 @@ export function formatEditotFqueryFunc() {
                 let template = `declare interface selectColDeclare$${index} {
                     {{define}}
                 }`
-                if (col) {
-                    colStr = col[1].trim()
-                    console.log()
-                    const define = colStr.split("\n").map(
-                        item => {
-                            let [queryCol, commit] = item.split("//")
-                            if (queryCol.indexOf(" as") != -1) {
-                                queryCol = queryCol.split(" as")[1].trim()
-                            } else {
-                                queryCol = queryCol.split(".")[1].trim()
-                            }
-                            queryCol = queryCol.replace(",", "")
-                            console.log(queryCol)
-                            let line = `
-                            /**
-                             * ${commit}
-                            */
-                            ${queryCol}: string
-                            `
-                            console.log(line)
-                            return line
-                        }
-                    ).join("\n")
-                    debugger
-                    template = template.replace("{{define}}", define)
-                    addTempDts(template)
-                    console.log(template)
-                }
+                // if (col) {
+                //     colStr = col[1].trim()
+
+                //     const define = colStr.split("\n").map(
+                //         item => {
+                //             let [queryCol, commit] = item.split("//")
+                //             if (!commit) {
+                //                 return
+                //             }
+                //             if (queryCol.indexOf(" as") != -1) {
+                //                 queryCol = queryCol.split(" as")[1].trim()
+                //             } else {
+                //                 queryCol = queryCol.split(".")[1].trim()
+                //             }
+                //             queryCol = queryCol.replace(",", "")
+                //             console.log(queryCol)
+                //             let line = `
+                //             /**
+                //              * ${commit}
+                //             */
+                //             ${queryCol}: string
+                //             `
+                //             console.log(line)
+                //             return line
+                //         }
+                //     ).join("\n")
+                //     debugger
+                //     template = template.replace("{{define}}", define)
+                //     addTempDts(template)
+                //     console.log(template)
+                // }
 
 
                 const partsIndex = query.indexOf('=');
 
                 // if (parts.length === 2) {
-                // const variableName = parts[0].trim();
                 const queryString = query.substring(partsIndex + 1).trim();
+                // const variableName = parts[0].trim();
                 // console.log("Variable Name:", variableName);
                 // console.log("Query String:", queryString);
                 // const sqlStr = "`" + queryString + "`"

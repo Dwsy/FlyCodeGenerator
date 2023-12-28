@@ -22,6 +22,7 @@ declare module 'vue' {
     FlycodeExport: typeof import('./components/flycodeExport/index.vue')['default']
     FlycodeImport: typeof import('./components/flycodeImport/index.vue')['default']
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
+    MacVideo: typeof import('./components/macVideo/index.vue')['default']
     Menu: typeof import('./components/Menu/index.vue')['default']
     MonacoEnhance: typeof import('./components/MonacoEnhance/index.vue')['default']
     Otaku: typeof import('./components/Otaku/index.vue')['default']
