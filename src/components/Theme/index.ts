@@ -92,12 +92,12 @@ export const changeTheme = (name: string = 'default') => {
                     data.colors = {
                         // "editor.foreground": "#0001110",
                         // "editor.background": "#0001110",
-                        "editor.selectionBackground": "#49483E",
-                        "editor.lineHighlightBackground": "#3E3D32",
-                        "editorCursor.foreground": "#F8F8F0",
-                        "editorWhitespace.foreground": "#3B3A32",
-                        "editorIndentGuide.activeBackground": "#9D550FB0",
-                        "editor.selectionHighlightBorder": "#222218"
+                        // "editor.selectionBackground": "#49483E",
+                        // "editor.lineHighlightBackground": "#3E3D32",
+                        // "editorCursor.foreground": "#F8F8F0",
+                        // "editorWhitespace.foreground": "#3B3A32",
+                        // "editorIndentGuide.activeBackground": "#9D550FB0",
+                        // "editor.selectionHighlightBorder": "#222218"
                     }
                 }
                 else {

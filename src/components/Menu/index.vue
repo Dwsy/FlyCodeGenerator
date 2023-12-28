@@ -60,6 +60,7 @@ import { NButton } from 'naive-ui'
 import { GM_getValue, GM_setValue } from '../../util'
 import { useFlyStore } from '../../store/flyStore'
 import { changeTheme } from '../Theme'
+import { applyCustomFlycode } from '../MonacoEnhance/monaco.languages.conf'
 const flyStore = useFlyStore()
 const trigger = ref<HTMLElement>()
 const codeGeneratorEnable = ref(GM_getValue('codeGeneratorEnable', false))
@@ -123,6 +124,7 @@ const ChangeThemeMenuText = computed(() => {
 
 async function rcGenerate() {
   const flyStore = useFlyStore()
+  applyCustomFlycode()
   flyStore.$reset
   flyStore.codeGeneratorInitStatus = false
   await nextTick()

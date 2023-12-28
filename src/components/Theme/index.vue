@@ -66,9 +66,9 @@ onMounted(() => {
       monaco.editor.onDidCreateEditor((editor: ICodeEditor) => {
         changeTheme(MonacoTheme)
       })
-      setTimeout(() => {
-        changeTheme(MonacoTheme)
-      }, 666)
+      // setTimeout(() => {
+      //   changeTheme(MonacoTheme)
+      // }, 666)
     }
   })
 })

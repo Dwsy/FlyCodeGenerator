@@ -109,6 +109,10 @@ monacoInitializedUtil.addInitializedCallback(async () => {
     editor.updateOptions({
       fontFamily: 'Cascadia Code PL',
       // fontSize: 14
+      minimap: {
+        enabled: true,
+        autohide: true
+      },
       // formatOnPaste: true,
       fixedOverflowWidgets: true,
       cursorBlinking: 'smooth',

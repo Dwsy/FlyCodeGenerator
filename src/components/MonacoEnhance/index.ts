@@ -1,7 +1,7 @@
 import { addTempDts, pushTempBoNewDtsList } from "../../flycodeDts";
 import { useFlyStore } from "../../store/flyStore";
 import { PropertyTypeCode } from "../../type/model/propertyTypeCodeRef";
-import { getPrimaryKey, getTableShortName } from "../../util";
+import { GM_setClipboard, getPrimaryKey, getTableShortName } from "../../util";
 import { getMonacoModel } from "../../util/monacoUtil";
 import { formatFquery } from "../../util/formateFquery";
 import { message } from "../../util/message";
@@ -39,7 +39,6 @@ export const addFomatSqlAction = (editor: monaco.editor.IStandaloneCodeEditor) =
             // @param editor The editor instance is passed in as a convenience
             run: function (ed) {
                 let lines = formatEditotFqueryFunc()
-
                 ed.executeEdits('name-of-edit', [
                     {
                         range: editor.getModel().getFullModelRange(), // full range
@@ -82,6 +81,54 @@ export const switchCodeCheck =
 
     }
 
+export function copyToVscode() {
+    return (editor: monaco.editor.IStandaloneCodeEditor) => {
+        // noSyntaxValidation: 关闭语法检测
+        // noSemanticValidation: 关闭语义检测
+        editor.addAction(
+            {
+                id: "copyToVscode",
+                label: "copyToVscode",
+                keybindings: [
+                ],
+                precondition: null,
+                keybindingContext: null,
+                contextMenuGroupId: "navigation",
+                contextMenuOrder: 2,
+                run: function (ed) {
+                    const monacoModel = getMonacoModel()
+                    let text = monacoModel.getValue()
+                    // 使用正则表达式进行匹配，忽略大小写
+                    let regex = /(\w+)\s*=\s*(select|SELECT)[^;]+;/g;
+                    var matches = text.match(regex);
+                    const allFQuery: Array<string> = []
+                    if (matches) {
+                        const genStore = useGenStore()
+                        matches.forEach(function (match, index) {
+                            var assignment = match.match(/(\w+)\s*=\s*(select\s+\w+)/i);
+                            if (assignment) {
+                                let variableName = assignment[1];
+                                let query = match.substring(match.indexOf(variableName)).trim();
+                                console.log(query)
+                                const partsIndex = query.indexOf('=');
+                                const queryString = query.substring(partsIndex + 1).trim();
+                                let formattedSQL = '`' + queryString + '`'
+                                text = text.replace(queryString, formattedSQL)
+                            }
+                        });
+                        console.log(text)
+                        GM_setClipboard(text, "text")
+                    } else {
+                        console.log("No matching SQL statements found in the text.");
+                    }
+                },
+            }
+        )
+    }
+}
+export function pasteToMonaco() {
+
+}
 
 export function formatEditotFqueryFunc() {
     const monacoModel = getMonacoModel()

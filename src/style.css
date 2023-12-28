@@ -1,0 +1,30 @@
+ pre{
+    margin-left: 10%!important;
+    text-align:left!important;
+    font-size: 1em;
+    white-space: pre-wrap!important; /* 保留空格和换行符 */
+    position: relative!important;
+}
+
+pre::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 1px;
+    background-color: #ccc; /* 分隔符颜色 */
+    display: block;
+    height: 100%;
+    content: "";
+  }
+
+  .logic-edit-container > .left-side{
+    background-color: #ffffff00!important;
+  }
+  .logic-edit-container > .right-side{
+    background-color: #ffffff00!important;
+  }
+  #beSetting > div.main-content > div.tab-content.ant-tabs.ant-tabs-top.ant-tabs-line > div.ant-tabs-content.ant-tabs-content-animated.ant-tabs-top-content > div.ant-tabs-tabpane.ant-tabs-tabpane-active{
+    padding: 0px!important;
+  }

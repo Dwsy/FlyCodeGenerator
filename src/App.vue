@@ -54,17 +54,20 @@ onBeforeUnmount(() => {
 
 const init = async () => {
   registerProviders()
-  applyCustomFlycode()
   if (flyStore.addDtsEnable) {
     RefreshExtraLib()
   }
   if (flyStore.addDtsEnable || flyStore.codeGeneratorEnable) {
     checkURLChangeThenUpdateProtocol()
   }
+  setTimeout(() => {
+    applyCustomFlycode()
+  }, 666)
   // @ts-ignore
   window.getMonacoModel = getMonacoModel
   //@ts-ignore
   window.cr = function () {
+    applyCustomFlycode()
     flyStore.codeGeneratorInitStatus = false
     flyStore.codeGeneratorInitStatus = true
   }
