@@ -1,4 +1,4 @@
-import { pushTempBoNewDtsList } from "../../flycodeDts";
+import { addTempDts, pushTempBoNewDtsList } from "../../flycodeDts";
 import { useFlyStore } from "../../store/flyStore";
 import { PropertyTypeCode } from "../../type/model/propertyTypeCodeRef";
 import { getPrimaryKey, getTableShortName } from "../../util";
@@ -6,6 +6,7 @@ import { getMonacoModel } from "../../util/monacoUtil";
 import { formatFquery } from "../../util/formateFquery";
 import { message } from "../../util/message";
 import { useMessage } from "naive-ui";
+import { useGenStore } from "../../store/genStore";
 
 
 
@@ -27,15 +28,13 @@ export const addFomatSqlAction = (editor: monaco.editor.IStandaloneCodeEditor) =
             label: "FomatFquery",
             keybindings: [
                 monaco.KeyMod.CtrlCmd | monaco.KeyCode.F9,
-
-
             ],
             // A precondition for this action.
             precondition: null,
             // A rule to evaluate on top of the precondition in order to dispatch the keybindings.
             keybindingContext: null,
             contextMenuGroupId: "navigation",
-            contextMenuOrder: 1.5,
+            contextMenuOrder: 2,
             // Method that will be executed when the action is triggered.
             // @param editor The editor instance is passed in as a convenience
             run: function (ed) {
@@ -53,6 +52,36 @@ export const addFomatSqlAction = (editor: monaco.editor.IStandaloneCodeEditor) =
     }, 1);
 }
 
+export const switchCodeCheck =
+    (editor: monaco.editor.IStandaloneCodeEditor) => {
+        // noSyntaxValidation: 关闭语法检测
+        // noSemanticValidation: 关闭语义检测
+        editor.addAction(
+            {
+                id: "switchCodeCheck",
+                label: "switchCodeCheck",
+                keybindings: [
+                    monaco.KeyMod.CtrlCmd | monaco.KeyCode.F8,
+                ],
+                precondition: null,
+                keybindingContext: null,
+                contextMenuGroupId: "navigation",
+                contextMenuOrder: 2,
+                run: function (ed) {
+
+                    ed.updateOptions({
+                        //@ts-ignore
+                        noSyntaxValidation: !ed.getRawOptions().noSyntaxValidation,
+                        //@ts-ignore
+                        noSemanticValidation: !ed.getRawOptions().noSemanticValidation
+                    })
+                },
+            }
+        )
+
+
+    }
+
 
 export function formatEditotFqueryFunc() {
     const monacoModel = getMonacoModel()
@@ -64,12 +93,50 @@ export function formatEditotFqueryFunc() {
 
     const allFQuery: Array<string> = []
     if (matches) {
+        const genStore = useGenStore()
         matches.forEach(function (match, index) {
             var assignment = match.match(/(\w+)\s*=\s*(select\s+\w+)/i);
             if (assignment) {
                 let variableName = assignment[1];
                 let query = match.substring(match.indexOf(variableName)).trim();
                 console.log(query)
+
+                const regex = /SELECT([\s\S]*)FROM/i;
+                let col = query.match(regex);
+                let colStr = ""
+                let template = `declare interface selectColDeclare$${index} {
+                    {{define}}
+                }`
+                if (col) {
+                    colStr = col[1].trim()
+                    console.log()
+                    const define = colStr.split("\n").map(
+                        item => {
+                            let [queryCol, commit] = item.split("//")
+                            if (queryCol.indexOf(" as") != -1) {
+                                queryCol = queryCol.split(" as")[1].trim()
+                            } else {
+                                queryCol = queryCol.split(".")[1].trim()
+                            }
+                            queryCol = queryCol.replace(",", "")
+                            console.log(queryCol)
+                            let line = `
+                            /**
+                             * ${commit}
+                            */
+                            ${queryCol}: string
+                            `
+                            console.log(line)
+                            return line
+                        }
+                    ).join("\n")
+                    debugger
+                    template = template.replace("{{define}}", define)
+                    addTempDts(template)
+                    console.log(template)
+                }
+
+
                 const partsIndex = query.indexOf('=');
 
                 // if (parts.length === 2) {
@@ -133,22 +200,25 @@ export const addAutoAutoAutoAutoAuto = (editor: monaco.editor.IStandaloneCodeEdi
 
 
 
-type AutoAutoAutoType = "fori" | "while" | "NewBO" | "select" | "selectc"
+type AutoAutoAutoType = "fori" | "while" | "NewBO" | "select" | "selectc" | "suffixLog" | "suffixSLog"
 
 function autoGen(lineContent: string, ed: monaco.editor.ICodeEditor) {
 
-    let regexFor = /for\s+.*/;
-    let regexSelect = /(sel|select|sl)\s+.*/;
-    let regexSelectc = /(selc|selectc|sc)\s+.*/;
+    const regexFor = /for\s+.*/;
+    const regexSelect = /(sel|select|sl)\s+.*/;
+    const regexSelectc = /(selc|selectc|sc)\s+.*/;
+
+    const regexSuffixLog = /^(.*)\.(log|l)$/;
+    const regexSuffixSLog = /^(.*)\.(slog|sl)$/;
 
 
-    let matchResultFor = lineContent.match(regexFor);
-    let matchResultSelect = lineContent.match(regexSelect);
-    let matchResultSelectc = lineContent.match(regexSelectc);
-    let matchResultBoNew = lineContent.match(/BO.new\((.*?)\)/);
-    if (!matchResultBoNew) {
-        matchResultBoNew = lineContent.match(/new\s+(.*)/);
-    }
+    const matchResultFor = lineContent.match(regexFor);
+    const matchResultSelect = lineContent.match(regexSelect);
+    const matchResultSelectc = lineContent.match(regexSelectc);
+    const matchResultBoNew = lineContent.match(/BO.new\((.*?)\)/) || lineContent.match(/new\s+(.*)/);
+    const matchResultSuffixLog = lineContent.match(regexSuffixLog);
+    const matchResultSuffixSLog = lineContent.match(regexSuffixSLog);
+
     if (matchResultFor) {
         message.success("gen for")
         return getAutoFn("fori", matchResultFor[0].split(" ")[1])(ed)
@@ -164,6 +234,14 @@ function autoGen(lineContent: string, ed: monaco.editor.ICodeEditor) {
     if (matchResultSelectc) {
         message.success("gen selectc")
         return getAutoFn("selectc", matchResultSelectc[0].split(" ")[1])(ed)
+    }
+    if (matchResultSuffixLog) {
+        message.success("gen suffixLog")
+        return getAutoFn("suffixLog", matchResultSuffixLog[1])(ed)
+    }
+    if (matchResultSuffixSLog) {
+        message.success("gen suffixSLog")
+        return getAutoFn("suffixSLog", matchResultSuffixSLog[1])(ed)
     }
 
 
@@ -181,6 +259,12 @@ function getAutoFn(type: AutoAutoAutoType, matchResult: string): Function {
     }
     if (type == "NewBO") {
         return newBoFn(matchResult);
+    }
+    if (type == "suffixLog") {
+        return suffixLogFn(matchResult);
+    }
+    if (type == "suffixSLog") {
+        return suffixSLogFn(matchResult);
     }
     return () => { }
 
@@ -301,6 +385,39 @@ function newBoFn(matchResult: string) {
     }
 }
 
+function suffixLogFn(matchResult: string): Function {
+    return (ed: monaco.editor.ICodeEditor) => {
+        const leadingSpaces = matchResult.match(/^\s*/)[0];
+        const codeLine = `${leadingSpaces}FLY.log(${matchResult.trim()})\n`;
+        // 删除当前行
+        ed.executeEdits("source", [{
+            range: new monaco.Range(ed.getPosition().lineNumber, 1, ed.getPosition().lineNumber, 1),
+            text: ""
+        }]);
+        ed.executeEdits("source", [{
+            range: new monaco.Range(ed.getPosition().lineNumber, 1, ed.getPosition().lineNumber + 1, 1),
+            text: codeLine
+        }]);
+    };
+}
+function suffixSLogFn(matchResult: string): Function {
+    return (ed: monaco.editor.ICodeEditor) => {
+        const leadingSpaces = matchResult.match(/^\s*/)[0];
+        // JSON.stringify(fixedCombination,null,4)
+
+        const codeLine = `${leadingSpaces}FLY.log(JSON.stringify(${matchResult.trim()},null,4))\n`;
+        // 删除当前行
+        ed.executeEdits("source", [{
+            range: new monaco.Range(ed.getPosition().lineNumber, 1, ed.getPosition().lineNumber, 1),
+            text: ""
+        }]);
+        ed.executeEdits("source", [{
+            range: new monaco.Range(ed.getPosition().lineNumber, 1, ed.getPosition().lineNumber + 1, 1),
+            text: codeLine
+        }]);
+    };
+}
+
 
 
 function AutoAutoAuto(type: AutoAutoAutoType, matchResult): Function {
@@ -329,6 +446,8 @@ function AutoAutoAuto(type: AutoAutoAutoType, matchResult): Function {
     }
     return () => { }
 }
+
+
 
 
 

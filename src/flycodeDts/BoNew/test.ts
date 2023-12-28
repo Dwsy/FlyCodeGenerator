@@ -111,3 +111,15 @@ declare class BO {
 
 
 
+
+
+declare interface test {
+    /**
+     * 123
+    */
+    dictionaryid: string
+}
+
+let a: test
+
+a.dictionaryid = "1"

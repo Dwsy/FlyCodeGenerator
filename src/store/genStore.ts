@@ -7,6 +7,10 @@ export const useGenStore = defineStore('genStore', () => {
     const pushTempBoNewDtsList = (boname) => {
         tempBoNewDtsList.value.push(boname)
     }
+    const pushTempDtsList = (boname) => {
+        tempBoNewDtsList.value.push(boname)
+    }
+
     const cleartempBoNewDtsList = () => {
         tempBoNewDtsList.value = []
     }
@@ -16,6 +20,7 @@ export const useGenStore = defineStore('genStore', () => {
     return {
         tempBoNewDtsList,
         pushTempBoNewDtsList,
-        cleartempBoNewDtsList
+        cleartempBoNewDtsList,
+        pushTempDtsList
     }
 });

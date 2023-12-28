@@ -25,6 +25,8 @@ import { RefreshExtraLib } from './flycodeDts'
 import { getMonacoModel, monacoInitializedUtil } from './util/monacoUtil'
 import { getFqueryModel } from './flycodeDts/FQuery/test'
 import { GM_getValue } from './util'
+import { registerProviders } from './components/MonacoEnhance/provider'
+import { applyCustomFlycode } from './components/MonacoEnhance/monaco.languages.conf'
 
 const theme = ref<GlobalTheme | null>(darkTheme)
 const flyStore = useFlyStore()
@@ -51,6 +53,8 @@ onBeforeUnmount(() => {
 })
 
 const init = async () => {
+  registerProviders()
+  applyCustomFlycode()
   if (flyStore.addDtsEnable) {
     RefreshExtraLib()
   }

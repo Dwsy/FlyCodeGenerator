@@ -74,7 +74,7 @@ onMounted(() => {
 
   genBtn.value.addEventListener('click', clickFunc)
 
-  rowData.value = flyStore.protocol.output[0].properties.map((property: Property) => {
+  rowData.value = flyStore.protocol?.output[0]?.properties.map((property: Property) => {
     return {
       field: property.name,
       column: property.propertyname,

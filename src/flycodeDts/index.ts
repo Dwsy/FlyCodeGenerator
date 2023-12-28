@@ -21,6 +21,11 @@ export function pushTempBoNewDtsList(boname) {
     RefreshExtraLib(false)
 }
 
+export function addTempDts(dts: string) {
+    tempBoNewEntityInterfaceDtsList.push(dts)
+    RefreshExtraLib(false)
+}
+
 
 
 export function RefreshExtraLib(onlyUIFlycode: boolean = false) {

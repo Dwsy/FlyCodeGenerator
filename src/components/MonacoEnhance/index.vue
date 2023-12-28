@@ -3,13 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
 import { getMonacoModel, monacoInitializedUtil } from '../../util/monacoUtil'
-import { useFlyStore } from '../../store/flyStore'
-import { el, it } from 'date-fns/locale'
-import { PropertyTypeCode } from '../../type/model/propertyTypeCodeRef'
-import { useGenStore } from '../../store/genStore'
-import { pushTempBoNewDtsList } from '../../flycodeDts'
 import { addAutoAutoAutoAutoAuto, addFomatSqlAction } from './index'
 import { applyCustomFlycode, MonarchTokensProvider, LanguageConfiguration } from './monaco.languages.conf'
 import { getUiProtocol } from '../../dataRequest'
@@ -20,16 +14,18 @@ onMounted(() => {
   //@ts-ignore
   window.LanguageConfiguration = LanguageConfiguration
   //@ts-ignore
-  window.apply = applyCustomFlycode
+  window.applyCustomFlycode = applyCustomFlycode
   // @ts-ignore
   window.getMonacoModel0 = getMonacoModel
   monacoInitializedUtil.addInitializedCallback(async () => {
     monaco.editor.onDidCreateEditor(async (editor) => {
+      // @ts-ignore
+      window.noweditor = editor
       if (window.location.href.indexOf('modeledit') > -1) {
         // addBoNewAction(editor)
         addFomatSqlAction(editor)
         addAutoAutoAutoAutoAuto(editor)
-        applyCustomFlycode()
+        // applyCustomFlycode()
       } else if (window.location.href.indexOf('uiedit') > -1) {
         return
         addAutoAutoAutoAutoAuto(editor)

@@ -123,6 +123,8 @@ export function randomImg() {
     // document.body.style.setProperty('--theme-primary-color',color)
     const urls = [
         'https://api.paugram.com/wallpaper/?source=sina',
+        'https://api.paugram.com/wallpaper/?source=jsd',
+        'https://api.paugram.com/wallpaper/?source=jsd',
         'https://api.paugram.com/wallpaper/?source=sm',
         // 'https://api.yimian.xyz/img?type=moe&size=1920x1080',
         'https://api.likepoems.com/img/pc/',
@@ -130,9 +132,10 @@ export function randomImg() {
         // 'https://api.lyiqk.cn/dfproject',
         'https://api.lyiqk.cn/menhera',
         'https://api.lyiqk.cn/miku',
+        'https://www.loliapi.com/acg/pc/',
         // 'https://api.lyiqk.cn/acgst'
         // 'https://api.lyiqk.cn/lol',
-        // 'https://api.lyiqk.cn/scenery',
+        'https://api.lyiqk.cn/scenery',
         'https://api.lyiqk.cn/bing'
     ]
 

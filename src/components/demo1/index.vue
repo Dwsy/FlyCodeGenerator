@@ -114,25 +114,27 @@ monacoInitializedUtil.addInitializedCallback(async () => {
       cursorBlinking: 'smooth',
       mouseWheelZoom: true,
       cursorSmoothCaretAnimation: 'on',
+
       fontLigatures: true,
       // fontVariations: true,
       smoothScrolling: true,
       wordWrap: 'on',
       wordWrapColumn: 100,
+      wrappingIndent: 'indent',
       wrappingStrategy: 'advanced',
+      renderValidationDecorations: 'editable',
       suggest: {
         // showStatusBar: true,
-        showEvents: true,
         shareSuggestSelections: true,
         preview: true,
         showInlineDetails: true,
         showFunctions: true,
-        matchOnWordStartOnly: true,
-        showSnippets: true
+        matchOnWordStartOnly: false
+        // showSnippets: true
       },
       inlineSuggest: {
-        enabled: true,
-        showToolbar: 'always'
+        // enabled: true,
+        // showToolbar: 'onHover'
       }
     })
     console.log('nowEditor', nowEditor)
@@ -180,7 +182,7 @@ const genSql = () => {
       text: sql
     }
   ])
-  showModal.value = false
+  // showModal.value = false
   const newPosition = new monaco.Position(position.lineNumber, 0)
   editor.setPosition(newPosition)
   editor.focus()
@@ -416,17 +418,17 @@ function createColumns(): DataTableColumns<EntityRowData> {
 <style scoped>
 :deep(.relationobj1 td) {
   /* color: rgba(255, 0, 0, 0.75) !important; */
-  background-color: rgba(255, 89, 89, 0.4) !important;
+  /* background-color: rgba(255, 89, 89, 0.4) !important; */
   font: bold;
 }
 :deep(.relationobj2 td) {
   /* color: rgba(255, 0, 0, 0.75) !important; */
-  background-color: rgba(117, 255, 86, 0.2) !important;
+  /* background-color: rgba(117, 255, 86, 0.2) !important; */
   font: bold;
 }
 :deep(.relationobj3 td) {
   /* color: rgba(255, 0, 0, 0.75) !important; */
-  background-color: rgba(54, 185, 255, 0.4) !important;
+  /* background-color: rgba(54, 185, 255, 0.4) !important; */
   font: bold;
 }
 :deep(.relationobj) {
