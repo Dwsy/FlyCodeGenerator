@@ -13,7 +13,7 @@ export const registerProviders = () => {
       debugger
 
       if (checkInSqlRange.in) {
-        const items = getSqlCompletionItemsWithCache(model, position, context, token, checkInSqlRange.sqlRange)
+        const items = getSqlCompletionItems(model, position, context, token, checkInSqlRange.sqlRange)
         // debugger
 
         return items
@@ -217,15 +217,16 @@ export function checkInSqlRangeFn(model: monaco.editor.ITextModel, position: mon
 }
 // const { Parser } = require('@florajs/sql-parser');
 // import { parse, Statement } from 'pgsql-ast-parser';
-
+const tableDataSuggestionsCache = new Map<string, monaco.languages.CompletionItem[]>()
 function getSqlCompletionItems(model: monaco.editor.ITextModel, position: monaco.Position, context: monaco.languages.CompletionContext, token: monaco.CancellationToken, range: monaco.Range): monaco.languages.ProviderResult<monaco.languages.CompletionList> {
   const flyStore = useFlyStore()
   const sqlText = model.getValueInRange(range)
   const partsIndex = sqlText.indexOf('=');
   const queryString = sqlText.substring(partsIndex + 1).trim();
   let formattedSQL = formatFquery(queryString.replaceAll("//", "--//"), '')
+  formattedSQL = formattedSQL.replace(/,\s*(select\s+form\s+form)/i, ' $1');
   const sqlQueryTables = getSqlQueryTables(formattedSQL)
-  console.log(JSON.stringify(sqlQueryTables))
+  console.log((sqlQueryTables))
   const suggestions = sqlQueryTables.map((item) => {
     let tableData = flyStore.tableNameDataMap.get(item.tableName)
     if (!tableData) {
@@ -234,54 +235,40 @@ function getSqlCompletionItems(model: monaco.editor.ITextModel, position: monaco
     if (!tableData) {
       return []
     }
-    // console.log(tableData)
+    const completionItem = tableDataSuggestionsCache.get(item.tableName)
+    if (completionItem) {
+      // console.log(completionItem)
+      completionItem.forEach((item) => {
+        item.range = null
+      })
+      return completionItem
+    }
     const completionItems = tableData.properties.map((property) => {
-      const text = `${item.alias}.${property.columnname}(${property.propertyname})`
+      const label = `${item.alias}.${property.columnname}(${property.propertyname})`
+      const insertText = `${item.alias}.${property.columnname},//${property.propertyname}`
       const typeDesc = getPropertyTypeEmoji(Number(property.propertytypecode)) + getPropertyTypeName(property.propertycategorycode)
       const completionItem: monaco.languages.CompletionItem = {
-        label: text,
+        label: label,
         kind: monaco.languages.CompletionItemKind.Field,
-        insertText: text,
+        insertText: insertText,
         insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-        range: null,
-        preselect: true,
+        range: new monaco.Range(position.lineNumber, position.column - 1, position.lineNumber, position.column),
+        // preselect: true,
         detail: typeDesc + `${getPropertyTypeName(property.propertycode)}${property.propertydescr}`,
       }
       return completionItem
     })
+    tableDataSuggestionsCache.set(item.tableName, completionItems)
     return completionItems
   }).flat()
-  debugger
+  console.log("suggestions len", suggestions.length)
   return {
     suggestions
   }
 }
-function withCache_getSqlCompletionItems(getSqlCompletionItems) {
-  let cache = {
-    time: 0,
-    tableName: "",
-    result: undefined as monaco.languages.ProviderResult<monaco.languages.CompletionList> | undefined,
-  };
 
-  return function (...args) {
-    const model: monaco.editor.ITextModel = args[0]
-    const range: monaco.Range = args[4]
-    const sqlText = model.getValueInRange(range)
-    const partsIndex = sqlText.indexOf('=');
-    const queryString = sqlText.substring(partsIndex + 1).trim();
-    let formattedSQL = formatFquery(queryString.replaceAll("//", "--//"), '')
-    const sqlQueryTables = getSqlQueryTables(formattedSQL)
-    const tableName = sqlQueryTables[0]?.tableName; // assuming the first table name is the primary one.
-    if (Date.now() - cache.time < 25000 && cache.tableName === tableName) {
-      return cache.result;
-    }
-    const result = getSqlCompletionItems(...args);
-    cache = { time: Date.now(), tableName: tableName, result: result };
-    return result;
-  };
-}
 
-const getSqlCompletionItemsWithCache = withCache_getSqlCompletionItems(getSqlCompletionItems);
+
 interface SqlQueryTable {
   tableName: string;
   alias: string;
