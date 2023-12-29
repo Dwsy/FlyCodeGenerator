@@ -128,8 +128,8 @@ MonarchTokensProvider.tokenizer.root.unshift([/\b(\w+)\(/, 'function'])
 // MonarchTokensProvider.tokenizer.root.unshift([/[a-zA-Z_]\w*\(/, 'function']);
 // MonarchTokensProvider.tokenizer.root.unshift([/\b([a-zA-Z_]\w*)(?=\()/, 'function']);
 export const applyCustomFlycode = (monarchTokensProvider = MonarchTokensProvider, languageConfiguration = LanguageConfiguration) => {
-  // if (GM_getValue('MonacoTheme', null) == "default")
-  // return
+  if (GM_getValue('MonacoTheme', null) == "default")
+    return
   console.log("apply MonarchTokensProvider and setLanguageConfiguration");
   monaco.languages.setMonarchTokensProvider("flycode", monarchTokensProvider);
   monaco.languages.setLanguageConfiguration("flycode", languageConfiguration);
