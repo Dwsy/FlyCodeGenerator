@@ -130,9 +130,9 @@ export function pasteToMonaco() {
 
 }
 
-export function formatEditotFqueryFunc() {
+export function formatEditotFqueryFunc(useText: string = undefined) {
     const monacoModel = getMonacoModel()
-    let text = monacoModel.getValue()
+    let text = useText || monacoModel.getValue()
 
     // 使用正则表达式进行匹配，忽略大小写
     let regex = /(\w+)\s*=\s*(select|SELECT)[^;]+;/g;

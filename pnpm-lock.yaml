@@ -8,6 +8,9 @@ dependencies:
   '@babel/parser':
     specifier: ^7.23.6
     version: 7.23.6
+  '@florajs/sql-parser':
+    specifier: ^3.0.0
+    version: 3.0.0
   '@vueuse/core':
     specifier: ^10.7.0
     version: 10.7.0(vue@3.3.8)
@@ -26,6 +29,9 @@ dependencies:
   node-sql-parser:
     specifier: ^4.11.0
     version: 4.11.0
+  pgsql-ast-parser:
+    specifier: ^11.1.0
+    version: 11.1.0
   pinia:
     specifier: ^2.1.6
     version: 2.1.7(typescript@5.2.2)(vue@3.3.8)
@@ -603,6 +609,19 @@ packages:
     os: [win32]
     requiresBuild: true
     optional: true
+
+  /@florajs/errors@4.0.0:
+    resolution: {integrity: sha512-QyW0xczY+SPaHhqCvPujlGBL+Ov4RqulcCF8pxH4Vbs6j8Sg9QeMahkWCcRg/zUDuKi+NU+f1otwrLKe+NS6pQ==}
+    engines: {node: '>=16'}
+    dev: false
+
+  /@florajs/sql-parser@3.0.0:
+    resolution: {integrity: sha512-+NoO7pDLPWqzgDwHD95o9TZ6kMPT9Ko22zKRbC6F80fTjLWkyBCYoeQo7nJfOFI9378gFfN4QC5stihRCpMTXg==}
+    engines: {node: '>=16'}
+    dependencies:
+      '@florajs/errors': 4.0.0
+      has: 1.0.4
+    dev: false
 
   /@iconify/types@2.0.0:
     resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
@@ -1662,6 +1681,11 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
+  /has@1.0.4:
+    resolution: {integrity: sha512-qdSAmqLF6209RFj4VVItywPMbm3vWylknmB3nvNiUIs72xAimcM8nVYxYr7ncvZq5qzk9MKIZR8ijqD/1QuYjQ==}
+    engines: {node: '>= 0.4.0'}
+    dev: false
+
   /hasown@2.0.0:
     resolution: {integrity: sha512-vUptKVTpIJhcczKBbgnS+RtcuYMB8+oNzPK2/Hp3hanz8JmpATdmmgLgSaadVREkDm+e2giHwY3ZRkyjSIDDFA==}
     engines: {node: '>= 0.4'}
@@ -2178,6 +2202,13 @@ packages:
 
   /pathe@1.1.1:
     resolution: {integrity: sha512-d+RQGp0MAYTIaDBIMmOfMwz3E+LOZnxx1HZd5R18mmCZY0QBlK0LDZfPc8FW8Ed2DlvsuE6PRjroDY+wg4+j/Q==}
+
+  /pgsql-ast-parser@11.1.0:
+    resolution: {integrity: sha512-c0XnjHzUyg2Z/3iB2Akk6+jDtsza4Jqw4bC5SSt9pQ3b+K4aQC75gJQDvsNYvFqQNaPHLCUunDLPc5SZsQQLIA==}
+    dependencies:
+      moo: 0.5.2
+      nearley: 2.20.1
+    dev: false
 
   /picocolors@1.0.0:
     resolution: {integrity: sha512-1fygroTLlHu66zi26VoTDv8yRgm0Fccecssto+MhsZ0D/DGW2sm8E8AjW7NU5VVTRt5GxbeZ5qBuJr+HyLYkjQ==}

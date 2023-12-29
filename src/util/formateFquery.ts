@@ -17,7 +17,7 @@ export function formatFquery(sql: string, start: string): string {
     });
     sql = sql.split("\n").map(line => line.trim()).join("\n");
     let ifArray: Array<string> = [];
-    let endifArray : Array<string> = [];
+    let endifArray: Array<string> = [];
     let ifSqlArray: Array<string> = [];
     let delBigPairIfSqlArray: Array<string> = [];
 
@@ -101,10 +101,10 @@ export function formatFquery(sql: string, start: string): string {
         }
     });
 
+    // debugger
     ifSqlBlockArray.forEach((b, index) => {
         const bif = b.if;
         const bendif = b.endif;
-
         if (b.ifSqlLineLen == 3) {
             let l = formatSQL.indexOf(`--split:if${index}` + bif);
             let r = formatSQL.indexOf(`--split:endif${index}` + bendif);

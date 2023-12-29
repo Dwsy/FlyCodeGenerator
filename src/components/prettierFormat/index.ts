@@ -6,9 +6,12 @@ import './bable.min'
 import { Options } from 'prettier'
 import { parse as babelParse } from '@babel/parser'
 import { GM_getValue } from '../../util';
+import { formatEditotFqueryFunc } from '../MonacoEnhance'
+
+let sqlCount = 0
 // 格式化逻辑
 async function spliceSemiAndDoubleQoute(code: string) {
-
+    sqlCount = 0
     const config: Options = {
         parser: 'babel',
         //不保留行尾分号去掉，开发规范统一
@@ -32,6 +35,7 @@ async function spliceSemiAndDoubleQoute(code: string) {
         plugins: prettierPlugins,
 
     }
+
     // 使用模板字符串包裹 flycode中的sql
     let regex = /(\w+)\s*=\s*(select|SELECT)[^;]+;/g;
     var matches = code.match(regex);
@@ -39,22 +43,24 @@ async function spliceSemiAndDoubleQoute(code: string) {
         matches.forEach((query) => {
             const partsIndex = query.indexOf('=');
             const queryString = query.substring(partsIndex + 1).trim();
-            const formattedSQL = '`' + queryString + '`';
-            code = code.replace(queryString, formattedSQL)
+            //FIXME 暂时处理 想同sql的问题 select => select r
+            const formattedSQL = '{}; /**5213' + queryString.replace(/(select|SELECT)/, "select * from rie") + '5213**/';
+            code = code.replaceAll(queryString, formattedSQL)
         })
     }
+    code = code.replaceAll("select * from rie", 'select')
 
-    code = code.replace(regex, function (match, p1, p2) {
-        return `${p1} = \`${p2}\``
-    })
+    // code = code.replace(regex, function (match, p1, p2) {
+    //     return `${p1} = \`${p2}\``
+    // })
     try {
+
         if (GM_getValue('es6toes5', true)) {
             // @ts-ignore
             code = Babel.transform(code, {
-                presets: ['es2015', 'es2016', 'es2017'],
+                presets: ['es2015'],//, 'es2016', 'es2017'],
                 retainLines: true  // 通过设置retainLines选项来保留原始代码中的空格
             }).code;
-            code = code.replace('"use strict";', '')
         }
         //@ts-ignore
         const formatCode = await prettier.format(code, config)
@@ -74,11 +80,7 @@ export const formatProvider: monaco.languages.DocumentFormattingEditProvider = {
     displayName: 'prettier-flycode',
     async provideDocumentFormattingEdits(model: monaco.editor.ITextModel, options: monaco.languages.FormattingOptions, token: monaco.CancellationToken): Promise<monaco.languages.TextEdit[]> {
         let text = removeStringWrapping(await spliceSemiAndDoubleQoute(model.getValue()))
-        if (GM_getValue('formatCodeAndFormatSQL', false)) {
-            debugger
-            // @ts-ignore
-            noweditor.getAction('FomatFquery').run()
-        }
+
         const modelRange = model.getFullModelRange()
         const range = {
             startLineNumber: modelRange.startLineNumber,
@@ -98,9 +100,23 @@ export const formatProvider: monaco.languages.DocumentFormattingEditProvider = {
 
 
 
-function removeStringWrapping(code) {
-    code = code.replace(/`/g, '')
+function removeStringWrapping(code: string) {
+    code = code.replace("'use strict'", '')
+    code = code.replaceAll("{} /**5213", '')
+    code = code.replaceAll("5213**/", '')
+    code = code.replaceAll("norule", 'NORULE')
+    code = code.replaceAll("paging", 'PAGING')
     code = code.replace(/console.log/g, 'FLY.log')
+    if (GM_getValue('formatCodeAndFormatSQL', true)) {
+        // setTimeout(() => {
+
+        // @ts-ignore
+        // noweditor.getAction('FomatFquery').run()
+
+        // }, 1);
+        debugger
+        code = formatEditotFqueryFunc(code)
+    }
 
     return code;
 }

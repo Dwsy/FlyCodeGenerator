@@ -62,7 +62,9 @@ export const useFlyStore = defineStore('flyStore', () => {
             // 将 data 对象添加到 tableDataMap 中
             tableDataMap.value.set(data.objectcode, data);
             tableNameDataMap.value.set(data.tablename, data);
-            if (data.tablename == "pl_dictionary") {
+            // if (data.tablename == "pl_dictionary") {
+            if (data.tablename != data.objectmark) {
+                //todo 暂时丢一起了
                 dictNameDataMap.value.set(data.objectmark, data);
             }
             // 遍历 data.properties 数组
