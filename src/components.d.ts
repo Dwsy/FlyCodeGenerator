@@ -27,6 +27,7 @@ declare module 'vue' {
     Menu: typeof import('./components/Menu/index.vue')['default']
     MonacoEnhance: typeof import('./components/MonacoEnhance/index.vue')['default']
     Otaku: typeof import('./components/Otaku/index.vue')['default']
+    PrettierFormat: typeof import('./components/prettierFormat/index.vue')['default']
     QueryGenerator: typeof import('./components/queryGenerator/index.vue')['default']
     SaveProtocolWatch: typeof import('./components/common/saveProtocolWatch.vue')['default']
     Theme: typeof import('./components/Theme/index.vue')['default']

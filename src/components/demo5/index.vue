@@ -6,7 +6,7 @@ onMounted(() => {
 .logic-edit-container > .left-side {
   background-color: #ffffff00 !important;
 }
-/* todo12321 switch */
+/* todo switch */
 .logic-edit-container > .right-side {
   background-color: #ffffff00 !important;
 }
@@ -28,7 +28,9 @@ onMounted(() => {
 .monaco-editor .margin {
   background-color: #ffffff00 !important;
 }
-
+.ant-drawer-content{
+    background-color:black !important;
+}
 body {
   opacity: 0.92;
   --theme-bg-nav: #ffffff00 !important;

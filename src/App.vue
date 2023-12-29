@@ -16,6 +16,7 @@
 
       <div v-if="!isBrowserMode">
         <Demo5></Demo5>
+        <PrettierFormat></PrettierFormat>
       </div>
     </n-config-provider>
   </n-message-provider>
