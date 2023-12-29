@@ -35,7 +35,7 @@ import { applyCustomFlycode } from './components/MonacoEnhance/monaco.languages.
 const theme = ref<GlobalTheme | null>(darkTheme)
 const flyStore = useFlyStore()
 const macVideoEnbale = ref(false)
-const isBrowserMode = ref(false)
+const isBrowserMode = ref(true)
 
 let previousURL = window.location.href
 let urlInterval: number | null = null
