@@ -19,13 +19,3 @@ pre::after {
     content: "";
   }
 
-  .logic-edit-container > .left-side{
-    background-color: #ffffff00!important;
-  }
-  /* todo switch */
-  .logic-edit-container > .right-side{
-    background-color: #ffffff00!important;
-  }
-  #beSetting > div.main-content > div.tab-content.ant-tabs.ant-tabs-top.ant-tabs-line > div.ant-tabs-content.ant-tabs-content-animated.ant-tabs-top-content > div.ant-tabs-tabpane.ant-tabs-tabpane-active{
-    padding: 0px!important;
-  }

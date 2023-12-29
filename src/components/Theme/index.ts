@@ -7,7 +7,7 @@ export const themeList = [
     // 'Birds of Paradise.json',
     // 'Blackboard.json',
     // 'Brilliance Black.json',
-    // 'Brilliance Dull.json',
+    'default 添加属性高亮以及TODO功能',
     'Xcode_default.json|推荐',
     'GitHub Light.json|推荐',
     'Monokai.json|推荐',
@@ -74,6 +74,41 @@ export const changeTheme = (name: string = 'default') => {
         const darkTheme = 'vs-dark'; // 深色主题
         //@ts-ignore
         monaco.editor.setTheme(themeSetting === 'light' ? lightTheme : darkTheme);
+    }
+    else if (name == 'default 添加属性高亮以及TODO功能') {
+        localStorage.setItem("MonacoTheme", name)
+        const themeSetting = localStorage.getItem("ide_theme");
+        const lightTheme = 'vs'; // 浅色主题
+        const darkTheme = 'vs-dark'; // 深色主题
+        const light = themeSetting === 'light'
+        const customDefaultTheme: monaco.editor.IStandaloneThemeData = {
+            base: light ? lightTheme : darkTheme,
+            inherit: true,
+            rules: [],
+            colors: {},
+        }
+
+        customDefaultTheme.rules.push({ token: 'comment.todo', foreground: 'ecd452', fontStyle: 'bold' })
+        customDefaultTheme.rules.push({ token: 'comment.fixme', foreground: 'd83b01', fontStyle: 'bold' })
+        customDefaultTheme.rules.push({ token: 'comment.remind', foreground: '00bcf2', fontStyle: 'bold' })
+        if (light) {
+            customDefaultTheme.rules.push({ token: 'flylog', foreground: '27ae60', fontStyle: 'underline' })
+            customDefaultTheme.rules.push({ token: 'function', foreground: '795E27', fontStyle: '' })
+            customDefaultTheme.rules.push({ token: 'code.property', foreground: '001080', fontStyle: '' })
+            customDefaultTheme.rules.push({ token: "code.propertypre", foreground: "800000", fontStyle: '' })
+        } else {
+            customDefaultTheme.rules.push({ token: 'flylog', foreground: 'F92572', fontStyle: 'underline' })
+            customDefaultTheme.rules.push({ token: 'function', foreground: '65D9EF', fontStyle: '' })
+            customDefaultTheme.rules.push({ token: 'code.property', foreground: 'DCDCAA', fontStyle: '' })
+            customDefaultTheme.rules.push({ token: "code.propertypre", foreground: "9CDCFE", fontStyle: '' })
+        }
+        // @ts-ignore         "fontStyle": "underline",
+        monaco.editor.defineTheme('customDefaultTheme', customDefaultTheme)
+        // @ts-ignore
+        monaco.editor.setTheme('customDefaultTheme')
+        //@ts-ignore
+
+        // monaco.editor.setTheme(themeSetting === 'light' ? lightTheme : darkTheme);
     } else {
         fetch('http://xwide.dwsy.link/monaco-themes-master/themes/' + name.split("|")[0])
             .then((data) => data.json())

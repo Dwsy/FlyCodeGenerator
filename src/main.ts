@@ -19,3 +19,4 @@ document.body.append(app);
 createApp(App).use(naive).use(pinia).mount(app);
 
 registerMenuCommand()
+

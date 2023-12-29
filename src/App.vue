@@ -13,6 +13,10 @@
       <Menu></Menu>
       <MacVideo v-if="macVideoEnbale"></MacVideo>
       <Otaku v-if="GM_getValue('szzrx', false)"></Otaku>
+
+      <div v-if="!isBrowserMode">
+        <Demo5></Demo5>
+      </div>
     </n-config-provider>
   </n-message-provider>
 </template>
@@ -31,6 +35,8 @@ import { applyCustomFlycode } from './components/MonacoEnhance/monaco.languages.
 const theme = ref<GlobalTheme | null>(darkTheme)
 const flyStore = useFlyStore()
 const macVideoEnbale = ref(false)
+const isBrowserMode = ref(false)
+
 let previousURL = window.location.href
 let urlInterval: number | null = null
 
@@ -38,6 +44,7 @@ const themePrimaryColor = ref('#288eff')
 themePrimaryColor.value = '#446a37'
 
 onMounted(async () => {
+  isBrowserMode.value = GM_getValue('isBrowserMode', false)
   macVideoEnbale.value = GM_getValue('macVideoEnbale', false)
   //@ts-ignore
   window.getFqueryModel = getFqueryModel

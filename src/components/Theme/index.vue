@@ -8,6 +8,7 @@
       :bordered="false"
       class="flycode-theme"
     >
+      当前主题: {{ MonacoTheme }}
       <div class="flycode-theme">
         <n-list
           hoverable
