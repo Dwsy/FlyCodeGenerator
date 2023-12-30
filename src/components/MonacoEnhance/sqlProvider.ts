@@ -118,23 +118,23 @@ export function getSqlCompletionItems(
         })
         return completionItem
       }
-      const completionItems = tableData.properties.map((property) => {
+      const completionItems = tableData.properties.map((property, index) => {
         const label = `${item.alias}.${property.columnname}(${property.propertyname})`
-        let pure_insertText = `${item.alias}.${property.columnname}`
+        let pure_insertText = `${item.alias}.${property.columnname} `
         let insertText = pure_insertText + `,//${property.propertyname}\n`
 
         const typeDesc =
-          getPropertyTypeEmoji(Number(property.propertytypecode)) + getPropertyTypeName(property.propertycategorycode)
+          getPropertyTypeEmoji(Number(property.propertytypecode)) + getPropertyTypeName(property.propertytypecode)
         const completionItem: monaco.languages.CompletionItem = {
           label: label,
           kind: monaco.languages.CompletionItemKind.Field,
           insertText: isAfterForm ? pure_insertText : insertText,
-          sortText: property.seq.toString(),
+          sortText: String(index),
           filterText: pure_insertText,
           insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
           range: new monaco.Range(position.lineNumber, position.column - 1, position.lineNumber, position.column),
           preselect: true,
-          detail: typeDesc + `${getPropertyTypeName(property.propertycode)}${property.propertydescr}`
+          detail: typeDesc + `\n${getPropertyTypeName(property.propertycode)}${property.propertydescr}`
         }
         return completionItem
       })
@@ -332,16 +332,20 @@ const getSqlQueryTables = (sqlText: string): Array<SqlQueryTable> => {
   sqlText = sqlText.replace(/WHERE([\s\S]*)$/i, '')
 
   // 删除所有 JOIN ... ON 之间的内容
-  const removeOnClause = (sqlText: string): string => {
-    let splitText = sqlText.split(' ')
-
+  const removeOnClause1 = (sqlText: string): string => {
+    let lowerCaseSql = sqlText.toLowerCase()
+    let splitText = lowerCaseSql.split('join ')
+    let newText = []
     for (let i = 0; i < splitText.length; i++) {
-      if (splitText[i].toUpperCase() === 'ON') {
-        splitText = splitText.slice(0, i)
-        break
-      }
+      let partBeforeOn = splitText[i].split(' on ')[0]
+      //@ts-ignore
+      newText.push(partBeforeOn)
     }
-    return splitText.join(' ')
+    return newText.join('\njoin ')
+  }
+  const removeOnClause = (sqlText: string): string => {
+    let splitText = sqlText.toLowerCase().split('join ')
+    return splitText.map((part) => part.split(' on ')[0]).join('\njoin ')
   }
   sqlText = removeOnClause(sqlText)
 

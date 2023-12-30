@@ -128,7 +128,7 @@ export const registerProviders = () => {
             kind: monaco.languages.CompletionItemKind.Keyword,
             insertText: 'select\n $1 \nfrom $2;',
             preselect: true,
-            detail: '查询',
+            detail: '查询 输入sel + tablename 然后 ctrl + b 生成',
             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
           },
           {

@@ -46,6 +46,11 @@
             </NSpace>
           </NListItem>
         </NList>
+        <NListItem>
+          <NSpace justify="end">
+            <NButton @click="useSystemPicute" type="info" size="small">使用MAC工作区壁纸</NButton></NSpace
+          >
+        </NListItem>
 
         <NListItem>
           <NSpace justify="space-between"
@@ -152,6 +157,19 @@ async function rcGenerate() {
   setTimeout(() => {
     flyStore.codeGeneratorInitStatus = true
   }, 666)
+}
+const useSystemPicute = async () => {
+  try {
+    // const response = await fetch('http://localhost:3000/get_desktop_picture_base64')
+    // const data = await response.text()
+    // // 使用获取到的Base64数据创建一个图片URL
+    // const imageUrl = 'data:image/png;base64,' + data
+    document.body.style.backgroundImage = `url(http://localhost:3000/get_desktop_picture?${Math.random()})`
+    // console.log(imageUrl)
+    // 将图片URL设置为body的背景图片
+  } catch (error) {
+    console.error(error)
+  }
 }
 </script>
 

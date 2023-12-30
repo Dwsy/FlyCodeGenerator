@@ -112,7 +112,7 @@ function removeStringWrapping(code: string) {
 
     // }, 1);
     debugger
-    code = formatEditotFqueryFunc(code)
+    code = formatEditotFqueryFunc(code) || code
   }
 
   return code

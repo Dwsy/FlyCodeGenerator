@@ -1,8 +1,9 @@
 <template>
   <n-modal v-model:show="showCode" preset="card" title="Flycode" style="width: 900px" :bordered="false">
-    <div class="flycode-d">
+    <!-- <div class="flycode-d">
       <pre id="flyCode" data-lang="sql" style="height: 690px">{{ fquery }}</pre>
-    </div>
+    </div> -->
+    <code-preview :fly-code="fquery"></code-preview>
   </n-modal>
 </template>
 
@@ -58,12 +59,14 @@ const genFunc = () => {
           onClick={async () => {
             //@ts-ignore
             window.fly_d_showCode.value = !window.fly_d_showCode.value
-            await nextTick(() => {
+            {
+              /* await nextTick(() => {
               // @ts-ignore
               monaco.editor.colorizeElement(document.getElementById('flyCode'), {
                 theme: GM_getValue('MonacoTheme', null) ? 'mytheme' : ''
               })
-            })
+            }) */
+            }
           }}
         >
           预览代码

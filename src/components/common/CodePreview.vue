@@ -1,7 +1,8 @@
 <template>
-  <div class="flycode-d">
+  <!-- <div class="flycode-d">
     <pre id="flyCode" data-lang="javascript" style="height: 690px">{{ props.flyCode }}</pre>
-  </div>
+  </div> -->
+  <div class="preview-monaco" style="height: 560px; width: 900px"></div>
 </template>
 
 <script setup lang="ts">
@@ -15,7 +16,12 @@ const props = defineProps<Props>()
 onMounted(async () => {
   await nextTick(() => {
     // @ts-ignore
-    monaco.editor.colorizeElement(document.getElementById('flyCode'), {
+    // monaco.editor.colorizeElement(document.getElementById('flyCode'), {
+    //   theme: GM_getValue('MonacoTheme', null) ? 'mytheme' : ''
+    // })
+    monaco.editor.create(document.querySelector('.preview-monaco'), {
+      value: props.flyCode,
+      language: 'flycode',
       theme: GM_getValue('MonacoTheme', null) ? 'mytheme' : ''
     })
   })

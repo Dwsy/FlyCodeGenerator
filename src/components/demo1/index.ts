@@ -83,7 +83,7 @@ function genInOutProtocol(tableData: tableData, EntityRowDatas: EntityRowData[])
         propertycode: child2.this.propertycode,
         marktype: '2',
         level: child2.level,
-        joinField: child2.joinField,
+        joinField: child2.joinField
         // key: this.columnName=child2.key
       }
       if (child2.query) {
@@ -322,8 +322,8 @@ function genQueryModel_(output: Output, queryArgumentArrayMap: Map<string, Prope
   deepJoinRelationTableMap.forEach((relationTable: tableData, deepJoinKey: DeepJoinKey) => {
     let joinModel: JoinModel
     if (deepJoinKey.level == 3) {
-      joinModelArray.forEach(item => {
-        if (item.columnName == deepJoinKey.prefixName.split("__")[0]) {
+      joinModelArray.forEach((item) => {
+        if (item.columnName == deepJoinKey.prefixName.split('__')[0]) {
           let tableName = relationTable.tablename
           let columnname = deepJoinKey.prefixName
           if (tableName === 'pl_dictionary' || tableName === 'pl_orgstruct' || tableName === 'pl_region') {
@@ -345,7 +345,7 @@ function genQueryModel_(output: Output, queryArgumentArrayMap: Map<string, Prope
             relationTable: {
               name: relationTable.tablename,
               shortName: relationTableShortName,
-              idField: customJoinFieldMap.get(deepJoinKey.prefixName + "__" + deepJoinKey.lastName)
+              idField: customJoinFieldMap.get(deepJoinKey.prefixName + '__' + deepJoinKey.lastName)
             },
             columnName: deepJoinKey.lastName
           }
@@ -368,7 +368,7 @@ function genQueryModel_(output: Output, queryArgumentArrayMap: Map<string, Prope
       // console.log("relationTableShortNameMap", relationTableShortNameMap.get(queryname))
       relationTableShortNameMap.get(queryname)
       // debugger
-      if (queryname.indexOf("__") == -1) {
+      if (queryname.indexOf('__') == -1) {
         const columnModel: ColumnModel = {
           tableShortName: tableShortName,
           columnName: data.columnname,

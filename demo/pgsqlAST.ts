@@ -21,35 +21,39 @@ const visitor = astVisitor((map) => ({
     map.super().join(t)
   }
 }))
-const sql = `
+var sql = `
 
 SELECT * FROM
-xxw_promotion_giveaways AS xpg
-LEFT JOIN xxw_main_promotion AS xmp_pro ON xmp_pro.id = xpg.promotion_main_id
-LEFT JOIN pl_orgstruct AS ps_sal ON ps_sal.orgstructid = xpg.salearea_id
-LEFT JOIN xxw_customer AS xc_cus ON xc_cus.id = xpg.customer_id
-LEFT JOIN xxw_channelcustomers AS xc_cha ON xc_cha.id = xpg.channel_id
-LEFT JOIN xxw_finished_material xfm ON xfm.id = xpg.activity_product_id
-LEFT JOIN xxw_finished_material xfm1 ON xfm1.id = xpg.gift_product_id
-LEFT JOIN xxw_store AS xs_sto ON xs_sto.id = xpg.store_id
-LEFT JOIN pl_dictionary AS xpr_pro 1231
+ kx_sales_target as kst 
+left join kx_sales_target_detail detail on detail.targetid = kst.id
+left join kx_kq_store store on store.id = detail.storeid
+left join pmmmember pmm on pmm.orgstructid = kst.memberid 
+left join pl_orgstruct pos on pos.orgstructid = pmm.parentorgstructid
+left join pl_orgstruct org on org.orgstructid = pos.parentorgstructid
+left join pl_userinfo usr on usr.userinfoid = pmm.userinfoid
+left join ka_kq_channelcustomers kkc on kkc.id = usr.distrbutorid
+left join pl_orgstruct lead on lead.orgstructid = pmm.parentmemberid
+left join pl_orgstruct pos1 on pos1.orgstructid = lead.parentorgstructid
+left join pl_dictionary dic1 on dic1.dictionaryid = usr.guidetype
+where 1=1
 
 
 `
 const removeOnClause = (sqlText: string): string => {
-  let splitText = sqlText.split(' ')
-
+  let lowerCaseSql = sqlText.toLowerCase()
+  let splitText = lowerCaseSql.split('join ')
+  let newText = []
   for (let i = 0; i < splitText.length; i++) {
-    if (splitText[i].toUpperCase() === 'ON') {
-      splitText = splitText.slice(0, i)
-      break
-    }
+    let partBeforeOn = splitText[i].split(' on ')[0]
+    //@ts-ignore
+    newText.push(partBeforeOn)
   }
-  return splitText.join(' ')
+  return newText.join('\njoin ')
 }
+sql = removeOnClause(sql)
 console.log(sql)
 // start traversing a statement
-visitor.statement(parseFirst(removeOnClause(sql)))
+visitor.statement(parseFirst(sql))
 
 // print result
 console.log(SqlQueryTables)
