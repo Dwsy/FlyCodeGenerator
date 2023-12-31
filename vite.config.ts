@@ -9,8 +9,8 @@ import Components from 'unplugin-vue-components/vite'
 // https://vitejs.dev/config/
 export default defineConfig({
   build: {
-    minify: 'esbuild'
-    // minify: false
+    // minify: 'esbuild'
+    minify: false
   },
   plugins: [
     jsx({}),

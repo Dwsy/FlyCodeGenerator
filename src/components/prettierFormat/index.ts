@@ -4,9 +4,10 @@ import './bable'
 import './estree'
 import './bable.min'
 import { Options } from 'prettier'
-import { parse as babelParse } from '@babel/parser'
+// import {transform} from '@babel/standalone'
 import { GM_getValue } from '../../util'
 import { formatEditotFqueryFunc } from '../MonacoEnhance'
+import { TransformOptions } from './type.d'
 
 let sqlCount = 0
 // 格式化逻辑
@@ -54,11 +55,14 @@ async function spliceSemiAndDoubleQoute(code: string) {
   // })
   try {
     if (GM_getValue('es6toes5', true)) {
+      const babelTransformOptions: TransformOptions = {
+        presets: ['es2015'],
+        // plugins: ['transform-es2015-modules-umd'],
+        retainLines: true, // 通过设置retainLines选项来保留原始代码中的空格
+        ast: false
+      }
       // @ts-ignore
-      code = Babel.transform(code, {
-        presets: ['es2015'], //, 'es2016', 'es2017'],
-        retainLines: true // 通过设置retainLines选项来保留原始代码中的空格
-      }).code
+      code = Babel.transform(code, babelTransformOptions).code
     }
     //@ts-ignore
     const formatCode = await prettier.format(code, config)

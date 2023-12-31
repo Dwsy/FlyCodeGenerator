@@ -16,7 +16,7 @@ export const registerProviders = () => {
 
       if (checkInSqlRange.in) {
         const autoAsSqlCompletionRet = autoAsSqlCompletion(model, position, context, token)
-        debugger
+        // debugger
         if (autoAsSqlCompletionRet.in) {
           return {
             suggestions: [

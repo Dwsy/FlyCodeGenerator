@@ -63,7 +63,11 @@ export function checkInSqlRangeFn(
 // import { parse, Statement } from 'pgsql-ast-parser';
 
 const tableDataSuggestionsCache = new Map<string, monaco.languages.CompletionItem[]>()
-
+const tableDataSelectAllSuggestionsCache = new Map<string, monaco.languages.CompletionItem>()
+let sqlFuncCompletionItem: monaco.languages.CompletionItem[] = []
+monacoInitializedUtil.addInitializedCallback(() => {
+  sqlFuncCompletionItem = getSqlFuncCompletionItem()
+})
 /**
  * 预热表数据建议缓存。
  *
@@ -71,6 +75,7 @@ const tableDataSuggestionsCache = new Map<string, monaco.languages.CompletionIte
  */
 export const warm_upTableDataSuggestionsCache = (model) => {
   tableDataSuggestionsCache.clear()
+  tableDataSelectAllSuggestionsCache.clear()
   // 获取模型中的文本内容
   const text = model.getValue()
   let regex = /(\w+)\s*=\s*(select|SELECT)[^;]+;/g
@@ -84,6 +89,20 @@ export const warm_upTableDataSuggestionsCache = (model) => {
     const completionItems = SQL2CompletionItems(formattedSQL)
     completionItems.forEach((item) => {
       tableDataSuggestionsCache.set(item.tableAs, item.CompletionItems)
+      const selectAllLine: string[] = []
+      item.CompletionItems.forEach((item1) => {
+        selectAllLine.push(item1.insertText)
+      })
+      const selectAllCompletionItem = {
+        label: item.tableAs.split('.')[0] + '.' + 'all',
+        kind: monaco.languages.CompletionItemKind.Event,
+        insertText: selectAllLine.join(''),
+        range: null,
+        preselect: true,
+        detail: 'selectAll'
+      }
+      // debugger
+      tableDataSelectAllSuggestionsCache.set(item.tableAs, selectAllCompletionItem)
     })
   }
 }
@@ -129,7 +148,7 @@ const SQL2CompletionItems = (formattedSQL: string): TableNameAsAndCompletionItem
         return completionItem
       })
       tableNameAsAndCompletionItems.push({
-        tableAs: item.tableName + item.alias,
+        tableAs: item.tableName + '.' + item.alias,
         CompletionItems: completionItems
       })
       // return [item.tableName + item.alias, completionItems]
@@ -176,8 +195,15 @@ export function getSqlCompletionItems(
     new monaco.Range(range.startLineNumber, range.startColumn, position.lineNumber, position.column)
   )
   const isAfterForm = /from\s+/i.test(textBeforePosition)
+  //判断当前位置前后是否有 ( )
+  const bracketPairAroundCursor = isBracketPairAroundCursor(position, model, range)
+
+  const selectAllCompletionItems: monaco.languages.CompletionItem[] = []
+
   let suggestions = sqlQueryTables
     .map((item) => {
+      const key = item.tableName + '.' + item.alias
+
       let tableData = flyStore.tableNameDataMap.get(item.tableName)
       if (!tableData) {
         tableData = flyStore.dictNameDataMap.get(item.tableName.toLowerCase())
@@ -185,29 +211,51 @@ export function getSqlCompletionItems(
       if (!tableData) {
         return []
       }
-      const completionItem = tableDataSuggestionsCache.get(item.tableName + item.alias)
-      if (completionItem) {
-        completionItem.forEach((item) => {
+      const completionItemsCache = tableDataSuggestionsCache.get(key)
+      const selectAllcompletionItemsCache = tableDataSelectAllSuggestionsCache.get(key)
+      let selectAllLine: string[] = []
+      if (completionItemsCache) {
+        completionItemsCache.forEach((item) => {
           item.range = null
           if (isAfterForm) {
-            item.insertText = isAfterForm ? item.filterText : item.insertText
+            if (bracketPairAroundCursor) {
+              item.insertText = item.filterText.trim()
+            } else {
+              //@ts-ignore
+              item.insertText = item.filterText
+            }
+          } else {
+            if (bracketPairAroundCursor) {
+              item.insertText = item.filterText.trim()
+            } else {
+              //@ts-ignore
+              item.insertText = item.documentation
+            }
           }
+          // console.log(item.insertText)
         })
-        return completionItem
+        if (!isAfterForm) {
+          selectAllCompletionItems.push(selectAllcompletionItemsCache)
+        }
+        return completionItemsCache
       }
+
       const completionItems = tableData.properties.map((property, index) => {
         const label = `${item.alias}.${property.columnname}(${property.propertyname})`
         let pure_insertText = `${item.alias}.${property.columnname} `
         let insertText = pure_insertText + `,//${property.propertyname}\n`
-
+        selectAllLine.push(insertText)
         const typeDesc =
           getPropertyTypeEmoji(Number(property.propertytypecode)) + getPropertyTypeName(property.propertytypecode)
         const completionItem: monaco.languages.CompletionItem = {
           label: label,
           kind: monaco.languages.CompletionItemKind.Field,
           insertText: isAfterForm ? pure_insertText : insertText,
+          //@ts-ignore
+          // insertText_backup: insertText,
           sortText: String(index),
           filterText: pure_insertText,
+          documentation: insertText,
           insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
           range: new monaco.Range(position.lineNumber, position.column - 1, position.lineNumber, position.column),
           preselect: true,
@@ -215,7 +263,20 @@ export function getSqlCompletionItems(
         }
         return completionItem
       })
-      tableDataSuggestionsCache.set(item.tableName + item.alias, completionItems)
+      if (!isAfterForm) {
+        const selectAllCompletionItem = {
+          label: item.alias + '.' + 'all',
+          kind: monaco.languages.CompletionItemKind.Event,
+          insertText: selectAllLine.join(''),
+          range: null,
+          preselect: true,
+          detail: 'selectAll'
+        }
+        // debugger
+        selectAllCompletionItems.push(selectAllCompletionItem)
+        tableDataSelectAllSuggestionsCache.set(key, selectAllCompletionItem)
+      }
+      tableDataSuggestionsCache.set(key, completionItems)
     })
     .flat()
   //   if (isAfterForm) {
@@ -371,13 +432,16 @@ export function getSqlCompletionItems(
       }
     ]
   }
+  if (!isAfterForm) {
+    suggestions = suggestions.concat(selectAllCompletionItems)
+  }
   if (!suggestions[0]) suggestions = []
-  generalSqlCompletionItems.forEach((item) => {
-    suggestions.push(item)
-  })
 
-  //   }
-  console.log('suggestions len', suggestions)
+  suggestions.push(...generalSqlCompletionItems)
+  debugger
+  suggestions.push(...sqlFuncCompletionItem)
+
+  console.log('suggestions len', suggestions.length)
   return {
     suggestions
   }
@@ -388,6 +452,7 @@ interface SqlQueryTable {
   alias: string
 }
 import { astVisitor, parse, parseFirst, Statement } from 'pgsql-ast-parser'
+import { FunctionDefinition, getSqlFuncCompletionItem } from './sqlFuncProvider'
 
 /**
  * 获取 SQL 查询中的表名和别名。
@@ -520,7 +585,7 @@ export function autoAsSqlCompletion(
     }
   }
 
-  debugger
+  // debugger
   const secondLastWord = match[1]
   const lastWord = match[2]
   if (asArray.indexOf(lastWord) != -1) {
@@ -534,4 +599,26 @@ export function autoAsSqlCompletion(
   return {
     in: false
   }
+}
+function isBracketPairAroundCursor(position: monaco.Position, model: monaco.editor.ITextModel, range: monaco.Range) {
+  let lineNumber = position.lineNumber
+  let decorations = model.getAllDecorations()
+
+  let isBracketHighlighted = decorations.some((deco) => {
+    let startLineNumber = deco.range.startLineNumber
+    let endLineNumber = deco.range.endLineNumber
+    let startColumn = deco.range.startColumn
+    let endColumn = deco.range.endColumn
+    let inlineClassName = deco.options.inlineClassName
+    let rangeMatch =
+      startLineNumber <= lineNumber &&
+      lineNumber <= endLineNumber &&
+      startColumn <= position.column &&
+      position.column <= endColumn
+    let classMatch = inlineClassName === 'bracket-highlighting-0' || inlineClassName === 'bracket-highlighting-1'
+    return rangeMatch && classMatch
+  })
+
+  console.log('是否在括号内:', isBracketHighlighted)
+  return isBracketHighlighted
 }
