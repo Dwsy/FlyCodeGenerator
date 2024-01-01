@@ -7,10 +7,6 @@ export const useOptionsStore = defineStore(
   () => {
     const sqlFormatterOptions = useLocalStorage('sqlFormatterOptions', sqlFormatterDefaultOptions)
 
-    if (!sqlFormatterOptions.value) {
-      sqlFormatterOptions.value = sqlFormatterDefaultOptions
-    }
-
     return {
       sqlFormatterOptions
     }

@@ -21,3 +21,26 @@ document.body.append(app)
 createApp(App).use(naive).use(pinia).mount(app)
 
 registerMenuCommand()
+var handler = {
+  get: function (target, prop, receiver) {
+    var propValue = Reflect.get(target, prop, receiver)
+    if (typeof propValue !== 'function') {
+      console.log(`Get ${prop}`)
+      return propValue
+    }
+
+    // 对函数做特别处理
+    return function (...args) {
+      console.log(`Execute ${prop}`)
+      return propValue.apply(target, args)
+    }
+  },
+  set: function (target, prop, value) {
+    if (prop !== 'length' && typeof value !== 'function') {
+      console.log(`Change ${prop} to ${value}`)
+    }
+    return Reflect.set(target, prop, value)
+  }
+}
+
+// window.sessionStorage = new Proxy(window.sessionStorage, handler)

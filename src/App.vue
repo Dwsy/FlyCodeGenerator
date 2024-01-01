@@ -20,7 +20,7 @@
         <Demo5></Demo5>
         <PrettierFormat></PrettierFormat>
       </div>
-      {{ optionsStore.sqlFormatterOptions }}
+      {{ templateModules }}
     </n-config-provider>
   </n-message-provider>
 </template>
@@ -40,6 +40,20 @@ const theme = ref<GlobalTheme | null>(darkTheme)
 const flyStore = useFlyStore()
 const optionsStore = useOptionsStore()
 
+const templateModules = useSessionStorage('templateModules', null, {
+  serializer: {
+    read: (v) => {
+      return JSON.parse(v)
+    },
+    write: (v) => {
+      return JSON.stringify(v)
+    }
+  }
+})
+
+watch(templateModules.value, () => {
+  console.log('templateModules', templateModules.value)
+})
 const macVideoEnbale = ref(false)
 const isBrowserMode = ref(true)
 
