@@ -12,7 +12,8 @@
       <demo1></demo1>
       <demo3></demo3>
       <!-- <demo2></demo2> -->
-      <Menu></Menu>
+      <!--      <menu-old></menu-old>-->
+      <menu-new></menu-new>
       <MacVideo v-if="macVideoEnbale"></MacVideo>
       <Otaku v-if="GM_getValue('szzrx', false)"></Otaku>
 
@@ -20,22 +21,22 @@
         <Demo5></Demo5>
         <PrettierFormat></PrettierFormat>
       </div>
-      {{ templateModules }}
     </n-config-provider>
   </n-message-provider>
 </template>
 
 <script setup lang="tsx">
-import { darkTheme, lightTheme, useMessage } from 'naive-ui'
-import { Generator } from './components/index'
-import type { GlobalTheme } from 'naive-ui'
-import { useFlyStore } from './store/flyStore'
-import { RefreshExtraLib } from './flycodeDts'
-import { getMonacoModel, monacoInitializedUtil } from './util/monacoUtil'
-import { getFqueryModel } from './flycodeDts/FQuery/test'
-import { GM_getValue } from './util'
-import { applyCustomFlycode } from './components/MonacoEnhance/monaco.languages.conf'
-import { useOptionsStore } from './store/OptionsStore'
+import type {GlobalTheme} from 'naive-ui'
+import {darkTheme, lightTheme} from 'naive-ui'
+import {Generator} from './components/index'
+import {useFlyStore} from './store/flyStore'
+import {RefreshExtraLib} from './flycodeDts'
+import {getMonacoModel, monacoInitializedUtil} from './util/monacoUtil'
+import {getFqueryModel} from './flycodeDts/FQuery/test'
+import {GM_getValue} from './util'
+import {applyCustomFlycode} from './components/MonacoEnhance/monaco.languages.conf'
+import {useOptionsStore} from './store/OptionsStore'
+
 const theme = ref<GlobalTheme | null>(darkTheme)
 const flyStore = useFlyStore()
 const optionsStore = useOptionsStore()
@@ -115,7 +116,9 @@ const init = async () => {
     }
   }, 1000)
 }
-onMounted(async () => {})
+onMounted(async () => {
+})
+
 function checkURLChangeThenUpdateProtocol() {
   // debugger
   if (urlInterval) {

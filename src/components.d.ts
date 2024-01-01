@@ -25,6 +25,8 @@ declare module 'vue' {
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
     MacVideo: typeof import('./components/macVideo/index.vue')['default']
     Menu: typeof import('./components/Menu/index.vue')['default']
+    MenuNew: typeof import('./components/MenuNew/index.vue')['default']
+    MenuOld: typeof import('./components/MenuOld/index.vue')['default']
     MonacoEnhance: typeof import('./components/MonacoEnhance/index.vue')['default']
     MonacoProvider: typeof import('./components/monacoProvider/index.vue')['default']
     Otaku: typeof import('./components/Otaku/index.vue')['default']

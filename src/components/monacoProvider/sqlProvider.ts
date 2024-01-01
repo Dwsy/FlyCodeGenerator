@@ -94,7 +94,7 @@ export const warm_upTableDataSuggestionsCache = (model) => {
         selectAllLine.push(item1.insertText)
       })
       const selectAllCompletionItem = {
-        label: item.tableAs.split('.')[0] + '.' + 'all',
+        label: item.tableAs.split('.')[1] + '.' + 'all',
         kind: monaco.languages.CompletionItemKind.Event,
         insertText: selectAllLine.join(''),
         range: null,
