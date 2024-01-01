@@ -20,6 +20,7 @@
         <Demo5></Demo5>
         <PrettierFormat></PrettierFormat>
       </div>
+      {{ optionsStore.sqlFormatterOptions }}
     </n-config-provider>
   </n-message-provider>
 </template>
@@ -34,8 +35,11 @@ import { getMonacoModel, monacoInitializedUtil } from './util/monacoUtil'
 import { getFqueryModel } from './flycodeDts/FQuery/test'
 import { GM_getValue } from './util'
 import { applyCustomFlycode } from './components/MonacoEnhance/monaco.languages.conf'
+import { useOptionsStore } from './store/OptionsStore'
 const theme = ref<GlobalTheme | null>(darkTheme)
 const flyStore = useFlyStore()
+const optionsStore = useOptionsStore()
+
 const macVideoEnbale = ref(false)
 const isBrowserMode = ref(true)
 
@@ -53,7 +57,7 @@ onMounted(async () => {
   localStorage.getItem('ide_theme') === 'light' ? (theme.value = lightTheme) : (theme.value = darkTheme)
   const r = await flyStore.init()
   // debugger
-  monacoInitializedUtil.addInitializedCallback(init)
+  monacoInitializedUtil.onInitialized(init)
 })
 
 onBeforeUnmount(() => {
@@ -131,7 +135,7 @@ function checkURLChangeThenUpdateProtocol() {
       if (currentURL.indexOf('uiedit') != -1) {
         if (flyStore.addDtsEnable) {
           console.log('update uiflycode dts')
-          monacoInitializedUtil.addInitializedCallback(() => RefreshExtraLib(true))
+          monacoInitializedUtil.onInitialized(() => RefreshExtraLib(true))
         }
       }
       // addGenQueryElement();

@@ -1,4 +1,26 @@
-import { format } from 'sql-formatter'
+import { FormatOptionsWithLanguage, format } from 'sql-formatter'
+import { monacoInitializedUtil } from './monacoUtil'
+
+let sqlFormatterOptions: FormatOptionsWithLanguage = {
+  language: 'plsql',
+  tabWidth: 2,
+  keywordCase: 'upper',
+  linesBetweenQueries: 2,
+  tabulateAlias: false,
+  commaPosition: 'before', //TODO可配置项目
+  /*
+  a.replace(/(SELECT[\s\S]*?FROM)/g, function(match){
+return match.replace(/\n\s*\n/g, '\n');
+});
+  */
+  paramTypes: {
+    custom: [{ regex: String.raw`\{[\s\S]*?\}` }]
+  }
+}
+monacoInitializedUtil.onInitialized(() => {
+  sqlFormatterOptions = JSON.stringify(localStorage.getItem('sqlFormatterOptions')) as FormatOptionsWithLanguage
+})
+
 const tempFunc = (sql: string, onlyReturnSql: boolean = false) => {
   let matches = sql.match(/\{[\s\S]*?\}/g)
   matches.map((matche) => {
@@ -98,15 +120,7 @@ export function formatFquery(sql: string, start: string, onlyReturnSql: boolean 
   if (onlyReturnSql) {
     return sql
   }
-  let formatSQL = format(sql, {
-    language: 'plsql',
-    tabWidth: 2,
-    keywordCase: 'upper',
-    linesBetweenQueries: 2,
-    paramTypes: {
-      custom: [{ regex: String.raw`\{[\s\S]*?\}` }]
-    }
-  })
+  let formatSQL = format(sql, sqlFormatterOptions)
 
   // debugger
   ifSqlBlockArray.forEach((b, index) => {

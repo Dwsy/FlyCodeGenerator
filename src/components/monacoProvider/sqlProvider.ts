@@ -65,7 +65,7 @@ export function checkInSqlRangeFn(
 const tableDataSuggestionsCache = new Map<string, monaco.languages.CompletionItem[]>()
 const tableDataSelectAllSuggestionsCache = new Map<string, monaco.languages.CompletionItem>()
 let sqlFuncCompletionItem: monaco.languages.CompletionItem[] = []
-monacoInitializedUtil.addInitializedCallback(() => {
+monacoInitializedUtil.onInitialized(() => {
   sqlFuncCompletionItem = getSqlFuncCompletionItem()
 })
 /**
@@ -134,15 +134,19 @@ const SQL2CompletionItems = (formattedSQL: string): TableNameAsAndCompletionItem
 
         const typeDesc =
           getPropertyTypeEmoji(Number(property.propertytypecode)) + getPropertyTypeName(property.propertytypecode)
+
         const completionItem: monaco.languages.CompletionItem = {
           label: label,
           kind: monaco.languages.CompletionItemKind.Field,
           insertText: insertText,
+          //@ts-ignore
+          // insertText_backup: insertText,
           sortText: String(index),
           filterText: pure_insertText,
+          documentation: insertText,
           insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-          preselect: true,
           range: null,
+          preselect: true,
           detail: typeDesc + `\n${getPropertyTypeName(property.propertycode)}${property.propertydescr}`
         }
         return completionItem
@@ -560,6 +564,7 @@ interface autoAsSqlCompletionRet {
   in: boolean
   tableName?: string
   shortName?: string
+  suggestions?: Array<monaco.languages.CompletionItem>
 }
 export function autoAsSqlCompletion(
   model: monaco.editor.ITextModel,
@@ -592,6 +597,30 @@ export function autoAsSqlCompletion(
     const tableShortName = getTableShortName(secondLastWord)
     return {
       in: true,
+      suggestions: [
+        {
+          label: 'as',
+          filterText: 'as',
+          kind: monaco.languages.CompletionItemKind.Method,
+          insertText: `as ${tableShortName}`,
+          preselect: true,
+          sortText: 'as1',
+          detail: `as ${tableShortName}`,
+          insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+          range: null
+        },
+        {
+          label: 'AS',
+          filterText: 'AS',
+          kind: monaco.languages.CompletionItemKind.Method,
+          insertText: `AS ${tableShortName}`,
+          preselect: true,
+          detail: 'AS',
+          sortText: 'AS1',
+          insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+          range: null
+        }
+      ],
       tableName: secondLastWord,
       shortName: tableShortName
     }

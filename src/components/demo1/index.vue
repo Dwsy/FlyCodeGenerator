@@ -96,7 +96,7 @@ let nowEditor: monaco.editor.ICodeEditor
 /**
  * 初始化monaco编辑器，并添加回调函数
  */
-monacoInitializedUtil.addInitializedCallback(async () => {
+monacoInitializedUtil.onInitialized(async () => {
   /**
    * 当创建编辑器时触发回调函数
    * @param {monaco.editor.IStandaloneCodeEditor} editor - 当前创建的编辑器实例

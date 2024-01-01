@@ -29,7 +29,7 @@ let nowEditor: monaco.editor.ICodeEditor
 /**
  * 初始化monaco编辑器，并添加回调函数
  */
-monacoInitializedUtil.addInitializedCallback(async () => {
+monacoInitializedUtil.onInitialized(async () => {
   /**
    * 当创建编辑器时触发回调函数
    * @param {monaco.editor.IStandaloneCodeEditor} editor - 当前创建的编辑器实例
@@ -110,7 +110,9 @@ function getCtrFunc(editor: monaco.editor.ICodeEditor) {
   const ArrayCtrlNameList = ['editortable', 'infotable']
   const position = editor.getPosition()
   const isArrayCtrl = ArrayCtrlNameList.includes(nowSelectCodeType.value.type)
-  const gendCode = `const ${isArrayCtrl ? 'table' : 'ctrl'}Rie = Page.get${isArrayCtrl ? 'Array' : ''}Ctrl("${nowSelectCodeType.value.name}")`
+  const gendCode = `const ${isArrayCtrl ? 'table' : 'ctrl'}Rie = Page.get${isArrayCtrl ? 'Array' : ''}Ctrl("${
+    nowSelectCodeType.value.name
+  }")`
 
   editor.executeEdits('source', [
     {
@@ -121,7 +123,10 @@ function getCtrFunc(editor: monaco.editor.ICodeEditor) {
 
   const _ = (e?) => {
     //   console.log('goto editor lo', e)
-    const newPosition = new monaco.Position(position.lineNumber, position.column + `const ${isArrayCtrl ? 'table' : 'ctrl'}`.length)
+    const newPosition = new monaco.Position(
+      position.lineNumber,
+      position.column + `const ${isArrayCtrl ? 'table' : 'ctrl'}`.length
+    )
     editor.setPosition(newPosition)
     editor.focus()
   }

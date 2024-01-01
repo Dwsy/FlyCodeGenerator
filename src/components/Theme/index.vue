@@ -60,7 +60,7 @@ onMounted(() => {
   window.showChangeTheme = () => {
     showChangeTheme.value = !showChangeTheme.value
   }
-  monacoInitializedUtil.addInitializedCallback(async () => {
+  monacoInitializedUtil.onInitialized(async () => {
     console.log(MonacoTheme)
     if (MonacoTheme != null) {
       // @ts-ignore

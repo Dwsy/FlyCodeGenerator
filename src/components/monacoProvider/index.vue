@@ -8,7 +8,7 @@ import { registerProviders } from './provider'
 import { warm_upTableDataSuggestionsCache } from './sqlProvider'
 
 onMounted(() => {
-  monacoInitializedUtil.addInitializedCallback(() => {
+  monacoInitializedUtil.onInitialized(() => {
     registerProviders()
     monaco.editor.onDidCreateEditor((model) => {
       setTimeout(() => {
