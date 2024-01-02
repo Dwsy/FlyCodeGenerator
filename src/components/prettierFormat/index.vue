@@ -5,6 +5,7 @@ import { getMonacoModel, monacoInitializedUtil } from '../../util//monacoUtil'
 onMounted(() => {
   console.log('prettierFormat')
   monacoInitializedUtil.onInitialized(() => {
+    console.log('prettierFormat onInitialized')
     monaco.languages.registerDocumentFormattingEditProvider('flycode', formatProvider)
   })
 })

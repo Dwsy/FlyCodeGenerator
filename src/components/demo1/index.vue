@@ -107,8 +107,8 @@ monacoInitializedUtil.onInitialized(async () => {
   monaco.editor.onDidCreateEditor(async (editor) => {
     nowEditor = editor
     editor.updateOptions({
-      // fontFamily: 'Cascadia Code PL,微软雅黑',
-      // fontSize: 14
+      fontFamily: 'Cascadia Code PL',
+      // fontSize: 14,
       minimap: {
         enabled: true,
         autohide: true

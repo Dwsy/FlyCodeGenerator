@@ -84,8 +84,8 @@ export const warm_upTableDataSuggestionsCache = (model) => {
     const sqlText = match[0]
     const partsIndex = sqlText.indexOf('=')
     const queryString = sqlText.substring(partsIndex + 1).trim()
-    let formattedSQL = formatFquery(queryString.replaceAll('//', '--//'), '')
-
+    // let formattedSQL = formatFquery(queryString.replaceAll('//', '--//'), '')
+    let formattedSQL = queryString.replaceAll('//', '--//')
     const completionItems = SQL2CompletionItems(formattedSQL)
     completionItems.forEach((item) => {
       tableDataSuggestionsCache.set(item.tableAs, item.CompletionItems)
@@ -183,7 +183,9 @@ export function getSqlCompletionItems(
   const sqlText = model.getValueInRange(range)
   const partsIndex = sqlText.indexOf('=')
   const queryString = sqlText.substring(partsIndex + 1).trim()
-  let formattedSQL = formatFquery(queryString.replaceAll('//', '--//'), '')
+  // let formattedSQL = formatFquery(queryString.replaceAll('//', '--//'), '')
+  let formattedSQL = queryString.replaceAll('//', '--//')
+
   let sqlQueryTables: SqlQueryTable[]
   try {
     // 获取 SQL 查询中的表名和别名。
@@ -284,158 +286,159 @@ export function getSqlCompletionItems(
     })
     .flat()
   //   if (isAfterForm) {
-  if (generalSqlCompletionItems.length == 0) {
-    generalSqlCompletionItems = [
-      {
-        label: 'yyy',
-        kind: monaco.languages.CompletionItemKind.Text,
-        insertText: '"yyyy-MM-dd hh:mm:ss"',
-        preselect: true,
-        range: null,
-        detail: '格式化日期',
-        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
-      },
-      {
-        label: 'ifend',
-        kind: monaco.languages.CompletionItemKind.Field,
-        insertText: '{#if $1} \n\n$2{#endif}',
-        range: null,
-        preselect: true,
-        detail: '{#if} {#endif}',
-        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
-      },
-      {
-        label: 'ifend',
-        kind: monaco.languages.CompletionItemKind.Function,
-        range: null,
-        preselect: true,
-        detail: '{#if} {#endif}',
-        insertText: '{#if $1} \n\t$2\n{#endif}',
-        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
-      },
-      {
-        label: 'left',
-        kind: monaco.languages.CompletionItemKind.Field,
-        preselect: true,
-        range: null,
-        detail: 'left join',
-        insertText: 'left join $1 as $2 on $3',
-        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
-      },
-      {
-        label: 'LEFT',
-        kind: monaco.languages.CompletionItemKind.Field,
-        range: null,
-        preselect: true,
-        detail: 'LEFT JOIN',
-        insertText: 'LEFT JOIN $1 AS $2 ON $3',
-        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
-      },
-      {
-        label: 'right',
-        kind: monaco.languages.CompletionItemKind.Field,
-        preselect: true,
-        range: null,
-        detail: 'right join',
-        insertText: 'right join $1 as $2 on $3',
-        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
-      },
-      {
-        label: 'RIGHT',
-        kind: monaco.languages.CompletionItemKind.Field,
-        range: null,
-        preselect: true,
-        detail: 'RIGHT JOIN',
-        insertText: 'RIGHT JOIN $1 AS $2 ON $3',
-        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
-      },
-      {
-        label: 'inner',
-        kind: monaco.languages.CompletionItemKind.Field,
-        preselect: true,
-        range: null,
-        detail: 'inner join',
-        insertText: 'inner join $1 as $2 on $3',
-        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
-      },
-      {
-        label: 'INNER',
-        kind: monaco.languages.CompletionItemKind.Field,
-        range: null,
-        preselect: true,
-        detail: 'INNER JOIN',
-        insertText: 'INNER JOIN $1 AS $2 ON $3',
-        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
-      },
-      {
-        label: 'full',
-        kind: monaco.languages.CompletionItemKind.Field,
-        preselect: true,
-        range: null,
-        detail: 'full join',
-        insertText: 'full join $1 as $2 on $3',
-        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
-      },
-      {
-        label: 'FULL',
-        kind: monaco.languages.CompletionItemKind.Field,
-        range: null,
-        preselect: true,
-        detail: 'FULL JOIN',
-        insertText: 'FULL JOIN $1 AS $2 ON $3',
-        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
-      },
-      {
-        label: 'where',
-        kind: monaco.languages.CompletionItemKind.Field,
-        range: null,
-        preselect: true,
-        insertText: 'where $1',
-        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
-      },
-      {
-        label: 'between',
-        kind: monaco.languages.CompletionItemKind.Field,
-        range: null,
-        preselect: true,
-        insertText: 'between $1 and $2',
-        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
-      },
-      {
-        label: 'case',
-        kind: monaco.languages.CompletionItemKind.Field,
-        range: null,
-        preselect: true,
-        insertText: 'case when $1 then $2 else $3 end',
-        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
-      },
-      {
-        label: 'order',
-        range: null,
-        kind: monaco.languages.CompletionItemKind.Field,
-        preselect: true,
-        detail: 'order by',
-        insertText: 'order by $1',
-        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
-      },
-      {
-        label: 'norule',
-        kind: monaco.languages.CompletionItemKind.Field,
-        preselect: true,
-        range: null,
-        insertText: 'NORULE',
-        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
-      },
-      {
-        label: 'paging',
-        kind: monaco.languages.CompletionItemKind.Field,
-        range: null,
-        preselect: true,
-        insertText: 'PAGING',
-        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
-      }
-    ]
-  }
+  // if (generalSqlCompletionItems.length == 0) {
+
+  // }
+  generalSqlCompletionItems = [
+    {
+      label: 'yyy',
+      kind: monaco.languages.CompletionItemKind.Text,
+      insertText: '"yyyy-MM-dd hh:mm:ss"',
+      preselect: true,
+      range: null,
+      detail: '格式化日期',
+      insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+    },
+    {
+      label: 'ifend',
+      kind: monaco.languages.CompletionItemKind.Field,
+      insertText: '{#if $1} \n\n$2{#endif}',
+      range: null,
+      preselect: true,
+      detail: '{#if} {#endif}',
+      insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+    },
+    {
+      label: 'ifend',
+      kind: monaco.languages.CompletionItemKind.Function,
+      range: null,
+      preselect: true,
+      detail: '{#if} {#endif}',
+      insertText: '{#if $1} \n\t$2\n{#endif}',
+      insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+    },
+    {
+      label: 'left',
+      kind: monaco.languages.CompletionItemKind.Field,
+      preselect: true,
+      range: null,
+      detail: 'left join',
+      insertText: 'left join $1 as $2 on $3',
+      insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+    },
+    {
+      label: 'LEFT',
+      kind: monaco.languages.CompletionItemKind.Field,
+      range: null,
+      preselect: true,
+      detail: 'LEFT JOIN',
+      insertText: 'LEFT JOIN $1 AS $2 ON $3',
+      insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+    },
+    {
+      label: 'right',
+      kind: monaco.languages.CompletionItemKind.Field,
+      preselect: true,
+      range: null,
+      detail: 'right join',
+      insertText: 'right join $1 as $2 on $3',
+      insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+    },
+    {
+      label: 'RIGHT',
+      kind: monaco.languages.CompletionItemKind.Field,
+      range: null,
+      preselect: true,
+      detail: 'RIGHT JOIN',
+      insertText: 'RIGHT JOIN $1 AS $2 ON $3',
+      insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+    },
+    {
+      label: 'inner',
+      kind: monaco.languages.CompletionItemKind.Field,
+      preselect: true,
+      range: null,
+      detail: 'inner join',
+      insertText: 'inner join $1 as $2 on $3',
+      insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+    },
+    {
+      label: 'INNER',
+      kind: monaco.languages.CompletionItemKind.Field,
+      range: null,
+      preselect: true,
+      detail: 'INNER JOIN',
+      insertText: 'INNER JOIN $1 AS $2 ON $3',
+      insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+    },
+    {
+      label: 'full',
+      kind: monaco.languages.CompletionItemKind.Field,
+      preselect: true,
+      range: null,
+      detail: 'full join',
+      insertText: 'full join $1 as $2 on $3',
+      insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+    },
+    {
+      label: 'FULL',
+      kind: monaco.languages.CompletionItemKind.Field,
+      range: null,
+      preselect: true,
+      detail: 'FULL JOIN',
+      insertText: 'FULL JOIN $1 AS $2 ON $3',
+      insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+    },
+    {
+      label: 'where',
+      kind: monaco.languages.CompletionItemKind.Field,
+      range: null,
+      preselect: true,
+      insertText: 'where $1',
+      insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+    },
+    {
+      label: 'between',
+      kind: monaco.languages.CompletionItemKind.Field,
+      range: null,
+      preselect: true,
+      insertText: 'between $1 and $2',
+      insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+    },
+    {
+      label: 'case',
+      kind: monaco.languages.CompletionItemKind.Field,
+      range: null,
+      preselect: true,
+      insertText: 'case when $1 then $2 else $3 end',
+      insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+    },
+    {
+      label: 'order',
+      range: null,
+      kind: monaco.languages.CompletionItemKind.Field,
+      preselect: true,
+      detail: 'order by',
+      insertText: 'order by $1',
+      insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+    },
+    {
+      label: 'norule',
+      kind: monaco.languages.CompletionItemKind.Field,
+      preselect: true,
+      range: null,
+      insertText: 'NORULE',
+      insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+    },
+    {
+      label: 'paging',
+      kind: monaco.languages.CompletionItemKind.Field,
+      range: null,
+      preselect: true,
+      insertText: 'PAGING',
+      insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+    }
+  ]
   if (!isAfterForm) {
     suggestions = suggestions.concat(selectAllCompletionItems)
   }

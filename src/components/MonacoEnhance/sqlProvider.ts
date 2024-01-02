@@ -83,7 +83,8 @@ export function getSqlCompletionItems(
   const sqlText = model.getValueInRange(range)
   const partsIndex = sqlText.indexOf('=')
   const queryString = sqlText.substring(partsIndex + 1).trim()
-  let formattedSQL = formatFquery(queryString.replaceAll('//', '--//'), '')
+  // let formattedSQL = formatFquery(queryString.replaceAll('//', '--//'), '')
+  let formattedSQL = queryString.replaceAll('//', '--//')
   let sqlQueryTables: SqlQueryTable[]
   try {
     // 获取 SQL 查询中的表名和别名。

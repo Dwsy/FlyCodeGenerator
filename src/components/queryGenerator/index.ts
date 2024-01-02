@@ -136,6 +136,10 @@ export function genQueryModel_(output: Output, queryArgumentArrayMap: Map<string
     return columnData
   })
   // 获取表格的短名称
+  if (!outputTable.tablename) {
+    message.error('未设置输出表')
+    return
+  }
   const tableShortName = getTableShortName(outputTable.tablename)
   // 将 outPropertiesDataMap 中的数据添加到 fquery 中
   fquery += `\n  from ${outputTable.tablename} as ${tableShortName}`
