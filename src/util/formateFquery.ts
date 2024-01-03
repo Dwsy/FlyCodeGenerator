@@ -18,7 +18,7 @@ return match.replace(/\n\s*\n/g, '\n');
   }
 }
 monacoInitializedUtil.onInitialized(() => {
-  sqlFormatterOptions = JSON.stringify(localStorage.getItem('sqlFormatterOptions')) as FormatOptionsWithLanguage
+  // sqlFormatterOptions = JSON.stringify(localStorage.getItem('sqlFormatterOptions')) as FormatOptionsWithLanguage
 })
 
 const tempFunc = (sql: string, onlyReturnSql: boolean = false) => {
@@ -34,12 +34,13 @@ const tempFunc = (sql: string, onlyReturnSql: boolean = false) => {
 }
 export function formatFquery(sql: string, start: string, onlyReturnSql: boolean = false): string {
   sql = sql.replace(
-    /(\bpaging|\bas|\bruleobj|\bnorule\bselect|\bcase|\bfrom|\bwhere|\band|\bor|\border by|\bleft join|\binner join|\bjoin)\b/gi,
+    /\b(paging|as|ruleobj|norule|select|case|from|where|and|or|order\sby|left\sjoin|inner\sjoin|join)\b/gi,
     (match) => {
       console.log(match)
       return match.toUpperCase()
     }
   )
+  debugger
   sql = sql
     .split('\n')
     .map((line) => line.trim())

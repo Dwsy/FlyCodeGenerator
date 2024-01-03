@@ -7,6 +7,7 @@ import { formatFquery } from '../../util/formateFquery'
 import { message } from '../../util/message'
 import { MessageRenderMessage, NAlert, useMessage } from 'naive-ui'
 import { useGenStore } from '../../store/genStore'
+import { checkInSqlRangeFn, getAllSqlRangeFn } from './sqlProvider'
 
 /**
  * 添加格式化SQL操作到编辑器
@@ -20,10 +21,11 @@ import { useGenStore } from '../../store/genStore'
  */
 export const addFomatSqlAction = (editor: monaco.editor.IStandaloneCodeEditor) => {
   const flyStore = useFlyStore()
+  addFomatCursorPositionSqlAction(editor)
   setTimeout(() => {
     editor.addAction({
       id: 'FomatFquery',
-      label: 'FomatFquery',
+      label: '格式化全文sql',
       keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.F9],
       // A precondition for this action.
       precondition: null,
@@ -34,13 +36,45 @@ export const addFomatSqlAction = (editor: monaco.editor.IStandaloneCodeEditor) =
       // Method that will be executed when the action is triggered.
       // @param editor The editor instance is passed in as a convenience
       run: function (ed) {
-        let lines = formatEditotFqueryFunc()
-        ed.executeEdits('name-of-edit', [
-          {
-            range: editor.getModel().getFullModelRange(), // full range
-            text: lines // target value here
-          }
-        ])
+        let lines = formatEditotFqueryFuncNew(ed)
+        if (lines) {
+          ed.executeEdits('name-of-edit', [
+            {
+              range: editor.getModel().getFullModelRange(), // full range
+              text: lines // target value here
+            }
+          ])
+        }
+      }
+    })
+  }, 1)
+}
+
+export const addFomatCursorPositionSqlAction = (editor: monaco.editor.IStandaloneCodeEditor) => {
+  const flyStore = useFlyStore()
+  setTimeout(() => {
+    editor.addAction({
+      id: 'FomatCursorPositionSqlAction',
+      label: '格式化当前位置sql',
+      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Digit9],
+      // A precondition for this action.
+      precondition: null,
+      // A rule to evaluate on top of the precondition in order to dispatch the keybindings.
+      keybindingContext: null,
+      contextMenuGroupId: 'navigation',
+      contextMenuOrder: 2,
+      // Method that will be executed when the action is triggered.
+      // @param editor The editor instance is passed in as a convenience
+      run: function (ed) {
+        let r = formatCursorPositionFqueryFunc(ed)
+        if (r) {
+          ed.executeEdits('name-of-edit', [
+            {
+              range: r.sqlRange, // full range
+              text: r.formattedSQL // target value here
+            }
+          ])
+        }
       }
     })
   }, 1)
@@ -90,7 +124,9 @@ export function copyToVscode() {
         if (matches) {
           const genStore = useGenStore()
           matches.forEach(function (match, index) {
-            var assignment = match.match(/(\w+)\s*=\s*(select\s+\w+)/i)
+            // var assignment =
+            var assignment = match.match(/([\w\s]+)=\s*(select[\w\s]+)\s+/i)
+
             if (assignment) {
               let variableName = assignment[1]
               let query = match.substring(match.indexOf(variableName)).trim()
@@ -112,6 +148,69 @@ export function copyToVscode() {
 }
 export function pasteToMonaco() {}
 
+export function formatCursorPositionFqueryFunc(ed: monaco.editor.ICodeEditor, useText: string = undefined) {
+  const model = ed.getModel()
+  const allText = model.getValue()
+  const position = ed.getPosition()
+  const checkInSqlRangeRet = checkInSqlRangeFn(model, position)
+  debugger
+  if (checkInSqlRangeRet.in) {
+    const sqlRange = checkInSqlRangeRet.sqlRange
+    const formattedSQL = formatRangeSql(ed, sqlRange)
+    // let formattedSQL = formatFquery(sql.replaceAll('//', '--//'), '')
+    // formattedSQL = formattedSQL.replaceAll('--//', '//')
+    // // const newallText = allText.replace(sql, formattedSQL)
+    // debugger
+    // formattedSQL = formattedSQL
+    //   .split('\n')
+    //   .map((item, index) => {
+    //     if (index == 0) {
+    //       return item
+    //     } else {
+    //       return ' '.repeat(sqlRange.startColumn - 3) + item
+    //     }
+    //   })
+    //   .join('\n')
+    return {
+      formattedSQL: formattedSQL,
+      sqlRange: sqlRange
+    }
+  }
+  return false
+  // let text = useText || ed.
+}
+
+export function formatRangeSql(ed: monaco.editor.ICodeEditor, sqlRange: monaco.Range) {
+  const model = ed.getModel()
+  const sql = model.getValueInRange(sqlRange)
+
+  let formattedSQL = formatFquery(sql.replaceAll('//', '--//'), '')
+  formattedSQL = formattedSQL.replaceAll('--//', '//')
+  // const newallText = allText.replace(sql, formattedSQL)
+  debugger
+  formattedSQL = formattedSQL
+    .split('\n')
+    .map((item, index) => {
+      if (index == 0) {
+        return item
+      } else {
+        return ' '.repeat(sqlRange.startColumn - 3) + item
+      }
+    })
+    .join('\n')
+  return formattedSQL
+}
+
+export function formatEditotFqueryFuncNew(ed: monaco.editor.ICodeEditor, useText: string = undefined) {
+  const model = ed.getModel()
+  const allSqlRange = getAllSqlRangeFn(model)
+  let allText = model.getValue()
+  allSqlRange.forEach((range) => {
+    const formattedSQL = formatRangeSql(ed, range)
+    allText = allText.replace(model.getValueInRange(range), formattedSQL)
+  })
+  return allText
+}
 export function formatEditotFqueryFunc(useText: string = undefined) {
   const monacoModel = getMonacoModel()
   let text = useText || monacoModel.getValue()
@@ -124,7 +223,8 @@ export function formatEditotFqueryFunc(useText: string = undefined) {
   if (matches) {
     const genStore = useGenStore()
     matches.forEach(function (match, index) {
-      var assignment = match.match(/(\w+)\s*=\s*(select\s+\w+)/i)
+      // var assignment = match.match(/([\w\s]+)=\s*(select[\w\s]+)\s+/i)
+      var assignment = true
       if (assignment) {
         let variableName = assignment[1]
         let query = match.substring(match.indexOf(variableName)).trim()
@@ -192,7 +292,17 @@ export function formatEditotFqueryFunc(useText: string = undefined) {
 
         formattedSQL = formattedSQL.replaceAll('--//', '//')
         console.log('formattedSQL\n' + formattedSQL)
-
+        // mo
+        // formattedSQL = formattedSQL
+        // .split('\n')
+        // .map((item, index) => {
+        //   if (index == 0) {
+        //     return item
+        //   } else {
+        //     return ' '.repeat(sqlRange.startColumn - 3) + item
+        //   }
+        // })
+        // .join('\n')
         text = text.replace(queryString, formattedSQL)
       }
     })
@@ -248,7 +358,7 @@ export const addAutoAutoAutoAutoAuto = (editor: monaco.editor.IStandaloneCodeEdi
   setTimeout(() => {
     editor.addAction({
       id: '🥰AutoGen',
-      label: '🥰AutoGen',
+      label: '智能生成代码🥰AutoGen',
       keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.F6, monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyB],
       precondition: null,
       keybindingContext: null,
@@ -458,7 +568,7 @@ function newBoFn(matchResult: string) {
 function suffixLogFn(matchResult: string): Function {
   return (ed: monaco.editor.ICodeEditor) => {
     const leadingSpaces = matchResult.match(/^\s*/)[0]
-    const codeLine = `${leadingSpaces}FLY.log(${matchResult.trim()})\n`
+    const codeLine = `${leadingSpaces}FLY.log("${matchResult.trim()}" + ${matchResult.trim()})\n`
     // 删除当前行
     ed.executeEdits('source', [
       {
@@ -479,7 +589,7 @@ function suffixSLogFn(matchResult: string): Function {
     const leadingSpaces = matchResult.match(/^\s*/)[0]
     // JSON.stringify(fixedCombination,null,4)
 
-    const codeLine = `${leadingSpaces}FLY.log(JSON.stringify(${matchResult.trim()},null,4))\n`
+    const codeLine = `${leadingSpaces}FLY.log(JSON.stringify("${matchResult.trim()}" + ${matchResult.trim()},null,4))\n`
     // 删除当前行
     ed.executeEdits('source', [
       {

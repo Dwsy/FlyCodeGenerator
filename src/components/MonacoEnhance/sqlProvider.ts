@@ -18,6 +18,59 @@ export function checkInSqlRangeFn(
   in: boolean
   sqlRange?: monaco.Range
 } {
+  const allSqlRange = getAllSqlRangeFn(model)
+  debugger
+  const containsPosition = allSqlRange.filter((range) => range.containsPosition(position))
+  if (containsPosition.length > 0) {
+    return {
+      in: true,
+      sqlRange: containsPosition[0]
+    }
+  }
+
+  // let text = model.getValue() // 获取 Monaco Editor 的文本内容
+  // let lines = text.split('\n') // 将文本按照行切分
+  // let totalLengthSoFar = 0 // 累计长度
+
+  // let regex = /(\w+)\s*=\s*(select|SELECT)[^;]+;/g
+  // let match
+
+  // const sqlRangeList: Array<monaco.Range> = []
+  // let seq = 0
+  // while ((match = regex.exec(text))) {
+  //   let start = match.index // 匹配的起始字符位置
+  //   let end = match.index + match[0].length // 匹配的结束字符位置
+  //   const range = {
+  //     startLineNumber: 0,
+  //     endLineNumber: 0,
+  //     startColumn: 0,
+  //     endColumn: 0
+  //   }
+  //   const rangeForText = getRangeForText(match[0], model)
+  //   sqlRangeList.push(
+  //     new monaco.Range(
+  //       rangeForText.startLineNumber,
+  //       rangeForText.startColumn,
+  //       rangeForText.endLineNumber,
+  //       rangeForText.endColumn
+  //     )
+  //   )
+  // }
+  // for (let i = 0; i < sqlRangeList.length; i++) {
+  //   let range = sqlRangeList[i]
+  //   if (range.containsPosition(position)) {
+  //     return {
+  //       in: true,
+  //       sqlRange: range
+  //     }
+  //   }
+  // }
+  return {
+    in: false
+  }
+}
+
+export function getAllSqlRangeFn(model: monaco.editor.ITextModel): Array<monaco.Range> {
   let text = model.getValue() // 获取 Monaco Editor 的文本内容
   let lines = text.split('\n') // 将文本按照行切分
   let totalLengthSoFar = 0 // 累计长度
@@ -46,18 +99,12 @@ export function checkInSqlRangeFn(
       )
     )
   }
+  const ret: Array<monaco.Range> = []
   for (let i = 0; i < sqlRangeList.length; i++) {
     let range = sqlRangeList[i]
-    if (range.containsPosition(position)) {
-      return {
-        in: true,
-        sqlRange: range
-      }
-    }
+    ret.push(range)
   }
-  return {
-    in: false
-  }
+  return ret
 }
 // const { Parser } = require('@florajs/sql-parser');
 // import { parse, Statement } from 'pgsql-ast-parser';
