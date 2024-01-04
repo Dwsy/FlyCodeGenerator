@@ -36,7 +36,7 @@ export const addFomatSqlAction = (editor: monaco.editor.IStandaloneCodeEditor) =
       // Method that will be executed when the action is triggered.
       // @param editor The editor instance is passed in as a convenience
       run: function (ed) {
-        let lines = formatEditotFqueryFuncNew(ed)
+        let lines = formatEditotFqueryFuncNew(ed.getModel())
         if (lines) {
           ed.executeEdits('name-of-edit', [
             {
@@ -156,7 +156,7 @@ export function formatCursorPositionFqueryFunc(ed: monaco.editor.ICodeEditor, us
   debugger
   if (checkInSqlRangeRet.in) {
     const sqlRange = checkInSqlRangeRet.sqlRange
-    const formattedSQL = formatRangeSql(ed, sqlRange)
+    const formattedSQL = formatRangeSql(ed.getModel(), sqlRange)
     // let formattedSQL = formatFquery(sql.replaceAll('//', '--//'), '')
     // formattedSQL = formattedSQL.replaceAll('--//', '//')
     // // const newallText = allText.replace(sql, formattedSQL)
@@ -180,8 +180,7 @@ export function formatCursorPositionFqueryFunc(ed: monaco.editor.ICodeEditor, us
   // let text = useText || ed.
 }
 
-export function formatRangeSql(ed: monaco.editor.ICodeEditor, sqlRange: monaco.Range) {
-  const model = ed.getModel()
+export function formatRangeSql(model: monaco.editor.ITextModel, sqlRange: monaco.Range) {
   const sql = model.getValueInRange(sqlRange)
 
   let formattedSQL = formatFquery(sql.replaceAll('//', '--//'), '')
@@ -201,12 +200,11 @@ export function formatRangeSql(ed: monaco.editor.ICodeEditor, sqlRange: monaco.R
   return formattedSQL
 }
 
-export function formatEditotFqueryFuncNew(ed: monaco.editor.ICodeEditor, useText: string = undefined) {
-  const model = ed.getModel()
+export function formatEditotFqueryFuncNew(model: monaco.editor.ITextModel, useText: string = undefined) {
   const allSqlRange = getAllSqlRangeFn(model)
   let allText = model.getValue()
   allSqlRange.forEach((range) => {
-    const formattedSQL = formatRangeSql(ed, range)
+    const formattedSQL = formatRangeSql(model, range)
     allText = allText.replace(model.getValueInRange(range), formattedSQL)
   })
   return allText

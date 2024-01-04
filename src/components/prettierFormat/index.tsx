@@ -6,7 +6,7 @@ import './bable.min'
 import { Options } from 'prettier'
 // import {transform} from '@babel/standalone'
 import { GM_getValue } from '../../util'
-import { formatEditotFqueryFunc } from '../MonacoEnhance'
+import { formatEditotFqueryFunc, formatEditotFqueryFuncNew } from '../MonacoEnhance'
 import { TransformOptions } from './type.d'
 import { MessageRenderMessage, NAlert, NCard } from 'naive-ui'
 
@@ -117,7 +117,7 @@ export const formatProvider: monaco.languages.DocumentFormattingEditProvider = {
     token: monaco.CancellationToken
   ): Promise<monaco.languages.TextEdit[]> {
     let code = await spliceSemiAndDoubleQoute(model.getValue())
-    code = removeStringWrapping(code)
+    code = removeStringWrapping(code, model)
 
     const modelRange = model.getFullModelRange()
     const range = {
@@ -134,7 +134,7 @@ export const formatProvider: monaco.languages.DocumentFormattingEditProvider = {
   }
 }
 
-function removeStringWrapping(code: string) {
+function removeStringWrapping(code: string, model: monaco.editor.ITextModel) {
   code = code.replace("'use strict'", '')
   code = code.replaceAll('{} /**5213', '')
   code = code.replaceAll('5213**/', '')
@@ -149,7 +149,7 @@ function removeStringWrapping(code: string) {
 
     // }, 1);
     debugger
-    code = formatEditotFqueryFunc(code) || code
+    code = formatEditotFqueryFuncNew(model, '') || code
   }
 
   return code

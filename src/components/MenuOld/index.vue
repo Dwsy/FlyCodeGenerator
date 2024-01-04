@@ -25,23 +25,23 @@
           <NSpace justify="space-between">
             <span>{{ BracketPairColorizationMenuText }}</span>
             <NSwitch
-                @update-value=""
-                :value="bracketPairColorizationEnable"
-                @update:value="switchBracketPairColorization"
+              @update-value=""
+              :value="bracketPairColorizationEnable"
+              @update:value="switchBracketPairColorization"
             ></NSwitch>
           </NSpace>
         </NListItem>
 
         <NListItem>
           <NSpace justify="space-between"
-          >{{ SzzrxMenuText }}
+            >{{ SzzrxMenuText }}
             <NSwitch @update-value="switchSzzrx" :value="szzrx"></NSwitch>
           </NSpace>
         </NListItem>
         <NList>
           <NListItem>
             <NSpace justify="space-between"
-            >{{ MacVideoMenuText }}
+              >{{ MacVideoMenuText }}
               <NSwitch @update-value="switchMacVideo" :value="macVideoEnbale"></NSwitch>
             </NSpace>
           </NListItem>
@@ -49,26 +49,24 @@
         <NListItem>
           <NSpace justify="end">
             <NButton @click="useSystemPicute" type="info" size="small">使用MAC工作区壁纸</NButton>
-          </NSpace
-          >
+          </NSpace>
         </NListItem>
 
         <NListItem>
           <NSpace justify="space-between"
-          ><span> {{ ChangeThemeMenuText }}</span>
+            ><span> {{ ChangeThemeMenuText }}</span>
             <NButton @click="openChangeTheme" type="info" size="small">切换</NButton>
-          </NSpace
-          >
+          </NSpace>
         </NListItem>
       </NList>
     </NCard>
   </div>
 </template>
 <script setup lang="tsx">
-import {NButton} from 'naive-ui'
-import {GM_getValue, GM_setValue} from '../../util'
-import {useFlyStore} from '../../store/flyStore'
-import {applyCustomFlycode} from '../MonacoEnhance/monaco.languages.conf'
+import { NButton } from 'naive-ui'
+import { GM_getValue, GM_setValue } from '../../util'
+import { useFlyStore } from '../../store/flyStore'
+import { applyCustomFlycode } from '../MonacoEnhance/monaco.languages.conf'
 
 const flyStore = useFlyStore()
 const trigger = ref<HTMLElement>()

@@ -18,7 +18,8 @@
       <Otaku v-if="GM_getValue('szzrx', false)"></Otaku>
 
       <!-- <div v-if="!isBrowserMode"> -->
-      <!-- <Demo5></Demo5> -->
+      <Demo5></Demo5>
+      <Demo6></Demo6>
       <PrettierFormat></PrettierFormat>
       <!-- </div> -->
     </n-config-provider>

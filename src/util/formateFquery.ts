@@ -4,7 +4,7 @@ import { monacoInitializedUtil } from './monacoUtil'
 let sqlFormatterOptions: FormatOptionsWithLanguage = {
   language: 'plsql',
   tabWidth: 2,
-  keywordCase: 'upper',
+  // keywordCase: 'upper',
   linesBetweenQueries: 2,
   tabulateAlias: false,
   commaPosition: 'before', //TODO可配置项目
@@ -17,9 +17,6 @@ return match.replace(/\n\s*\n/g, '\n');
     custom: [{ regex: String.raw`\{[\s\S]*?\}` }]
   }
 }
-monacoInitializedUtil.onInitialized(() => {
-  // sqlFormatterOptions = JSON.stringify(localStorage.getItem('sqlFormatterOptions')) as FormatOptionsWithLanguage
-})
 
 const tempFunc = (sql: string, onlyReturnSql: boolean = false) => {
   let matches = sql.match(/\{[\s\S]*?\}/g)
@@ -164,6 +161,10 @@ export function formatFquery(sql: string, start: string, onlyReturnSql: boolean 
   formatSQL = formatSQL.replace('--RULEOBJ', 'RULEOBJ')
   formatSQL = formatSQL.replace('--NORULE', 'NORULE')
   formatSQL = formatSQL.replace('EMTLYL', '.')
+  //FIX 替换大写MEMBER 为小写member
+  // formatSQL = formatSQL.replace(/\bMEMBER\b/g, 'member')
+  // formatSQL = formatSQL.replace(/\bLEVEL\b/g, 'level')
+  // formatSQL = formatSQL.replace(/\bNUMBER\b/g, 'number')
   formatSQL = formatSQL
     .split('\n')
     .map((line) => start + line)

@@ -135,6 +135,33 @@ export function genQueryModel_(output: Output, queryArgumentArrayMap: Map<string
     }
     return columnData
   })
+  //0
+  queryArgumentArrayMap.forEach((properties, tableName) => {
+    if (tableName == mainTableName) {
+      properties.map((data) => {
+        const columnData = flyStore.columnDataMap.get(data.propertycode)
+        if (data.name.indexOf('__') !== -1) {
+          const parts = data.name.split('__')
+          if (parts.length === 2) {
+            relationTableColumnMap.set(data.propertycode, data.name)
+            needJoinRelationTableMap.set(parts[0], flyStore.tableDataMap.get(data.objectcode))
+            // needJoinColumnTableNameMap.set(data.propertycode, columnData.columnname)
+          }
+          if (parts.length > 2) {
+            const deepJoinKey: DeepJoinKey = {
+              prefixName: parts.slice(0, parts.length - 1).join('__'),
+              lastName: parts[parts.length - 1],
+              level: parts.length - 1
+            }
+            deepJoinRelationTableMap.set(deepJoinKey, flyStore.tableDataMap.get(data.objectcode))
+          }
+        }
+        return columnData
+      })
+    }
+  })
+  //1
+
   // 获取表格的短名称
   if (!outputTable.tablename) {
     message.error('未设置输出表')
