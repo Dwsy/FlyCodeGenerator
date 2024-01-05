@@ -24,34 +24,6 @@ export function getMonacoModel() {
   }
 }
 
-export function showMonacoInlineDetails() {
-  // var editor = monaco.editor.create(document.getElementById("container"), {
-  //     value: "// First line\nfunction hello() {\n\talert('Hello world!');\n}\n// Last line",
-  //     language: "javascript",
-  //     lineNumbers: "off",
-  //     roundedSelection: false,
-  //     scrollBeyondLastLine: false,
-  //     readOnly: false,
-  //     theme: "vs-dark",
-  // });
-  // setTimeout(function () {
-  //     editor.updateOptions({
-  //         suggest: {
-  //             preview: true
-  //         },
-  //         inlineSuggest: {
-  //             enabled: true
-  //         }
-  //     });
-  // }, 2000);
-  // const monacoModel = getMonacoModel()
-  // monacoModel.updateOptions({
-  // });
-  // monacoModel.updateOptions({
-  //     // lineNumbers: "on",
-  // });
-}
-
 function MonacoInitialized() {
   // @ts-ignore
   return typeof monaco !== 'undefined'

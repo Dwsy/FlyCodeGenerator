@@ -8,6 +8,9 @@ import { addAutoAutoAutoAutoAuto, addFomatSqlAction } from './index'
 import { applyCustomFlycode, MonarchTokensProvider, LanguageConfiguration } from './monaco.languages.conf'
 import { getUiProtocol } from '../../dataRequest'
 import { UiProtocol } from '../../type/formProtocol'
+import { useFlyStore } from '../../store/flyStore'
+const flyStore = useFlyStore()
+
 onMounted(() => {
   //@ts-ignore
   window.MonarchTokensProvider = MonarchTokensProvider
@@ -19,14 +22,31 @@ onMounted(() => {
   window.getMonacoModel0 = getMonacoModel
   monacoInitializedUtil.onInitialized(async () => {
     monaco.editor.onDidCreateEditor(async (editor) => {
+      debugger
+      console.log(editor.getId())
+      console.log(editor.getContainerDomNode())
+      if (editor.getContainerDomNode().getAttribute('id') == 'SplitCode') {
+        return
+      }
+      if (!editor.getContainerDomNode().classList.contains('bm-flycode-monaco-editor-wrap')) {
+        return
+      }
+
       // @ts-ignore
       window.noweditor = editor
-      if (window.location.href.indexOf('modeledit') > -1) {
+      const href = window.location.href
+      const split = href.split('/')
+      const code = split[split.length - 1]
+      // flyStore.monacoEditorMap.set(code, editor)
+      flyStore.setMonacoEditorMap(code, editor)
+      debugger
+      console.log('monacoEditorMap', flyStore.monacoEditorMap)
+      if (href.indexOf('modeledit') > -1) {
         // addBoNewAction(editor)
         addFomatSqlAction(editor)
         addAutoAutoAutoAutoAuto(editor)
         // applyCustomFlycode()
-      } else if (window.location.href.indexOf('uiedit') > -1) {
+      } else if (href.indexOf('uiedit') > -1) {
         return
         addAutoAutoAutoAutoAuto(editor)
         applyCustomFlycode()

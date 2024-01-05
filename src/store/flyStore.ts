@@ -14,6 +14,30 @@ export const useFlyStore = defineStore('flyStore', () => {
   const appMounted = ref(false)
   const waitAppMountedFn = ref<Function[]>()
 
+  const monacoEditorMap = new Map<string, monaco.editor.IStandaloneCodeEditor>()
+  const waitMonacoEditorCallbackMap = new Map<string, Function[]>()
+  const waitMonacoEditorCallback = (code: string, callback: Function) => {
+    if (monacoEditorMap.has(code)) {
+      callback(monacoEditorMap.get(code))
+    } else {
+      if (!waitMonacoEditorCallbackMap.has(code)) {
+        waitMonacoEditorCallbackMap.set(code, [])
+      }
+      waitMonacoEditorCallbackMap.get(code).push(callback)
+    }
+  }
+  const setMonacoEditorMap = (code: string, editor: monaco.editor.IStandaloneCodeEditor) => {
+    monacoEditorMap.set(code, editor)
+    console.log(code, editor)
+
+    if (waitMonacoEditorCallbackMap.has(code)) {
+      waitMonacoEditorCallbackMap.get(code).forEach((callback) => {
+        callback(editor)
+      })
+      waitMonacoEditorCallbackMap.delete(code)
+    }
+  }
+
   const ActiveGenerator = ref()
   const protocol = ref<Protocol>()
   const tableDatas = ref<tableData[]>()
@@ -181,8 +205,11 @@ export const useFlyStore = defineStore('flyStore', () => {
     tableDataMap,
     tableNameDataMap,
     dictNameDataMap,
+    monacoEditorMap,
     // data
 
+    setMonacoEditorMap,
+    waitMonacoEditorCallback,
     // status
     appMounted,
     ActiveGenerator,

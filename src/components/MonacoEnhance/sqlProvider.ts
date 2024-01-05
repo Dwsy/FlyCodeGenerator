@@ -106,6 +106,7 @@ export function getAllSqlRangeFn(model: monaco.editor.ITextModel): Array<monaco.
   }
   return ret
 }
+
 // const { Parser } = require('@florajs/sql-parser');
 // import { parse, Statement } from 'pgsql-ast-parser';
 const tableDataSuggestionsCache = new Map<string, monaco.languages.CompletionItem[]>()
@@ -448,7 +449,7 @@ const getSqlQueryTables0ld = (sqlText: string): Array<SqlQueryTable> => {
   return result
 }
 
-function getRangeForText(text: string, model: monaco.editor.IModel): monaco.IRange | undefined {
+export function getRangeForText(text: string, model: monaco.editor.IModel): monaco.IRange | undefined {
   const matches = model.findMatches(text, false, false, true, null, true)
 
   // Check if a match was found

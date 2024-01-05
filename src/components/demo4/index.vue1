@@ -2,42 +2,20 @@
   <div v-if="goToSymbolResults">
     <Teleport to=".tree-container">
       <div class="fly-outline">
-        <div class="outline1"><span class="outline2">大纲</span></div>
+        <div class="outline1"><span class="outline2">业务实体</span></div>
 
         <!-- <NText style="margin-left: 1%" class="title">大纲</NText> -->
-        <n-input-group>
-          <n-popselect v-model:value="selectFilter" :options="selectFilterOptions" trigger="hover">
-            <NButton size="small">
-              <n-icon :component="FlashOutline" v-show="!selectFilter" />
-              <!-- @vue-ignore -->
-              <span
-                v-if="selectFilter"
-                class="codicon"
-                :class="`codicon-symbol-${SymbolKind[selectFilter].toLocaleLowerCase()}`"
-              >
-              </span>
-            </NButton>
-          </n-popselect>
-          <n-input v-model:value="pattern" placeholder="搜索" :style="{ width: '85%' }" size="small">
-            <template #prefix></template
-          ></n-input>
-        </n-input-group>
-
+        <n-input v-model:value="pattern" placeholder="搜索" />
         <div class="fly-outline-tree">
-          <n-tree
-            block-line
-            style="height: 40%"
-            :show-line="true"
-            :scrollbar-props="{ size: 'small', trigger: 'hover' }"
-            :data="treeData"
-            :pattern="pattern"
-            :filter="filter"
-            :show-irrelevant-nodes="showIrrelevantNodes"
-            :node-props="nodeProps"
-            update
-          >
-            <template #empty>...</template></n-tree
-          >
+          <NForm>
+            <n-tree
+              block-line
+              :data="treeData"
+              :pattern="pattern"
+              :show-irrelevant-nodes="showIrrelevantNodes"
+              :node-props="nodeProps"
+            />
+          </NForm>
         </div>
       </div>
     </Teleport>
@@ -45,42 +23,16 @@
 </template>
 
 <script setup lang="ts">
-import { FlashOutline } from '@vicons/ionicons5'
 import { TreeOption, useMessage } from 'naive-ui'
 import { monacoInitializedUtil } from '../../util/monacoUtil'
-import {
-  SymbolKindCodiconMap,
-  getAllSqlRangeSFWFn,
-  getMonacoJavaScriptMonarch,
-  provideDocumentSymbol,
-  SymbolKind
-} from './App'
+import { SymbolKindCodiconMap, getAllSqlRangeSFWFn, getMonacoJavaScriptMonarch, provideDocumentSymbol } from './App'
 import { querySelectorPromise } from '../demo6'
 import { getAllSqlRangeFn } from '../MonacoEnhance/sqlProvider'
-import { useFlyStore } from '../../store/flyStore'
-import { getPageCode } from '../../util'
-
-const selectFilter = ref('')
-
-const selectFilterOptions = reactive([
-  { key: 'all', value: '', label: '全部' },
-  { key: 'sql', value: 23, label: 'Query' },
-  { key: 'function', value: 11, label: '函数' },
-  { key: 'var', value: 12, label: '变量' },
-  { key: 'method', value: 5, label: '方法' },
-  { key: 'property', value: 6, label: '属性' }
-])
 const showIrrelevantNodes = ref(false)
 const treeData = ref<TreeOption[]>()
 const pattern = ref('')
-// PropType<(pattern: string, node: TreeOption) => boolean>;
-const filter = (pattern: string, node: TreeOption) => {
-  //@ts-ignore
-  return node.this.kind == selectFilter.value
-}
-
 const defaultExpandedKeys = ref([])
-const goToSymbolResults = ref<Boolean | Element>(false)
+const goToSymbolResults = ref(false)
 const r = ref(false)
 const message = useMessage()
 const IEditor = ref<monaco.editor.IEditor>(null)
@@ -123,68 +75,71 @@ onUnmounted(() => {
     // goToSymbolResults.value.remove()
   }
 })
-let enableOutline: Function = () => {}
-monacoInitializedUtil.onInitialized(() => {
-  const _ = new provideDocumentSymbol()
-  enableOutline = (e) => {
-    setTimeout(() => {
-      querySelectorPromise('.tree-container', 5000, 500).then((Element) => {
-        console.log('goToSymbolResults', Element)
-        //@ts-ignore
-        goToSymbolResults.value = Element
-      })
-    }, 50)
-    debugger
-    // if (!e.getDomNode()?.getAttribute('role')) {
-    //   return
-    // }
-    IEditor.value = e
-    const provideDocumentSymbols = async (model, token) => {
-      let symbols: any[] = await _.provideDocumentSymbols(model, token)
-      const allSqlRange = getAllSqlRangeSFWFn(model)
-      symbols = symbols.concat(allSqlRange)
-      console.log(symbols)
-      symbols.sort((a, b) => {
-        return a.range.startLineNumber - b.range.startLineNumber
-      })
-      const TreeOptionArray = convertSymbolArrayToTreeOptionArray(symbols)
-      // console.log(TreeOptionArray)
-      treeData.value = TreeOptionArray
-      return symbols
-    }
-    setTimeout(async () => {
-      provideDocumentSymbols(e.getModel(), null)
-    }, 50)
-    monaco.languages.registerDocumentSymbolProvider('javascript', {
-      provideDocumentSymbols
-    })
-  }
-  // monaco.editor.onDidCreateEditor()
-  // monacoJavaScriptMonarch.tokenizer.root.unshift([/[a-zA-Z_]\w*\(/, 'function']);
-  // monacoJavaScriptMonarch.tokenizer.root.unshift([/\b([a-zA-Z_]\w*)(?=\()/, 'function']);
-})
 onMounted(() => {
   console.log('goToSymbolResults onMounted')
-})
-const flyStore = useFlyStore()
-watchEffect(async () => {
-  if (useFlyStore().codeGeneratorInitStatus) {
-    setTimeout(async () => {
-      goToSymbolResults.value = false
-      await nextTick()
-      const pageCode = getPageCode()
-      flyStore.waitMonacoEditorCallback(pageCode, (e) => {
-        debugger
-        enableOutline(e)
+  monacoInitializedUtil.onInitialized(() => {
+    const monacoJavaScriptMonarch = getMonacoJavaScriptMonarch()
+    const PropertyRegexPre = /\w+(?=\.)/
+    monacoJavaScriptMonarch.tokenizer.root.unshift([/\/\/\s*TODO\b/i, 'comment.fixme'])
+    monacoJavaScriptMonarch.tokenizer.root.unshift([/\/\/\s*FIXME\b/i, 'comment.fixme'])
+    monacoJavaScriptMonarch.tokenizer.root.unshift([/\/\/\s*NOTE\b/i, 'comment.fixme'])
+    monacoJavaScriptMonarch.tokenizer.root.unshift([/\/\/\s*todo\b/i, 'comment.todo'])
+    monacoJavaScriptMonarch.tokenizer.root.unshift([/\/\/\s*fixme\b/i, 'comment.fixme'])
+    monacoJavaScriptMonarch.tokenizer.root.unshift([/\/\/\s*remind\b/i, 'comment.remind'])
+    // monacoJavaScriptMonarch.tokenizer.root.unshift([PropertyRegex, 'code.property'])
+    // [, 'attribute'],
+    monacoJavaScriptMonarch.tokenizer.root.unshift([/\.[a-zA-Z_]\w*/, 'code.property'])
+    monacoJavaScriptMonarch.tokenizer.root.unshift([PropertyRegexPre, 'code.propertypre'])
+    monacoJavaScriptMonarch.tokenizer.root.unshift([/FLY\.log/, 'flylog'])
+    monacoJavaScriptMonarch.tokenizer.root.unshift([/\b(\w+)\(/, 'function'])
+    monaco.languages.setMonarchTokensProvider('javascript', monacoJavaScriptMonarch)
+    monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+      noSuggestionDiagnostics: true,
+      noSemanticValidation: true,
+      noSyntaxValidation: true,
+      onlyVisible: true
+    })
+    const _ = new provideDocumentSymbol()
+    monaco.editor.onDidCreateEditor((e) => {
+      setTimeout(() => {
+        querySelectorPromise('.tree-container', 5000, 500).then((e) => {
+          console.log('goToSymbolResults', e)
+          //@ts-ignore
+          goToSymbolResults.value = e
+        })
+      }, 1000)
+      debugger
+      // if (!e.getDomNode()?.getAttribute('role')) {
+      //   return
+      // }
+      IEditor.value = e
+      const provideDocumentSymbols = async (model, token) => {
+        let symbols: any[] = await _.provideDocumentSymbols(model, token)
+        const allSqlRange = getAllSqlRangeSFWFn(model)
+        symbols = symbols.concat(allSqlRange)
+        console.log(symbols)
+        symbols.sort((a, b) => {
+          return a.range.startLineNumber - b.range.startLineNumber
+        })
+        const TreeOptionArray = convertSymbolArrayToTreeOptionArray(symbols)
+        // console.log(TreeOptionArray)
+        treeData.value = TreeOptionArray
+        return symbols
+      }
+      setTimeout(async () => {
+        provideDocumentSymbols(e.getModel(), null)
+      }, 1400)
+      monaco.languages.registerDocumentSymbolProvider('javascript', {
+        provideDocumentSymbols
       })
-    }, 10)
-    //todo
-  }
+    })
+    // monacoJavaScriptMonarch.tokenizer.root.unshift([/[a-zA-Z_]\w*\(/, 'function']);
+    // monacoJavaScriptMonarch.tokenizer.root.unshift([/\b([a-zA-Z_]\w*)(?=\()/, 'function']);
+  })
 })
-function convertSymbolArrayToTreeOptionArray(documentSymbols: monaco.languages.DocumentSymbol[]): TreeOption[] {
-  return documentSymbols.map(convertSymbolToTreeOption)
-}
+
 function convertSymbolToTreeOption(documentSymbol: monaco.languages.DocumentSymbol): TreeOption {
+  const SymbolKindKeys = Object.keys(monaco.languages.SymbolKind)
   debugger
   return {
     key: documentSymbol.name + documentSymbol.range.startLineNumber + documentSymbol.range.startColumn,
@@ -199,10 +154,13 @@ function convertSymbolToTreeOption(documentSymbol: monaco.languages.DocumentSymb
     // suffix: () => documentSymbol.detail
   }
 }
+function convertSymbolArrayToTreeOptionArray(documentSymbols: monaco.languages.DocumentSymbol[]): TreeOption[] {
+  return documentSymbols.map(convertSymbolToTreeOption)
+}
 </script>
 <style>
 #beSetting > div.left-side > div > div.tree-container > ul {
-  height: 40% !important;
+  height: 50% !important;
   overflow-y: auto;
 }
 .fly-outline {
@@ -212,11 +170,10 @@ function convertSymbolToTreeOption(documentSymbol: monaco.languages.DocumentSymb
 .fly-outline-tree {
   max-height: 50% !important;
   overflow-y: auto;
-  overflow-x: hidden;
 }
 .object-tree-container .tree-container {
   height: 100%;
-  overflow: hidden !important;
+  overflow: hidden;
 }
 
 .outline1 {

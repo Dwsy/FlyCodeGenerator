@@ -587,7 +587,7 @@ function suffixSLogFn(matchResult: string): Function {
     const leadingSpaces = matchResult.match(/^\s*/)[0]
     // JSON.stringify(fixedCombination,null,4)
 
-    const codeLine = `${leadingSpaces}FLY.log(JSON.stringify("${matchResult.trim()}" + ${matchResult.trim()},null,4))\n`
+    const codeLine = `${leadingSpaces}FLY.log('${matchResult.trim()}' + JSON.stringify(${matchResult.trim()},null,4))\n`
     // 删除当前行
     ed.executeEdits('source', [
       {

@@ -236,3 +236,10 @@ export const GM_registerMenuCommand = (name: string, callback: Function) => {
 export const GM_setClipboard = (string: string, type: string) => {
   copyToClipboard(string)
 }
+
+export function getPageCode() {
+  const href = window.location.href
+  const split = href.split('/')
+  const code = split[split.length - 1]
+  return code || ''
+}

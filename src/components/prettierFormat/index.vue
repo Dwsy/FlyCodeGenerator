@@ -6,7 +6,8 @@ onMounted(() => {
   console.log('prettierFormat')
   monacoInitializedUtil.onInitialized(() => {
     console.log('prettierFormat onInitialized')
-    monaco.languages.registerDocumentFormattingEditProvider('flycode', formatProvider)
+    // monaco.languages.registerDocumentFormattingEditProvider('flycode', formatProvider)
+    monaco.languages.registerDocumentFormattingEditProvider('javascript', formatProvider)
   })
 })
 </script>

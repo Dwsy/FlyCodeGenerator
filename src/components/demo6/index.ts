@@ -1,17 +1,24 @@
 import { getMonacoModel } from '../../util/monacoUtil'
+export const querySelectorPromise = (querySelector, w = 3000, i = 300): Promise<Element> =>
+  new Promise((resolve, reject) => {
+    const MAX_WAIT_TIME = w // 3 秒
+    const INTERVAL_TIME = i
+    let elapsed = 0
 
+    const intervalId = setInterval(() => {
+      elapsed += INTERVAL_TIME
+      const element = document.querySelector(querySelector)
+      if (element !== null) {
+        clearInterval(intervalId)
+        resolve(element)
+      } else if (elapsed >= MAX_WAIT_TIME) {
+        clearInterval(intervalId)
+        reject(new Error('Element not found within 3 seconds'))
+      }
+    }, INTERVAL_TIME)
+  })
 export const switchSplitEditor = async () => {
   console.log('openSplitEditor')
-  const querySelectorPromise = (querySelector): Promise<Element> =>
-    new Promise((resolve) => {
-      const intervalId = setInterval(() => {
-        const element = document.querySelector(querySelector)
-        if (element !== null) {
-          clearInterval(intervalId)
-          resolve(element)
-        }
-      }, 100)
-    })
 
   const rightSide = await querySelectorPromise('.right-side')
   // rightSide.classList.add('split-editor')
@@ -30,7 +37,7 @@ export const switchSplitEditor = async () => {
   let tabs = document.querySelectorAll(
     '#beSetting > div.right-side > div > div > div.ant-tabs-bar.ant-tabs-top-bar > div > div > div > div > div'
   )
-  debugger
+  // debugger
   if (tabs.length >= 3) {
     return
   }
@@ -79,12 +86,18 @@ export const switchSplitEditor = async () => {
     return
   }
   async function openPlan(index: number) {
+    const left_column_unfold: HTMLButtonElement = document.querySelector('#beSetting > span.fold_btn_left')
+    if (left_column_unfold) {
+      try {
+        left_column_unfold.click()
+      } catch {}
+    }
     if (index == 2) {
       rightSide.classList.toggle('split-editor', true)
-      right_column_unfold.classList.toggle('split-editor', true)
+      right_column_unfold.classList.toggle('split-editor_unfold', true)
     } else {
       rightSide.classList.toggle('split-editor', false)
-      right_column_unfold.classList.toggle('split-editor', false)
+      right_column_unfold.classList.toggle('split-editor_unfold', false)
     }
     const plans = document.querySelectorAll(
       '#beSetting > div.right-side > div > div > div.ant-tabs-content.ant-tabs-content-animated.ant-tabs-top-content > div'
@@ -102,6 +115,9 @@ export const switchSplitEditor = async () => {
       if (!SplitCodeDiv.hasChildNodes()) {
         const editor = monaco.editor.create(SplitCodeDiv, {
           model: getMonacoModel()
+        })
+        window.addEventListener('resize', () => {
+          editor.layout()
         })
       }
       content.classList.add('show-split-editor')

@@ -1,8 +1,9 @@
 <template>
   <n-message-provider>
-    <n-config-provider :theme="theme">
+    <n-config-provider :theme="theme" :theme-overrides="themeOverrides">
       <div v-if="flyStore.codeGeneratorInitStatus">
         <SaveProtocolWatch></SaveProtocolWatch>
+
         <component :is="Generator[flyStore.ActiveGenerator]"></component>
       </div>
       <Theme></Theme>
@@ -16,10 +17,11 @@
       <menu-new></menu-new>
       <MacVideo v-if="macVideoEnbale"></MacVideo>
       <Otaku v-if="GM_getValue('szzrx', false)"></Otaku>
-
       <!-- <div v-if="!isBrowserMode"> -->
       <Demo5></Demo5>
       <Demo6></Demo6>
+      <Demo4></Demo4>
+
       <PrettierFormat></PrettierFormat>
       <!-- </div> -->
     </n-config-provider>
@@ -37,8 +39,19 @@ import { getFqueryModel } from './flycodeDts/FQuery/test'
 import { GM_getValue } from './util'
 import { applyCustomFlycode } from './components/MonacoEnhance/monaco.languages.conf'
 import { useOptionsStore } from './store/OptionsStore'
+import { NConfigProvider } from 'naive-ui'
 
 const theme = ref<GlobalTheme | null>(darkTheme)
+
+const themeOverrides: import('naive-ui').GlobalThemeOverrides = {
+  Tree: {
+    fontSize: '12px',
+    nodeHeight: '20px',
+    nodeWrapperPadding: '2px 0',
+    nodeColorActive: 'rgba(155, 155, 155, 0.09)'
+  }
+}
+
 const flyStore = useFlyStore()
 const optionsStore = useOptionsStore()
 
@@ -113,9 +126,9 @@ const init = async () => {
 
       clearInterval(c)
     } else {
-      console.log('wait...')
+      // console.log('wait...')
     }
-  }, 1000)
+  }, 1500)
 }
 onMounted(async () => {})
 

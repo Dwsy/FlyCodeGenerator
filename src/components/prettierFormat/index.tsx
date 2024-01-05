@@ -88,10 +88,12 @@ const renderMessage: MessageRenderMessage = (props) => {
     maxWidth: 'calc(100vw - 32px)',
     width: '480px',
     boxShadow: 'var(--n-box-shadow)',
+    color: 'var(--theme-shell-menu-font-color)!important',
     backgroundColor: 'var(--theme-tools-button-background-color)'
   }
   const style2 = {
-    marginLeft: '0px!important'
+    marginLeft: '0px!important',
+    color: 'var(--theme-shell-menu-font-color)'
   }
 
   return h(
