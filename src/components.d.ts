@@ -18,6 +18,7 @@ declare module 'vue' {
     Demo4: typeof import('./components/demo4/index.vue')['default']
     Demo5: typeof import('./components/demo5/index.vue')['default']
     Demo6: typeof import('./components/demo6/index.vue')['default']
+    Demo7: typeof import('./components/demo7/index.vue')['default']
     ExcelExport: typeof import('./components/ExcelExport/index.vue')['default']
     ExcelFrontImport: typeof import('./components/ExcelFrontImport/index.vue')['default']
     ExcelImport: typeof import('./components/ExcelImport/index.vue')['default']

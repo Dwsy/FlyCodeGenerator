@@ -4,7 +4,7 @@ import { monacoInitializedUtil } from '../../util/monacoUtil'
 import { autoAsSqlCompletion, checkInSqlRangeFn, getSqlCompletionItems } from './sqlProvider'
 
 export const registerProviders = () => {
-  monaco.languages.registerCompletionItemProvider('flycode', {
+  monaco.languages.registerCompletionItemProvider('javascript', {
     //@ts-ignore
     provideCompletionItems: function (
       model: monaco.editor.ITextModel,

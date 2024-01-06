@@ -1,5 +1,5 @@
 import { getMonacoModel } from '../../util/monacoUtil'
-export const querySelectorPromise = (querySelector, w = 3000, i = 300): Promise<Element> =>
+export const querySelectorPromise = (querySelector: string, w = 3000, i = 300): Promise<Element> =>
   new Promise((resolve, reject) => {
     const MAX_WAIT_TIME = w // 3 秒
     const INTERVAL_TIME = i
@@ -17,7 +17,7 @@ export const querySelectorPromise = (querySelector, w = 3000, i = 300): Promise<
       }
     }, INTERVAL_TIME)
   })
-export const switchSplitEditor = async () => {
+export const switchSplitEditor = async (editor) => {
   console.log('openSplitEditor')
 
   const rightSide = await querySelectorPromise('.right-side')
@@ -113,11 +113,11 @@ export const switchSplitEditor = async () => {
     )
     if (index === 2) {
       if (!SplitCodeDiv.hasChildNodes()) {
-        const editor = monaco.editor.create(SplitCodeDiv, {
+        const ce = monaco.editor.create(SplitCodeDiv, {
           model: getMonacoModel()
         })
         window.addEventListener('resize', () => {
-          editor.layout()
+          ce.layout()
         })
       }
       content.classList.add('show-split-editor')

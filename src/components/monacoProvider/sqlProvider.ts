@@ -19,23 +19,11 @@ export function checkInSqlRangeFn(
   sqlRange?: monaco.Range
 } {
   let text = model.getValue() // 获取 Monaco Editor 的文本内容
-  let lines = text.split('\n') // 将文本按照行切分
-  let totalLengthSoFar = 0 // 累计长度
-
   let regex = /(\w+)\s*=\s*(select|SELECT)[^;]+;/g
   let match
-
   const sqlRangeList: Array<monaco.Range> = []
   let seq = 0
   while ((match = regex.exec(text))) {
-    let start = match.index // 匹配的起始字符位置
-    let end = match.index + match[0].length // 匹配的结束字符位置
-    const range = {
-      startLineNumber: 0,
-      endLineNumber: 0,
-      startColumn: 0,
-      endColumn: 0
-    }
     const rangeForText = getRangeForText(match[0], model)
     sqlRangeList.push(
       new monaco.Range(

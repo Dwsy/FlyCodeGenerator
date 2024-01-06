@@ -18,9 +18,13 @@
               </span>
             </NButton>
           </n-popselect>
-          <n-input v-model:value="pattern" placeholder="搜索" :style="{ width: '85%' }" size="small">
+          <n-input v-model:value="pattern" placeholder="搜索" :style="{ width: '75%' }" size="small">
             <template #prefix></template
           ></n-input>
+          <!-- @vue-skip -->
+          <NButton size="small">
+            <NIcon :component="Refresh" @click="RefreshOutline" style="transition: transform 1s"> </NIcon>
+          </NButton>
         </n-input-group>
 
         <div class="fly-outline-tree">
@@ -29,9 +33,8 @@
             style="height: 40%"
             :show-line="true"
             :scrollbar-props="{ size: 'small', trigger: 'hover' }"
-            :data="treeData"
+            :data="treeDataSearch"
             :pattern="pattern"
-            :filter="filter"
             :show-irrelevant-nodes="showIrrelevantNodes"
             :node-props="nodeProps"
             update
@@ -45,20 +48,24 @@
 </template>
 
 <script setup lang="ts">
-import { FlashOutline } from '@vicons/ionicons5'
+import { FlashOutline, Refresh } from '@vicons/ionicons5'
 import { TreeOption, useMessage } from 'naive-ui'
 import { monacoInitializedUtil } from '../../util/monacoUtil'
-import {
-  SymbolKindCodiconMap,
-  getAllSqlRangeSFWFn,
-  getMonacoJavaScriptMonarch,
-  provideDocumentSymbol,
-  SymbolKind
-} from './App'
+import { SymbolKindCodiconMap, getMonacoJavaScriptMonarch, provideDocumentSymbol, SymbolKind } from './App'
 import { querySelectorPromise } from '../demo6'
 import { getAllSqlRangeFn } from '../MonacoEnhance/sqlProvider'
 import { useFlyStore } from '../../store/flyStore'
 import { getPageCode } from '../../util'
+import { provideDocumentSymbols } from '.'
+import { HTMLAttributes } from 'vue'
+const props = withDefaults(
+  defineProps<{
+    pagecode: string
+  }>(),
+  {
+    pagecode: null
+  }
+)
 
 const selectFilter = ref('')
 
@@ -72,12 +79,35 @@ const selectFilterOptions = reactive([
 ])
 const showIrrelevantNodes = ref(false)
 const treeData = ref<TreeOption[]>()
+const treeDataSearch = ref<TreeOption[]>()
 const pattern = ref('')
 // PropType<(pattern: string, node: TreeOption) => boolean>;
-const filter = (pattern: string, node: TreeOption) => {
-  //@ts-ignore
-  return node.this.kind == selectFilter.value
-}
+// const filter = (pattern: string, node: TreeOption) => {
+//   //@ts-ignore
+//   // return node.this.kind == selectFilter.value
+//   if (selectFilter.value == '') {
+//     return true
+//   }
+//   //@ts-ignore
+//   return node.this.kind == selectFilter.value && node.this.name.indexOf(pattern) > -1
+// }
+const flyStore = useFlyStore()
+watch(
+  selectFilter,
+  (v) => {
+    console.log('selectFilter', v)
+    if (v) {
+      treeDataSearch.value = treeData.value.filter((item) => {
+        //@ts-ignore
+        return item.this.kind == v
+      })
+    } else {
+    }
+  },
+  {
+    // immediate: true
+  }
+)
 
 const defaultExpandedKeys = ref([])
 const goToSymbolResults = ref<Boolean | Element>(false)
@@ -85,7 +115,7 @@ const r = ref(false)
 const message = useMessage()
 const IEditor = ref<monaco.editor.IEditor>(null)
 const nodeProps = ({ option }: { option: TreeOption }) => {
-  return {
+  const nodeProps = {
     onClick() {
       //@ts-ignore
       // message.info('[Click] ' + option.this.name)
@@ -94,17 +124,16 @@ const nodeProps = ({ option }: { option: TreeOption }) => {
       //@ts-ignore
       const position = new monaco.Position(option.this.range.startLineNumber, option.this.range.startColumn)
       // IEditor.value.setPosition(position)
+      const editor = toRaw(IEditor.value)
       //@ts-ignore
-      noweditor.focus()
+      // const editor = noweditor
+      // const editor = flyStore.monacoEditorMap.get(getPageCode())
+      debugger
+      editor.focus()
+      editor.setPosition(position)
       //@ts-ignore
-
-      noweditor.setPosition(position)
-      //@ts-ignore
-
       const revealPosition = new monaco.Position(option.this.range.startLineNumber, option.this.range.startColumn)
-      //@ts-ignore
-
-      noweditor.revealPositionInCenterIfOutsideViewport(revealPosition)
+      editor.revealPositionInCenterIfOutsideViewport(revealPosition)
     }
     // onContextmenu (e: MouseEvent): void {
     //   optionsRef.value = [option]
@@ -115,17 +144,19 @@ const nodeProps = ({ option }: { option: TreeOption }) => {
     //   e.preventDefault()
     // }
   }
+  return nodeProps
 }
 onUnmounted(() => {
   console.log('onUnmounted goToSymbolResults')
 
   if (goToSymbolResults.value) {
-    // goToSymbolResults.value.remove()
+    //@ts-ignore
+    goToSymbolResults.value.remove()
   }
 })
 let enableOutline: Function = () => {}
+let RefreshOutline: Function = () => {}
 monacoInitializedUtil.onInitialized(() => {
-  const _ = new provideDocumentSymbol()
   enableOutline = (e) => {
     setTimeout(() => {
       querySelectorPromise('.tree-container', 5000, 500).then((Element) => {
@@ -135,74 +166,47 @@ monacoInitializedUtil.onInitialized(() => {
       })
     }, 50)
     debugger
-    // if (!e.getDomNode()?.getAttribute('role')) {
-    //   return
-    // }
     IEditor.value = e
-    const provideDocumentSymbols = async (model, token) => {
-      let symbols: any[] = await _.provideDocumentSymbols(model, token)
-      const allSqlRange = getAllSqlRangeSFWFn(model)
-      symbols = symbols.concat(allSqlRange)
-      console.log(symbols)
-      symbols.sort((a, b) => {
-        return a.range.startLineNumber - b.range.startLineNumber
-      })
-      const TreeOptionArray = convertSymbolArrayToTreeOptionArray(symbols)
-      // console.log(TreeOptionArray)
-      treeData.value = TreeOptionArray
-      return symbols
+    RefreshOutline = async () => {
+      treeData.value = await provideDocumentSymbols(e.getModel(), null)
+      treeDataSearch.value = treeData.value
+      console.log('RefreshOutline')
     }
-    setTimeout(async () => {
-      provideDocumentSymbols(e.getModel(), null)
-    }, 50)
-    monaco.languages.registerDocumentSymbolProvider('javascript', {
-      provideDocumentSymbols
-    })
+    RefreshOutline()
+    // monaco.languages.registerDocumentSymbolProvider('javascript', {
+    //   provideDocumentSymbols
+    // })
   }
-  // monaco.editor.onDidCreateEditor()
-  // monacoJavaScriptMonarch.tokenizer.root.unshift([/[a-zA-Z_]\w*\(/, 'function']);
-  // monacoJavaScriptMonarch.tokenizer.root.unshift([/\b([a-zA-Z_]\w*)(?=\()/, 'function']);
 })
-onMounted(() => {
+onMounted(async () => {
   console.log('goToSymbolResults onMounted')
+  await nextTick()
+  const pageCode = props.pagecode
+  flyStore.waitMonacoEditorCallback(pageCode, (e) => {
+    debugger
+    IEditor.value = e
+    enableOutline(e)
+  })
 })
-const flyStore = useFlyStore()
-watchEffect(async () => {
-  if (useFlyStore().codeGeneratorInitStatus) {
-    setTimeout(async () => {
-      goToSymbolResults.value = false
-      await nextTick()
-      const pageCode = getPageCode()
-      flyStore.waitMonacoEditorCallback(pageCode, (e) => {
-        debugger
-        enableOutline(e)
-      })
-    }, 10)
-    //todo
-  }
-})
-function convertSymbolArrayToTreeOptionArray(documentSymbols: monaco.languages.DocumentSymbol[]): TreeOption[] {
-  return documentSymbols.map(convertSymbolToTreeOption)
-}
-function convertSymbolToTreeOption(documentSymbol: monaco.languages.DocumentSymbol): TreeOption {
-  debugger
-  return {
-    key: documentSymbol.name + documentSymbol.range.startLineNumber + documentSymbol.range.startColumn,
-    label: documentSymbol.name,
-    disabled: false,
-    this: documentSymbol,
-    children: documentSymbol.children?.map(convertSymbolToTreeOption),
-    prefix: () =>
-      h('span', {
-        class: 'codicon ' + `codicon-symbol-${monaco.languages.SymbolKind[documentSymbol.kind].toLocaleLowerCase()}`
-      })
-    // suffix: () => documentSymbol.detail
-  }
-}
+// watchEffect(async () => {
+//   if (flyStore.codeGeneratorInitStatus) {
+//     setTimeout(async () => {
+//       goToSymbolResults.value = false
+//       await nextTick()
+//       const pageCode = getPageCode()
+//       flyStore.waitMonacoEditorCallback(pageCode, (e) => {
+//         debugger
+//         IEditor.value = e
+//         enableOutline(e)
+//       })
+//     }, 1)
+//     //todo
+//   }
+// })
 </script>
 <style>
 #beSetting > div.left-side > div > div.tree-container > ul {
-  height: 40% !important;
+  height: 35vh !important;
   overflow-y: auto;
 }
 .fly-outline {
@@ -210,7 +214,7 @@ function convertSymbolToTreeOption(documentSymbol: monaco.languages.DocumentSymb
   /* max-height: 50% !important; */
 }
 .fly-outline-tree {
-  max-height: 50% !important;
+  max-height: 45vh !important;
   overflow-y: auto;
   overflow-x: hidden;
 }

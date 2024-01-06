@@ -1,11 +1,20 @@
 <script setup lang="tsx">
+import { set } from '@vueuse/core'
 import { switchSplitEditor } from '.'
+import { useFlyStore } from '../../store/flyStore'
+import { getPageCode } from '../../util'
 import { monacoInitializedUtil } from '../../util/monacoUtil'
-
+const flyStore = useFlyStore()
+const alreadyStartSwitchSplitEditorCodeSet = new Set<string>()
 onMounted(() => {
   console.log('mounted')
+  // flyStore.waitMonacoEditorCallback(getPageCode(), switchSplitEditor)
   monacoInitializedUtil.onInitialized(async () => {
     monaco.editor.onDidCreateEditor(async (editor) => {
+      // if (alreadyStartSwitchSplitEditorCodeSet.has(getPageCode())) {
+      //   return
+      // }
+      alreadyStartSwitchSplitEditorCodeSet.add(getPageCode())
       debugger
       if (editor.getContainerDomNode().getAttribute('id') == 'SplitCode') {
         return
@@ -15,8 +24,8 @@ onMounted(() => {
       // window.noweditor = editor
       if (window.location.href.indexOf('modeledit') > -1) {
         setTimeout(() => {
-          switchSplitEditor()
-        }, 400)
+          switchSplitEditor(editor)
+        }, 200)
       } else if (window.location.href.indexOf('uiedit') > -1) {
       }
     })

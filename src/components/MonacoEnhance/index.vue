@@ -5,7 +5,7 @@
 <script setup lang="ts">
 import { getMonacoModel, monacoInitializedUtil } from '../../util/monacoUtil'
 import { addAutoAutoAutoAutoAuto, addFomatSqlAction } from './index'
-import { applyCustomFlycode, MonarchTokensProvider, LanguageConfiguration } from './monaco.languages.conf'
+import { applyCustomFlycode } from './monaco.languages.conf'
 import { getUiProtocol } from '../../dataRequest'
 import { UiProtocol } from '../../type/formProtocol'
 import { useFlyStore } from '../../store/flyStore'
@@ -13,9 +13,9 @@ const flyStore = useFlyStore()
 
 onMounted(() => {
   //@ts-ignore
-  window.MonarchTokensProvider = MonarchTokensProvider
+  // window.MonarchTokensProvider = MonarchTokensProvider
   //@ts-ignore
-  window.LanguageConfiguration = LanguageConfiguration
+  // window.LanguageConfiguration = LanguageConfiguration
   //@ts-ignore
   window.applyCustomFlycode = applyCustomFlycode
   // @ts-ignore

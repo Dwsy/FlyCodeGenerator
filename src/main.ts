@@ -44,3 +44,11 @@ var handler = {
 }
 
 // window.sessionStorage = new Proxy(window.sessionStorage, handler)
+//@ts-ignore
+// Object.prototype.replace = function (searchValue, replaceValue) {
+//   // // 确保当前对象是字符串，否则返回原对象
+//   if (typeof this === 'string') {
+//     return this.split(searchValue).join(replaceValue)
+//   }
+//   return this
+// }
