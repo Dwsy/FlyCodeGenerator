@@ -452,4 +452,26 @@ body {
   --vscode-symbolIcon-unitForeground: #cccccc;
   --vscode-symbolIcon-variableForeground: #75beff;
 }
+.n-tree-node-content .outlinesuffix {
+  /* display: none; */
+  /* opacity: 0; */
+  /* transition: opacity 1s ease-in-out; 添加动画效果 */
+}
+
+.n-tree-node-content:hover .outlinesuffix {
+  /* display: inline; */
+  /* opacity: 1; 鼠标悬停在 n-tree-node-content 元素上时显示 */
+}
+.n-tree-node-content .outlinesuffix {
+  opacity: 0;
+  transform: scale(0.5); /* 起始状态，元素大小为0 */
+  transition:
+    opacity 0.2s ease-in,
+    transform 0.2s ease-in; /* 添加动画效果 */
+}
+
+.n-tree-node-content:hover .outlinesuffix {
+  opacity: 1;
+  transform: scale(1); /* 鼠标悬停状态，元素大小正常 */
+}
 </style>

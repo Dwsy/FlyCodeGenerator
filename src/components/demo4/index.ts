@@ -33,7 +33,13 @@ function convertSymbolToTreeOption(documentSymbol: monaco.languages.DocumentSymb
       })
     },
     suffix: () => {
-      return h('span', {}, documentSymbol.range.startLineNumber)
+      return h(
+        'span',
+        {
+          class: 'outlinesuffix'
+        },
+        documentSymbol.range.startLineNumber
+      )
     }
 
     // suffix: () => documentSymbol.detail
