@@ -1,6 +1,4 @@
 <template>
-  {{ PageList }}
-
   <template v-for="pagecode in PageList" :key="pagecode">
     <Demo4 :pagecode="pagecode"></Demo4>
   </template>

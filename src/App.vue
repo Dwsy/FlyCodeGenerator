@@ -54,7 +54,7 @@ const theme = ref<GlobalTheme | null>(darkTheme)
 
 const themeOverrides: import('naive-ui').GlobalThemeOverrides = {
   Tree: {
-    fontSize: '12px',
+    fontSize: '14px',
     nodeHeight: '20px',
     nodeWrapperPadding: '2px 0',
     nodeColorActive: 'rgba(155, 155, 155, 0.09)'

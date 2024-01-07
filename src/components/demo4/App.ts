@@ -290,6 +290,7 @@ export function getMonacoJavaScriptMonarch(): monaco.languages.IMonarchLanguage 
     defaultToken: 'invalid',
     tokenPostfix: '.js',
     keywords: [
+      'endif',
       'abstract',
       'any',
       'as',
@@ -1454,4 +1455,90 @@ export enum SymbolKind {
   Event = 23,
   Operator = 24,
   TypeParameter = 25
+}
+
+export const languageConfiguration: monaco.languages.LanguageConfiguration = {
+  wordPattern: new RegExp(
+    '/(-?\\d*\\.\\d\\w*)|([^\\`\\~\\!\\@\\#\\%\\^\\&\\*\\(\\)\\-\\=\\+\\[\\{\\]\\}\\\\\\|\\;\\:\\\'\\"\\,\\.\\<\\>\\/\\?\\s]+)/g'
+  ),
+  comments: {
+    lineComment: '//',
+    blockComment: ['/*', '*/']
+  },
+  brackets: [
+    ['{', '}'],
+    ['[', ']'],
+    ['(', ')']
+  ],
+  onEnterRules: [
+    {
+      beforeText: new RegExp('/^\\s*\\/\\*\\*(?!\\/)([^\\*]|\\*(?!\\/))*$/'),
+      afterText: new RegExp('/^\\s*\\*\\/$/'),
+      action: {
+        indentAction: 2,
+        appendText: ' * '
+      }
+    },
+    {
+      beforeText: new RegExp('/^\\s*\\/\\*\\*(?!\\/)([^\\*]|\\*(?!\\/))*$/'),
+      action: {
+        indentAction: 0,
+        appendText: ' * '
+      }
+    },
+    {
+      beforeText: new RegExp('/^(\\t|(\\ \\ ))*\\ \\*(\\ ([^\\*]|\\*(?!\\/))*)?$/'),
+      action: {
+        indentAction: 0,
+        appendText: '* '
+      }
+    },
+    {
+      beforeText: new RegExp('/^(\\t|(\\ \\ ))*\\ \\*\\/\\s*$/'),
+      action: {
+        indentAction: 0,
+        removeText: 1
+      }
+    }
+  ],
+  autoClosingPairs: [
+    {
+      open: '{',
+      close: '}'
+    },
+    {
+      open: '[',
+      close: ']'
+    },
+    {
+      open: '(',
+      close: ')'
+    },
+    {
+      open: '"',
+      close: '"',
+      notIn: ['string']
+    },
+    {
+      open: "'",
+      close: "'",
+      notIn: ['string', 'comment']
+    },
+    {
+      open: '`',
+      close: '`',
+      notIn: ['string', 'comment']
+    },
+    {
+      open: '/**',
+      close: ' */',
+      notIn: ['string']
+    }
+  ],
+  folding: {
+    markers: {
+      start: new RegExp('/^\\s*\\/\\/\\s*#?region\\b/'),
+      end: new RegExp('/^\\s*\\/\\/\\s*#?endregion\\b/')
+    }
+  }
 }

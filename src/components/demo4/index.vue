@@ -48,16 +48,13 @@
 </template>
 
 <script setup lang="ts">
-import { FlashOutline, Refresh } from '@vicons/ionicons5'
+import { FlashOutline } from '@vicons/ionicons5'
 import { TreeOption, useMessage } from 'naive-ui'
 import { monacoInitializedUtil } from '../../util/monacoUtil'
-import { SymbolKindCodiconMap, getMonacoJavaScriptMonarch, provideDocumentSymbol, SymbolKind } from './App'
+import { SymbolKind } from './App'
 import { querySelectorPromise } from '../demo6'
-import { getAllSqlRangeFn } from '../MonacoEnhance/sqlProvider'
 import { useFlyStore } from '../../store/flyStore'
-import { getPageCode } from '../../util'
 import { provideDocumentSymbols } from '.'
-import { HTMLAttributes } from 'vue'
 const props = withDefaults(
   defineProps<{
     pagecode: string
@@ -67,6 +64,28 @@ const props = withDefaults(
   }
 )
 
+tryOnUnmounted(() => {
+  console.log('tryOnUnmounted')
+})
+onMounted(async () => {
+  console.log('goToSymbolResults onMounted')
+  console.log(document.querySelector('.tree-container'))
+  await nextTick()
+  const pageCode = props.pagecode
+  flyStore.waitMonacoEditorCallback(pageCode, (e: monaco.editor.IEditor) => {
+    debugger
+    IEditor.value = e
+    enableOutline(e)
+  })
+})
+onUnmounted(() => {
+  console.log('onUnmounted goToSymbolResults')
+
+  if (goToSymbolResults.value) {
+    //@ts-ignore
+    goToSymbolResults.value.remove()
+  }
+})
 const selectFilter = ref('')
 
 const selectFilterOptions = reactive([
@@ -81,16 +100,6 @@ const showIrrelevantNodes = ref(false)
 const treeData = ref<TreeOption[]>()
 const treeDataSearch = ref<TreeOption[]>()
 const pattern = ref('')
-// PropType<(pattern: string, node: TreeOption) => boolean>;
-// const filter = (pattern: string, node: TreeOption) => {
-//   //@ts-ignore
-//   // return node.this.kind == selectFilter.value
-//   if (selectFilter.value == '') {
-//     return true
-//   }
-//   //@ts-ignore
-//   return node.this.kind == selectFilter.value && node.this.name.indexOf(pattern) > -1
-// }
 const flyStore = useFlyStore()
 watch(
   selectFilter,
@@ -135,25 +144,10 @@ const nodeProps = ({ option }: { option: TreeOption }) => {
       const revealPosition = new monaco.Position(option.this.range.startLineNumber, option.this.range.startColumn)
       editor.revealPositionInCenterIfOutsideViewport(revealPosition)
     }
-    // onContextmenu (e: MouseEvent): void {
-    //   optionsRef.value = [option]
-    //   showDropdownRef.value = true
-    //   xRef.value = e.clientX
-    //   yRef.value = e.clientY
-    //   console.log(e.clientX, e.clientY)
-    //   e.preventDefault()
-    // }
   }
   return nodeProps
 }
-onUnmounted(() => {
-  console.log('onUnmounted goToSymbolResults')
 
-  if (goToSymbolResults.value) {
-    //@ts-ignore
-    goToSymbolResults.value.remove()
-  }
-})
 let enableOutline: Function = () => {}
 let RefreshOutline: Function = () => {}
 monacoInitializedUtil.onInitialized(() => {
@@ -178,16 +172,7 @@ monacoInitializedUtil.onInitialized(() => {
     // })
   }
 })
-onMounted(async () => {
-  console.log('goToSymbolResults onMounted')
-  await nextTick()
-  const pageCode = props.pagecode
-  flyStore.waitMonacoEditorCallback(pageCode, (e) => {
-    debugger
-    IEditor.value = e
-    enableOutline(e)
-  })
-})
+
 // watchEffect(async () => {
 //   if (flyStore.codeGeneratorInitStatus) {
 //     setTimeout(async () => {
