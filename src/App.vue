@@ -20,7 +20,7 @@
       <Otaku v-if="GM_getValue('szzrx', false)"></Otaku>
       <!-- <div v-if="!isBrowserMode"> -->
       <!--  -->
-      <Demo5></Demo5>
+      <Demo5 v-if="ide_theme == 'dark'"></Demo5>
 
       <!-- switchSplitEditor -->
       <Demo6></Demo6>
@@ -49,7 +49,7 @@ import { GM_getValue } from './util'
 import { applyCustomFlycode } from './components/MonacoEnhance/monaco.languages.conf'
 import { useOptionsStore } from './store/OptionsStore'
 import { NConfigProvider } from 'naive-ui'
-
+const ide_theme = useLocalStorage('ide_theme', 'dark')
 const theme = ref<GlobalTheme | null>(darkTheme)
 
 const themeOverrides: import('naive-ui').GlobalThemeOverrides = {

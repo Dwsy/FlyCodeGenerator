@@ -16,23 +16,23 @@ export const applyCustomFlycode = () => {
   monacoJavaScriptMonarch.tokenizer.root.unshift([/FLY\.log/, 'flylog'])
   monacoJavaScriptMonarch.tokenizer.root.unshift([/\b(\w+)\(/, 'function'])
   monaco.languages.setMonarchTokensProvider('javascript', monacoJavaScriptMonarch)
-  monaco.languages.registerFoldingRangeProvider('javascript', {
-    provideFoldingRanges: function (
-      model: monaco.editor.ITextModel,
-      context: monaco.languages.FoldingContext,
-      token: monaco.CancellationToken
-    ): monaco.languages.FoldingRange[] {
-      const allSqlRange = getAllSqlRangeFn(model)
+  // monaco.languages.registerFoldingRangeProvider('javascript', {
+  //   provideFoldingRanges: function (
+  //     model: monaco.editor.ITextModel,
+  //     context: monaco.languages.FoldingContext,
+  //     token: monaco.CancellationToken
+  //   ): monaco.languages.FoldingRange[] {
+  //     const allSqlRange = getAllSqlRangeFn(model)
 
-      return allSqlRange.map((range): monaco.languages.FoldingRange => {
-        return {
-          start: range.startLineNumber,
-          end: range.endLineNumber,
-          kind: monaco.languages.FoldingRangeKind.Region
-        }
-      })
-    }
-  })
+  //     return allSqlRange.map((range): monaco.languages.FoldingRange => {
+  //       return {
+  //         start: range.startLineNumber,
+  //         end: range.endLineNumber,
+  //         kind: monaco.languages.FoldingRangeKind.Region
+  //       }
+  //     })
+  //   }
+  // })
   monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
     noSuggestionDiagnostics: true,
     noSemanticValidation: true,

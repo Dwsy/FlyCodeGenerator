@@ -4,7 +4,13 @@
 
 <script setup lang="ts">
 import { getMonacoModel, monacoInitializedUtil } from '../../util/monacoUtil'
-import { addAutoAutoAutoAutoAuto, addFomatSqlAction } from './index'
+import {
+  addAutoAutoAutoAutoAuto,
+  addCodeRun,
+  addFomatCursorPositionSqlAction,
+  addFomatSqlAction,
+  addSplitCodeAction
+} from './index'
 import { applyCustomFlycode } from './monaco.languages.conf'
 import { getUiProtocol } from '../../dataRequest'
 import { UiProtocol } from '../../type/formProtocol'
@@ -44,7 +50,10 @@ onMounted(() => {
       if (href.indexOf('modeledit') > -1) {
         // addBoNewAction(editor)
         addFomatSqlAction(editor)
+        addFomatCursorPositionSqlAction(editor)
+        addCodeRun(editor)
         addAutoAutoAutoAutoAuto(editor)
+        addSplitCodeAction(editor, null)
         // applyCustomFlycode()
       } else if (href.indexOf('uiedit') > -1) {
         return

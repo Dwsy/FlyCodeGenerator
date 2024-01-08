@@ -3,7 +3,7 @@ import { Output, Protocol } from '../type/protocol'
 import { ActionType } from '../type/actionType'
 import { GeneratorName } from '../components/index'
 import { RefreshExtraLib } from '../flycodeDts'
-import { GM_getValue } from '../util/index'
+import { GM_getValue, getPageCode } from '../util/index'
 import { monacoInitializedUtil } from '../util/monacoUtil'
 import { getPropertyTypeName } from '../type/model/propertyTypeCodeRef'
 import { useGenStore } from './genStore'
@@ -40,6 +40,7 @@ export const useFlyStore = defineStore('flyStore', () => {
 
   const ActiveGenerator = ref()
   const protocol = ref<Protocol>()
+  const protocolMap = ref(new Map<string, Protocol>())
   const tableDatas = ref<tableData[]>()
   const tableDataMap = ref(new Map<string, tableData>())
   const tableNameDataMap = ref(new Map<string, tableData>())
@@ -143,6 +144,7 @@ export const useFlyStore = defineStore('flyStore', () => {
         return false
       }
       protocol.value = r.resp_data
+      protocolMap.value.set(getPageCode(), protocol.value)
 
       if (addDtsEnable) {
         const genStore = useGenStore()

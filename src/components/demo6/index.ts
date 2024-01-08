@@ -1,4 +1,10 @@
+import { get } from '@vueuse/core'
+import { getPageCode } from '../../util'
 import { getMonacoModel } from '../../util/monacoUtil'
+
+export const openSplitCodeFnMap = new Map<string, Function>()
+const splitEditorMap = new Map<string, monaco.editor.IEditor>()
+
 export const querySelectorPromise = (querySelector: string, w = 3000, i = 300): Promise<Element> =>
   new Promise((resolve, reject) => {
     const MAX_WAIT_TIME = w // 3 秒
@@ -20,7 +26,7 @@ export const querySelectorPromise = (querySelector: string, w = 3000, i = 300): 
 export const switchSplitEditor = async (editor) => {
   console.log('openSplitEditor')
 
-  const rightSide = await querySelectorPromise('.right-side')
+  const rightSide: HTMLDivElement = (await querySelectorPromise('.right-side')) as HTMLDivElement
   // rightSide.classList.add('split-editor')
   // right_column_unfold.classList.add('split-editor')
 
@@ -72,6 +78,7 @@ export const switchSplitEditor = async (editor) => {
       target.classList.replace('ant-tabs-tab-inactive', 'ant-tabs-tab-active')
     }
     openPlan(2)
+    openSplitCodeFnMap.set(getPageCode(), openPlan)
     debugger
   })
 
@@ -87,16 +94,32 @@ export const switchSplitEditor = async (editor) => {
   }
   async function openPlan(index: number) {
     const left_column_unfold: HTMLButtonElement = document.querySelector('#beSetting > span.fold_btn_left')
-    if (left_column_unfold) {
-      try {
-        left_column_unfold.click()
-      } catch {}
-    }
+
     if (index == 2) {
       rightSide.classList.toggle('split-editor', true)
       right_column_unfold.classList.toggle('split-editor_unfold', true)
+      rightSide.classList.toggle('split-editor-third')
+      if (rightSide.classList.contains('split-editor-third')) {
+        if (left_column_unfold) {
+          try {
+            left_column_unfold.click()
+          } catch {}
+        }
+      }
+      rightSide.style.height = rightSide.style.height
+      setTimeout(() => {
+        splitEditorMap.get(getPageCode())?.layout()
+      }, 90)
+
+      // if (tf) {
+      // rightSide.style.width = '33%'
+      // } else {
+      // rightSide.style.width = '50%'
+      // }
     } else {
       rightSide.classList.toggle('split-editor', false)
+      rightSide.classList.toggle('split-editor-third', false)
+
       right_column_unfold.classList.toggle('split-editor_unfold', false)
     }
     const plans = document.querySelectorAll(
@@ -111,14 +134,14 @@ export const switchSplitEditor = async (editor) => {
     const content: HTMLElement = document.querySelector(
       '#beSetting > div.right-side.split-editor > div > div > div.ant-tabs-content.ant-tabs-content-animated.ant-tabs-top-content'
     )
-    if (index === 2) {
+    if (index == 2) {
       if (!SplitCodeDiv.hasChildNodes()) {
         const ce = monaco.editor.create(SplitCodeDiv, {
           model: getMonacoModel()
         })
-        window.addEventListener('resize', () => {
-          ce.layout()
-        })
+        splitEditorMap.set(getPageCode(), ce)
+        // rightSide.addEventListener('resize', () => {
+        // })
       }
       content.classList.add('show-split-editor')
       // content.style.setProperty('margin-left:', '-200%')

@@ -39,6 +39,10 @@ onMounted(() => {
   width: 50% !important;
   /* background-size: cover !important; */
 }
+.split-editor-third {
+  width: 33% !important;
+  /* background-size: cover !important; */
+}
 
 .logic-edit-container > .right-side .ant-tabs-nav .ant-tabs-tab {
   width: 33% !important;

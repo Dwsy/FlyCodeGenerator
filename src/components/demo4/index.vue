@@ -23,7 +23,7 @@
           ></n-input>
           <!-- @vue-skip -->
           <NButton size="small">
-            <NIcon :component="Refresh" @click="RefreshOutline" style="transition: transform 1s"> </NIcon>
+            <NIcon :component="Refresh" @click="RefreshOutline"> </NIcon>
           </NButton>
         </n-input-group>
 
@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { FlashOutline } from '@vicons/ionicons5'
+import { FlashOutline, Refresh } from '@vicons/ionicons5'
 import { TreeOption, useMessage } from 'naive-ui'
 import { monacoInitializedUtil } from '../../util/monacoUtil'
 import { SymbolKind } from './App'
@@ -214,7 +214,7 @@ monacoInitializedUtil.onInitialized(() => {
   font-weight: 500;
   line-height: 38px;
   margin: 0px 4px;
-  border-bottom: 1px solid #3f4042;
+  /* border-bottom: 1px solid #3232320f; */
   color: #969799;
 }
 
@@ -449,7 +449,7 @@ body {
 }
 .n-tree-node-content .outlinesuffix {
   opacity: 0;
-  transform: scale(0.5); /* 起始状态，元素大小为0 */
+  transform: scale(0.8); /* 起始状态，元素大小为0 */
   transition:
     opacity 0.2s ease-in,
     transform 0.2s ease-in; /* 添加动画效果 */

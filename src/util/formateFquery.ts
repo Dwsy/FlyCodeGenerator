@@ -167,7 +167,14 @@ export function formatFquery(sql: string, start: string, onlyReturnSql: boolean 
   // formatSQL = formatSQL.replace(/\bNUMBER\b/g, 'number')
   formatSQL = formatSQL
     .split('\n')
-    .map((line) => start + line)
+    .map((line) => {
+      if (line.trim() == '') {
+        return null
+      } else {
+        return start + line
+      }
+    })
+    .filter((p) => p != null)
     .join('\n')
   console.log(formatSQL)
   return formatSQL

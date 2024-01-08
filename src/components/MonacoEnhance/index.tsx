@@ -1,13 +1,14 @@
 import { addTempDts, pushTempBoNewDtsList } from '../../flycodeDts'
 import { useFlyStore } from '../../store/flyStore'
 import { PropertyTypeCode } from '../../type/model/propertyTypeCodeRef'
-import { GM_setClipboard, getPrimaryKey, getTableShortName } from '../../util'
+import { GM_setClipboard, getPageCode, getPrimaryKey, getTableShortName } from '../../util'
 import { getMonacoModel } from '../../util/monacoUtil'
 import { formatFquery } from '../../util/formateFquery'
 import { message } from '../../util/message'
 import { MessageRenderMessage, NAlert, useMessage } from 'naive-ui'
 import { useGenStore } from '../../store/genStore'
 import { checkInSqlRangeFn, getAllSqlRangeFn } from './sqlProvider'
+import { openSplitCodeFnMap } from '../demo6'
 
 /**
  * 添加格式化SQL操作到编辑器
@@ -21,7 +22,7 @@ import { checkInSqlRangeFn, getAllSqlRangeFn } from './sqlProvider'
  */
 export const addFomatSqlAction = (editor: monaco.editor.IStandaloneCodeEditor) => {
   const flyStore = useFlyStore()
-  addFomatCursorPositionSqlAction(editor)
+
   setTimeout(() => {
     editor.addAction({
       id: 'FomatFquery',
@@ -78,6 +79,66 @@ export const addFomatCursorPositionSqlAction = (editor: monaco.editor.IStandalon
       }
     })
   }, 1)
+}
+
+export const addCodeRun = (editor: monaco.editor.IStandaloneCodeEditor) => {
+  setTimeout(() => {
+    editor.addAction({
+      id: 'codeRun',
+      label: 'codeRun',
+      keybindings: [monaco.KeyCode.F5],
+      precondition: null,
+      keybindingContext: null,
+      contextMenuGroupId: 'navigation',
+      contextMenuOrder: 0,
+      run: function (ed) {
+        const e1: HTMLButtonElement = document.querySelector(
+          '#beSetting > div.main-content > div.tab-content.ant-tabs.ant-tabs-top.ant-tabs-line > div.ant-tabs-bar.ant-tabs-top-bar > div > div > div > div > div:nth-child(1) > div:nth-child(3)'
+        )
+        e1.click()
+        setTimeout(() => {
+          const e0: HTMLButtonElement = document.querySelector(
+            '#beSetting > div.main-content > div.tab-content.ant-tabs.ant-tabs-top.ant-tabs-line > div.ant-tabs-content.ant-tabs-content-animated.ant-tabs-top-content > div.ant-tabs-tabpane.ant-tabs-tabpane-active > div.testcase-container > div > div > div.ant-tabs-bar.ant-tabs-top-bar > div > div > div > div > div:nth-child(1) > div:nth-child(1)'
+          )
+          e0.click()
+          setTimeout(() => {
+            const e2: HTMLButtonElement = document.querySelector(
+              '#beSetting > div.main-content > div.tab-content.ant-tabs.ant-tabs-top.ant-tabs-line > div.ant-tabs-content.ant-tabs-content-animated.ant-tabs-top-content > div.ant-tabs-tabpane.ant-tabs-tabpane-active > div.testcase-container > div > div > div.ant-tabs-content.ant-tabs-content-animated.ant-tabs-top-content > div.ant-tabs-tabpane.ant-tabs-tabpane-active > div.betest-tab-content.test-case > div.ant-table-wrapper > div > div > div > div > div > table > tbody > tr > td:nth-child(4) > div > a:nth-child(1)'
+            )
+            e2.click()
+            setTimeout(() => {
+              const e = document.querySelector(
+                '#beSetting > div.main-content > div.tab-content.ant-tabs.ant-tabs-top.ant-tabs-line > div.ant-tabs-bar.ant-tabs-top-bar > div > div > div > div > div:nth-child(1) > div:nth-child(4)'
+              )
+              //@ts-ignore
+              e.click()
+            }, 200)
+          }, 200)
+        }, 700)
+      }
+    })
+  }, 2000)
+}
+
+export const addSplitCodeAction = (editor: monaco.editor.IStandaloneCodeEditor, open: Function) => {
+  setTimeout(() => {
+    editor.addAction({
+      id: 'splitCode',
+      label: '开启侧边代码',
+      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Backslash],
+      precondition: null,
+      keybindingContext: null,
+      contextMenuGroupId: 'navigation',
+      contextMenuOrder: 2,
+      run: function (ed) {
+        // openSplitCodeFnMap.get(getPageCode())(2)
+        const openSplitCode: HTMLButtonElement = document.querySelector(
+          '#beSetting > div.right-side > div > div > div.ant-tabs-bar.ant-tabs-top-bar > div > div > div > div > div:nth-child(1) > div:nth-child(3)'
+        )
+        openSplitCode.click()
+      }
+    })
+  }, 1000)
 }
 
 export const switchCodeCheck = (editor: monaco.editor.IStandaloneCodeEditor) => {

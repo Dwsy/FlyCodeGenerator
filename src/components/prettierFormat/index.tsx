@@ -57,7 +57,7 @@ async function spliceSemiAndDoubleQoute(code: string) {
   try {
     if (GM_getValue('es6toes5', true)) {
       const babelTransformOptions: TransformOptions = {
-        presets: ['es2015'],
+        presets: ['es2017'],
         // plugins: ['transform-es2015-modules-umd'],
         retainLines: true, // 通过设置retainLines选项来保留原始代码中的空格
         ast: false
