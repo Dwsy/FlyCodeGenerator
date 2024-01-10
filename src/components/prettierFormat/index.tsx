@@ -5,7 +5,7 @@ import './estree'
 import './bable.min'
 import { Options } from 'prettier'
 // import {transform} from '@babel/standalone'
-import { GM_getValue } from '../../util'
+import { GM_getValue, getPageTypeIsModel } from '../../util'
 import { formatEditotFqueryFunc, formatEditotFqueryFuncNew } from '../MonacoEnhance'
 import { TransformOptions } from './type.d'
 import { MessageRenderMessage, NAlert, NCard } from 'naive-ui'
@@ -55,15 +55,22 @@ async function spliceSemiAndDoubleQoute(code: string) {
   //     return `${p1} = \`${p2}\``
   // })
   try {
-    if (GM_getValue('es6toes5', true)) {
+    debugger
+
+    if (GM_getValue('es6toes5', true) && getPageTypeIsModel()) {
       const babelTransformOptions: TransformOptions = {
-        presets: ['es2017'],
+        presets: ['es2015'],
         // plugins: ['transform-es2015-modules-umd'],
         retainLines: true, // 通过设置retainLines选项来保留原始代码中的空格
         ast: false
       }
       // @ts-ignore
-      code = Babel.transform(code, babelTransformOptions).code
+      code = Babel.transform(code, {
+        presets: ['es2015'],
+        // plugins: ['transform-es2015-modules-umd'],
+        retainLines: true, // 通过设置retainLines选项来保留原始代码中的空格
+        ast: false
+      }).code
     }
     //@ts-ignore
     const formatCode = await prettier.format(code, config)
@@ -151,7 +158,7 @@ function removeStringWrapping(code: string, model: monaco.editor.ITextModel) {
 
     // }, 1);
     debugger
-    code = formatEditotFqueryFuncNew(model, '') || code
+    // code = formatEditotFqueryFuncNew(model, '') || code
   }
 
   return code

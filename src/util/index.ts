@@ -243,3 +243,13 @@ export function getPageCode() {
   const code = split[split.length - 1]
   return code || ''
 }
+
+export function getPageTypeIsModel() {
+  const href = window.location.href
+  if (href.indexOf('uilist') != -1) {
+    return false
+  }
+  if (href.indexOf('modellist') != -1) {
+    return true
+  }
+}

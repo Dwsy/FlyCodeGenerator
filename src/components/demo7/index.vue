@@ -36,6 +36,7 @@ function fn() {
     delPageCodeArray = []
     if (split.length == 3) {
       const pageCode = split[2]
+
       if (PageList.value.indexOf(pageCode) == -1) {
         delPageCodeArray.push(pageCode)
       }

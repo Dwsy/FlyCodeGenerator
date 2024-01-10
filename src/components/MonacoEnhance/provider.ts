@@ -1,4 +1,4 @@
-import { getTableShortName } from '../../util'
+import { getPageCode, getPageTypeIsModel, getTableShortName } from '../../util'
 import { message } from '../../util/message'
 import { autoAsSqlCompletion, checkInSqlRangeFn, getSqlCompletionItems } from './sqlProvider'
 
@@ -11,6 +11,10 @@ export const registerProviders = () => {
       context: monaco.languages.CompletionContext,
       token: monaco.CancellationToken
     ) {
+      if (!getPageTypeIsModel()) {
+        getFrontprovideCompletionItems()
+        return
+      }
       const checkInSqlRange = checkInSqlRangeFn(model, position)
       // debugger
 
@@ -198,4 +202,7 @@ function gptTest(
     console.log(index)
   }
   return textUntilPosition === 'gpt'
+}
+function getFrontprovideCompletionItems() {
+  throw new Error('Function not implemented.')
 }

@@ -29,6 +29,7 @@ onMounted(() => {
   monacoInitializedUtil.onInitialized(async () => {
     monaco.editor.onDidCreateEditor(async (editor) => {
       debugger
+
       console.log(editor.getId())
       console.log(editor.getContainerDomNode())
       if (editor.getContainerDomNode().getAttribute('id') == 'SplitCode') {
@@ -37,7 +38,6 @@ onMounted(() => {
       if (!editor.getContainerDomNode().classList.contains('bm-flycode-monaco-editor-wrap')) {
         return
       }
-
       // @ts-ignore
       window.noweditor = editor
       const href = window.location.href
