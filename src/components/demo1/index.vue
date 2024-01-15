@@ -76,6 +76,7 @@ window.customGenSql = (tname: string) => {
       type: getPropertyTypeName(property.propertytypecode) + getPropertyTypeEmoji(Number(property.propertytypecode)),
       comment: property.propertydescr,
       relationobj: temp,
+      relationobjectcode: property.relationobjectcode,
       this: property,
       joinField: temp ? getPrimaryKey(temp.objectcode) : '',
       relationQueryFieldNames: [],
@@ -84,6 +85,7 @@ window.customGenSql = (tname: string) => {
       level: 1,
       children: []
     }
+    debugger
     if (Number(row.this.propertytypecode) == PropertyTypeCode.DictionaryObject) {
       row.relationQueryFieldNames.push('dicvalue')
     }
@@ -107,7 +109,7 @@ monacoInitializedUtil.onInitialized(async () => {
   monaco.editor.onDidCreateEditor(async (editor) => {
     nowEditor = editor
     editor.updateOptions({
-      fontFamily: 'Cascadia Code PL',
+      fontFamily: 'Cascadia Code',
       fontSize: 14,
       minimap: {
         enabled: true,
@@ -167,6 +169,7 @@ const genSql = () => {
     }
     if (row) row.select = true
   })
+  console.log(EntityRowDatas.value)
   const sql = generateSql(EntityRowData2QueryModel(mainTableData.value, EntityRowDatas.value))
   console.log(sql)
   // copyToClipboard(sql)
@@ -186,7 +189,7 @@ const genSql = () => {
       text: sql
     }
   ])
-  // showModal.value = false
+  showModal.value = false
   const newPosition = new monaco.Position(position.lineNumber, 0)
   editor.setPosition(newPosition)
   editor.focus()
@@ -290,70 +293,77 @@ function createColumns(): DataTableColumns<EntityRowData> {
             row.relationobj?.properties
               .filter((item) => value.includes(item.columnname))
               .map((item) => {
-                const temp2 = flyStore.tableDataMap.get(item.relationobjectcode)
+                debugger
+                // const temp2 = flyStore.tableDataMap.get(row.relationobj)
+                // if (!temp2) {
+                // message.error('未找到关联对象' + item.relationobjectcode)
+                // throw new Error('未找到关联对象')
+                // }
                 return {
                   key: row.key + '__' + row.this.columnname,
                   name: `${item.columnname} ${item.propertyname}`,
                   type:
                     getPropertyTypeName(item.propertytypecode) + getPropertyTypeEmoji(Number(item.propertytypecode)),
                   comment: item.propertydescr,
-                  relationobj: temp2,
+                  // propertytypecode: temp2.objectcode,
+                  relationobj: row.relationobj,
                   this: item,
                   relationQueryFieldNames: [],
-                  select: false,
+                  select: true,
                   level: row.level + 1,
                   query: false,
+
                   children: []
-                }
+                } as EntityRowData
               }) || []
           console.log(children)
           row.children = children
-          // if (row.level == 1) {
-          //   let children =
-          //     row.relationobj?.properties
-          //       .filter((item) => value.includes(item.columnname))
-          //       .map((item) => {
-          //         const temp2 = flyStore.tableDataMap.get(item.relationobjectcode)
-          //         return {
-          //           key: row.key + '__' + row.this.columnname,
-          //           name: `${item.columnname} ${item.propertyname}`,
-          //           type:
-          //             getPropertyTypeName(item.propertytypecode) + getPropertyTypeEmoji(Number(item.propertytypecode)),
-          //           comment: item.propertydescr,
-          //           relationobj: temp2,
-          //           this: item,
-          //           relationQueryFieldNames: [],
-          //           select: false,
-          //           level: 2,
-          //           query: false,
-          //           children: []
-          //         }
-          //       }) || []
-          //   console.log(children)
-          //   row.children = children
-          // } else if ((row.level = 2)) {
-          //   let children =
-          //     row.relationobj?.properties
-          //       .filter((item) => value.includes(item.columnname))
-          //       .map((item) => {
-          //         const temp3 = flyStore.tableDataMap.get(item.relationobjectcode)
-          //         return {
-          //           key: row.key + '__' + row.this.columnname,
-          //           name: `${item.columnname} ${item.propertyname}`,
-          //           type:
-          //             getPropertyTypeName(item.propertytypecode) + getPropertyTypeEmoji(Number(item.propertytypecode)),
-          //           comment: item.propertydescr,
-          //           relationobj: temp3,
-          //           this: item,
-          //           relationQueryFieldNames: [],
-          //           select: false,
-          //           level: 3,
-          //           query: false,
-          //           children: []
-          //         }
-          //       }) || []
-          //   row.children = children
-          // }
+          if (row.level == 1) {
+            let children =
+              row.relationobj?.properties
+                .filter((item) => value.includes(item.columnname))
+                .map((item) => {
+                  const temp2 = flyStore.tableDataMap.get(item.relationobjectcode)
+                  return {
+                    key: row.key + '__' + row.this.columnname,
+                    name: `${item.columnname} ${item.propertyname}`,
+                    type:
+                      getPropertyTypeName(item.propertytypecode) + getPropertyTypeEmoji(Number(item.propertytypecode)),
+                    comment: item.propertydescr,
+                    relationobj: temp2,
+                    this: item,
+                    relationQueryFieldNames: [],
+                    select: false,
+                    level: 2,
+                    query: false,
+                    children: []
+                  }
+                }) || []
+            console.log(children)
+            row.children = children
+          } else if ((row.level = 2)) {
+            let children =
+              row.relationobj?.properties
+                .filter((item) => value.includes(item.columnname))
+                .map((item) => {
+                  const temp3 = flyStore.tableDataMap.get(item.relationobjectcode)
+                  return {
+                    key: row.key + '__' + row.this.columnname,
+                    name: `${item.columnname} ${item.propertyname}`,
+                    type:
+                      getPropertyTypeName(item.propertytypecode) + getPropertyTypeEmoji(Number(item.propertytypecode)),
+                    comment: item.propertydescr,
+                    relationobj: temp3,
+                    this: item,
+                    relationQueryFieldNames: [],
+                    select: false,
+                    level: 3,
+                    query: false,
+                    children: []
+                  }
+                }) || []
+            row.children = children
+          }
 
           console.log(row.relationQueryFieldNames)
         }

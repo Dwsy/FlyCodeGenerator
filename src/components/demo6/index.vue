@@ -64,4 +64,9 @@ onMounted(() => {
 .logic-edit-container .right_column_unfold {
   background-size: auto !important;
 }
+
+.sc-resizable {
+  resize: horizontal;
+  overflow: auto;
+}
 </style>

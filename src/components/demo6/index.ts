@@ -11,8 +11,7 @@ export const querySelectorPromise = (querySelector: string, w = 3000, i = 300): 
     const INTERVAL_TIME = i
     let elapsed = 0
 
-    const intervalId = setInterval(() => {
-      elapsed += INTERVAL_TIME
+    const query = () => {
       const element = document.querySelector(querySelector)
       if (element !== null) {
         clearInterval(intervalId)
@@ -21,8 +20,34 @@ export const querySelectorPromise = (querySelector: string, w = 3000, i = 300): 
         clearInterval(intervalId)
         reject(new Error('Element not found within 3 seconds'))
       }
+    }
+
+    query() // 立即执行一次查询
+
+    const intervalId = setInterval(() => {
+      elapsed += INTERVAL_TIME
+      query()
     }, INTERVAL_TIME)
   })
+
+// export const querySelectorPromise = (querySelector: string, w = 3000, i = 300): Promise<Element> =>
+//   new Promise((resolve, reject) => {
+//     const MAX_WAIT_TIME = w // 3 秒
+//     const INTERVAL_TIME = i
+//     let elapsed = 0
+
+//     const intervalId = setInterval(() => {
+//       elapsed += INTERVAL_TIME
+//       const element = document.querySelector(querySelector)
+//       if (element !== null) {
+//         clearInterval(intervalId)
+//         resolve(element)
+//       } else if (elapsed >= MAX_WAIT_TIME) {
+//         clearInterval(intervalId)
+//         reject(new Error('Element not found within 3 seconds'))
+//       }
+//     }, INTERVAL_TIME)
+//   })
 export const switchSplitEditor = async (editor) => {
   console.log('openSplitEditor')
 
@@ -154,11 +179,15 @@ export const switchSplitEditor = async (editor) => {
   }
 
   const SplitCodeDiv = document.createElement('div')
+
   SplitCodeDiv.classList.add('ant-tabs-tabpane')
   SplitCodeDiv.classList.add('ant-tabs-tabpane-inactive')
   SplitCodeDiv.setAttribute('role', 'tabpanel')
   SplitCodeDiv.setAttribute('aria-hidden', 'false')
   SplitCodeDiv.setAttribute('id', 'SplitCode')
+  SplitCodeDiv.classList.add('sc-resizable')
+
+  //--
 
   const openSplitCodeDiv = () => {
     if (SplitCodeDiv.classList.contains('ant-tabs-tabpane-inactive')) {
@@ -170,6 +199,8 @@ export const switchSplitEditor = async (editor) => {
     }
   }
   tabsContentElement.appendChild(SplitCodeDiv)
+  // SplitCodeDiv.appendChild(handle)
+
   // tabsContentElement.insertBefore(SplitCodeDiv, tabsContentElement.firstChild)
   //plan
 }

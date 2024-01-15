@@ -246,10 +246,10 @@ export function getPageCode() {
 
 export function getPageTypeIsModel() {
   const href = window.location.href
-  if (href.indexOf('uilist') != -1) {
+  if (href.indexOf('uiedit') != -1) {
     return false
   }
-  if (href.indexOf('modellist') != -1) {
+  if (href.indexOf('modeledit') != -1) {
     return true
   }
 }

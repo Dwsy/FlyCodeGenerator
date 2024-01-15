@@ -2,7 +2,7 @@
   <!-- <div class="flycode-d">
     <pre id="flyCode" data-lang="javascript" style="height: 690px">{{ props.flyCode }}</pre>
   </div> -->
-  <div class="preview-monaco" style="height: 560px; width: 900px"></div>
+  <div class="preview-monaco" style="height: 560px; width: 100%"></div>
 </template>
 
 <script setup lang="ts">

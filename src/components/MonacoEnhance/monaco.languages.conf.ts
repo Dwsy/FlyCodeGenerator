@@ -33,11 +33,20 @@ export const applyCustomFlycode = () => {
   //     })
   //   }
   // })
+  const diagnosticCodesToIgnore = []
+  diagnosticCodesToIgnore.push(8016)
+  diagnosticCodesToIgnore.push(1434)
+  diagnosticCodesToIgnore.push(1005)
+  diagnosticCodesToIgnore.push(1435)
+  diagnosticCodesToIgnore.push(8013)
+  diagnosticCodesToIgnore.push(1109)
+  diagnosticCodesToIgnore.push(2568)
   monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
-    noSuggestionDiagnostics: true,
-    noSemanticValidation: true,
-    noSyntaxValidation: true,
-    onlyVisible: true
+    diagnosticCodesToIgnore
+    // noSuggestionDiagnostics: true,
+    // noSemanticValidation: true,
+    // noSyntaxValidation: true,
+    // onlyVisible: true
   })
   return
   if (GM_getValue('MonacoTheme', null) == 'default') return

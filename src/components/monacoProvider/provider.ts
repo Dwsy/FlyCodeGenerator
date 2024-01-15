@@ -1,4 +1,4 @@
-import { getTableShortName } from '../../util'
+import { getPageTypeIsModel, getTableShortName } from '../../util'
 import { message } from '../../util/message'
 import { monacoInitializedUtil } from '../../util/monacoUtil'
 import { autoAsSqlCompletion, checkInSqlRangeFn, getSqlCompletionItems } from './sqlProvider'
@@ -6,12 +6,15 @@ import { autoAsSqlCompletion, checkInSqlRangeFn, getSqlCompletionItems } from '.
 export const registerProviders = () => {
   monaco.languages.registerCompletionItemProvider('javascript', {
     //@ts-ignore
-    provideCompletionItems: function (
+    provideCompletionItems: async function (
       model: monaco.editor.ITextModel,
       position: monaco.Position,
       context: monaco.languages.CompletionContext,
       token: monaco.CancellationToken
     ) {
+      if (!getPageTypeIsModel()) {
+        return []
+      }
       const checkInSqlRange = checkInSqlRangeFn(model, position)
       // debugger
 

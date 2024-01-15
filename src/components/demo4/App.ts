@@ -1464,6 +1464,7 @@ export const languageConfiguration: monaco.languages.LanguageConfiguration = {
   comments: {
     lineComment: '//',
     blockComment: ['/*', '*/']
+    // blockComment: ['select', ';']
   },
   brackets: [
     ['{', '}'],

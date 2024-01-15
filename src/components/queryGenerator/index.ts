@@ -82,8 +82,6 @@ export function genQueryModel(outputArray: Output[]): QueryModel {
  * const queryModel = gen(output, queryArgumentArrayMap);
  */
 export function genQueryModel_(output: Output, queryArgumentArrayMap: Map<string, Property[]>): QueryModel {
-  // 定义 fquery 变量
-  let fquery = 'select\n{{selectColumns}}'
   const flyStore = useFlyStore()
   // const mainTableName = flyStore.protocol.input[0].name;
   const mainTableName = output.name
@@ -169,7 +167,6 @@ export function genQueryModel_(output: Output, queryArgumentArrayMap: Map<string
   }
   const tableShortName = getTableShortName(outputTable.tablename)
   // 将 outPropertiesDataMap 中的数据添加到 fquery 中
-  fquery += `\n  from ${outputTable.tablename} as ${tableShortName}`
 
   // 遍历 relationTableMap，将关联表格的数据添加到 fquery 中
   // 需要join的表 1.关联查询字段2.关联查询where筛选
@@ -213,14 +210,12 @@ export function genQueryModel_(output: Output, queryArgumentArrayMap: Map<string
       columnName: columnname
     }
     joinModelArray.push(joinModel)
-    fquery += `\n  left join ${relationTable.tablename} as ${relationTableShortName} `
-    fquery += `on ${tableShortName}.${columnname} = ${relationTableShortName}.${idField}`
   })
 
   console.log(deepJoinRelationTableMap)
   // 深度join
   // 查询列
-  let selectColumns = outPropertiesDataMap
+  outPropertiesDataMap
     .filter((predicate) => predicate != undefined)
     .map((data) => {
       // console.log("data", data)//todo
@@ -240,7 +235,6 @@ export function genQueryModel_(output: Output, queryArgumentArrayMap: Map<string
           zhColumnName: data.propertyname
         }
         columnModelArray.push(columnModel)
-        return `  ${tableShortName}.${data.columnname}`
       } else {
         const [relationTableName, relationColumnName] = queryname.split('__')
         // console.log("queryname", queryname)
@@ -258,21 +252,13 @@ export function genQueryModel_(output: Output, queryArgumentArrayMap: Map<string
           }
         }
         columnModelArray.push(columnModel)
-        return `  ${relationTableShortName}.${relationColumnName} as ${queryname}`
       }
     })
-    .join(',\n')
 
-  fquery = fquery.replace('{{selectColumns}}', selectColumns)
-  // 如果 query 不为 null，则将查询条件添加到 fquery 中
   if (queryArgumentArrayMap?.size > 0) {
     //todo 自定义处理
-    fquery += '\n  where 1=1\n'
   }
 
-  // 定义模板字符串
-  const template = `{#if {{if}}}\n and {{condition}}\n{#endif}\n`
-  // 遍历 queryMap，将查询条件添加到 fquery 中
   // debugger
   queryArgumentArrayMap.forEach((properties, tableName) => {
     if (tableName === mainTableName) {
@@ -280,7 +266,7 @@ export function genQueryModel_(output: Output, queryArgumentArrayMap: Map<string
         let conditionModel: ConditionModel
         const argName = property.name
         const operator = getOperator(property)
-        if (property.name.split('__').length > 1) {
+        if (property.name.split('__').length == 2) {
           const [relationTableName, relationColumnName] = property.name.split('__')
           const relationTableShortName = relationTableShortNameMap.get(relationTableName)
           conditionModel = {
@@ -291,7 +277,8 @@ export function genQueryModel_(output: Output, queryArgumentArrayMap: Map<string
             operator: operator,
             value: null,
             secondValue: null,
-            like: null
+            like: null,
+            rightClause: `IN.${mainTableName}.${property.name}`
           }
         } else {
           conditionModel = {
@@ -302,32 +289,17 @@ export function genQueryModel_(output: Output, queryArgumentArrayMap: Map<string
             operator: operator,
             value: null,
             secondValue: null,
-            like: null
+            like: null,
+            rightClause: `IN.${mainTableName}.${property.name}`
           }
         }
-        // if (property.propertytypecode == "3") return
-        // 先完成 = 操作 todo
-
-        let condition = `${tableShortName}.${argName} `
 
         if (operator == Operator.Equal) {
           conditionModelArray.push(conditionModel)
-          condition += operator
-          condition += ` { IN.${tableName}.${argName} }`
-          const blankJudge = template
-            .replace('{{if}}', `!String.isBlank(IN.${tableName}.${argName})`)
-            .replace('{{condition}}', condition)
-          fquery += blankJudge
         }
         if (operator == Operator.Like) {
           conditionModel.like = { matchType: LikeMatchType.Contains } //todo config
           conditionModelArray.push(conditionModel)
-          condition += operator
-          condition += ` { IN.${tableName}.${argName} }`
-          const blankJudge = template
-            .replace('{{if}}', `!String.isBlank(IN.${tableName}.${argName})`)
-            .replace('{{condition}}', condition)
-          fquery += blankJudge
         }
         if (operator == Operator.Between) {
           conditionModelArray.push(conditionModel)
@@ -335,17 +307,7 @@ export function genQueryModel_(output: Output, queryArgumentArrayMap: Map<string
 
           if (DatePropertyCodes.indexOf(Number(property.propertytypecode)) != -1) {
             //时间类
-            condition += ` ${operator} { bengin } ${Operator.AND} { end }`
-            const blankJudge = template
-              .replace('{{if}}', `!String.isBlank(begin)&&!String.isBlank(end)`)
-              .replace('{{condition}}', condition)
-            fquery += blankJudge
           } else {
-            condition += ` ${operator} { value1 } ${Operator.AND} { value2 }`
-            const blankJudge = template
-              .replace('{{if}}', `!String.isBlank(value1)&&!String.isBlank(value2)`)
-              .replace('{{condition}}', condition)
-            fquery += blankJudge
           }
         }
       })
@@ -363,11 +325,6 @@ export function genQueryModel_(output: Output, queryArgumentArrayMap: Map<string
           like: null
         }
         conditionModelArray.push(conditionModel)
-        const condition = `${relationTableShortNameMap.get(tableName)}.${argName} = { IN.${tableName}.${argName} }`
-        const q = template
-          .replace('{{if}}', `!String.isBlank(IN.${tableName}.${argName})`)
-          .replace('{{condition}}', condition)
-        fquery += q
       })
     }
   })
@@ -491,27 +448,72 @@ function getWhereCallback(): (c: ConditionModel) => string {
     // 定义模板字符串
     let whereTemplate = `// {{commit}}\n{#if {{if}}}\n  and {{condition}}\n{#endif}\n`
     const generator = new ConditionGenerator(c)
-    if (c.operator == Operator.Equal) {
-      const juede = `!String.isBlank(IN.${c.tableName}.${c.columnName})`
-      const condition = generator.generateWhereClause()
-      whereTemplate = whereTemplate
-        .replace('{{commit}}', `${c.zh_columnName}`)
-        .replace('{{if}}', juede)
-        .replace('{{condition}}', condition)
-    } else if (c.operator === Operator.Like) {
-      const juede = `!String.isBlank(IN.${c.tableName}.${c.columnName})`
-      let whereClause = generator.generateWhereClause()
-      whereTemplate = whereTemplate.replace('{{if}}', juede).replace('{{condition}}', whereClause)
-    } else if (c.operator === Operator.Between) {
-      const isDate = DatePropertyCodes.indexOf(Number(c.propertytypecode)) !== -1
-      const [lvalue, rvalue] = isDate ? ['begin', 'end'] : ['min', 'max']
 
-      const juede = `!String.isBlank(${lvalue}) && !String.isBlank(${rvalue})`
-      let whereClause = generator.generateWhereClause()
-      // console.log("c.propertytypecode", c.propertytypecode)
-      whereTemplate = whereTemplate.replace('{{if}}', juede).replace('{{condition}}', whereClause)
+    // 定义一个映射，存储每种操作符对应的处理函数
+    const operatorHandlers = {
+      // 对于等于操作符，判断条件是列的值不为空
+      [Operator.Equal]: () => `!String.isBlank(IN.${c.tableName}.${c.columnName})`,
+      // 对于类似操作符，判断条件是列的值不为空
+      [Operator.Like]: () => `!String.isBlank(IN.${c.tableName}.${c.columnName})`,
+      // 对于区间操作符，判断条件是开始和结束的值都不为空
+      [Operator.Between]: () => {
+        const isDate = DatePropertyCodes.indexOf(Number(c.propertytypecode)) !== -1
+        const [lvalue, rvalue] = isDate ? ['begin', 'end'] : ['min', 'max']
+        return `!String.isBlank(${lvalue}) && !String.isBlank(${rvalue})`
+      }
     }
-    whereTemplate = whereTemplate.replace('{{commit}}', `${c.zh_columnName}`)
+
+    // 根据操作符获取对应的判断条件
+    const juede = operatorHandlers[c.operator]()
+    // 生成 WHERE 子句
+    const condition = generator.generateWhereClause()
+
+    // 将模板字符串中的占位符替换为实际的值
+    whereTemplate = whereTemplate
+      .replace('{{commit}}', `${c.zh_columnName}`)
+      .replace('{{if}}', juede)
+      .replace('{{condition}}', condition)
+
     return whereTemplate
   }
 }
+
+// /**
+//  * 生成一个回调函数，该函数根据给定的条件模型生成一个 WHERE 子句模板。
+//  *
+//  * @returns {(c: ConditionModel) => string} 返回一个函数，该函数接收一个条件模型作为参数，返回一个 WHERE 子句模板。
+//  *
+//  * @example
+//  * const callback = getWhereCallback();
+//  * const conditionModel = new ConditionModel();
+//  * const whereClauseTemplate = callback(conditionModel);
+//  */
+// function getWhereCallback(): (c: ConditionModel) => string {
+//   return (c: ConditionModel) => {
+//     // 定义模板字符串
+//     let whereTemplate = `// {{commit}}\n{#if {{if}}}\n  and {{condition}}\n{#endif}\n`
+//     const generator = new ConditionGenerator(c)
+//     if (c.operator == Operator.Equal) {
+//       const juede = `!String.isBlank(IN.${c.tableName}.${c.columnName})`
+//       const condition = generator.generateWhereClause()
+//       whereTemplate = whereTemplate
+//         .replace('{{commit}}', `${c.zh_columnName}`)
+//         .replace('{{if}}', juede)
+//         .replace('{{condition}}', condition)
+//     } else if (c.operator === Operator.Like) {
+//       const juede = `!String.isBlank(IN.${c.tableName}.${c.columnName})`
+//       let whereClause = generator.generateWhereClause()
+//       whereTemplate = whereTemplate.replace('{{if}}', juede).replace('{{condition}}', whereClause)
+//     } else if (c.operator === Operator.Between) {
+//       const isDate = DatePropertyCodes.indexOf(Number(c.propertytypecode)) !== -1
+//       const [lvalue, rvalue] = isDate ? ['begin', 'end'] : ['min', 'max']
+
+//       const juede = `!String.isBlank(${lvalue}) && !String.isBlank(${rvalue})`
+//       let whereClause = generator.generateWhereClause()
+//       // console.log("c.propertytypecode", c.propertytypecode)
+//       whereTemplate = whereTemplate.replace('{{if}}', juede).replace('{{condition}}', whereClause)
+//     }
+//     whereTemplate = whereTemplate.replace('{{commit}}', `${c.zh_columnName}`)
+//     return whereTemplate
+//   }
+// }

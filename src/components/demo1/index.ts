@@ -27,6 +27,8 @@ export const EntityRowData2QueryModel = (tableData: tableData, EntityRowDatas: E
   const queryArgumentArrayMap = new Map<string, Property[]>()
   const { inputProperty, outputProperty } = genInOutProtocol(tableData, EntityRowDatas)
 
+  console.log(inputProperty)
+  console.log(outputProperty)
   queryArgumentArrayMap.set(tableData.objectmark, inputProperty)
   const output: Output = {
     customcode: tableData.objectcode,
@@ -79,7 +81,7 @@ function genInOutProtocol(tableData: tableData, EntityRowDatas: EntityRowData[])
         name: item.this.columnname + '__' + child2.this.columnname,
         propertyname: child2.this.propertyname,
         propertytypecode: child2.this.propertytypecode,
-        objectcode: child2?.relationobj.objectcode,
+        objectcode: child2?.relationobj?.objectcode,
         propertycode: child2.this.propertycode,
         marktype: '2',
         level: child2.level,
@@ -116,16 +118,6 @@ function genInOutProtocol(tableData: tableData, EntityRowDatas: EntityRowData[])
         }
       })
     })
-    //--
-    // item.relationQueryFieldNames.forEach((name) => {
-    //   inOutProtocol.outputProperty.push({
-    //     name: item.this.columnname + '__' + name,
-    //     propertycode: item.relationobj.properties.filter((property) => property.columnname === name)[0].propertycode,
-    //     propertyname: name,
-    //     objectcode: item.relationobj.objectcode,
-    //     level: item.level
-    //   })
-    // })
   })
 
   //EntityRowDatas 递归筛选 select的
@@ -415,7 +407,8 @@ function genQueryModel_(output: Output, queryArgumentArrayMap: Map<string, Prope
             operator: operator,
             value: null,
             secondValue: null,
-            like: null
+            like: null,
+            rightClause: `IN.${mainTableName}.${property.name}`
           }
         } else {
           conditionModel = {
@@ -426,21 +419,17 @@ function genQueryModel_(output: Output, queryArgumentArrayMap: Map<string, Prope
             operator: operator,
             value: null,
             secondValue: null,
-            like: null
+            like: null,
+            rightClause: `IN.${mainTableName}.${property.name}`
           }
         }
-        let condition = `${tableShortName}.${argName} `
 
         if (operator == Operator.Equal) {
           conditionModelArray.push(conditionModel)
-          condition += operator
-          condition += ` { IN.${tableName}.${argName} }`
         }
         if (operator == Operator.Like) {
           conditionModel.like = { matchType: LikeMatchType.Contains } //todo config
           conditionModelArray.push(conditionModel)
-          condition += operator
-          condition += ` { IN.${tableName}.${argName} }`
         }
         if (operator == Operator.Between) {
           conditionModelArray.push(conditionModel)
@@ -448,9 +437,7 @@ function genQueryModel_(output: Output, queryArgumentArrayMap: Map<string, Prope
 
           if (DatePropertyCodes.indexOf(Number(property.propertytypecode)) != -1) {
             //时间类
-            condition += ` ${operator} { bengin } ${Operator.AND} { end }`
           } else {
-            condition += ` ${operator} { value1 } ${Operator.AND} { value2 }`
           }
         }
       })
@@ -465,7 +452,8 @@ function genQueryModel_(output: Output, queryArgumentArrayMap: Map<string, Prope
           operator: Operator.Equal,
           value: null,
           secondValue: null,
-          like: null
+          like: null,
+          rightClause: `IN.${mainTableName}.${property.name}`
         }
         conditionModelArray.push(conditionModel)
       })

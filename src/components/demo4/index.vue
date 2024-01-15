@@ -22,6 +22,12 @@
             <template #prefix></template
           ></n-input>
           <!-- @vue-skip -->
+
+          <NButton size="small">
+            <NIcon :component="expand_all ? ChevronDown : ChevronUp" @click="openTree"> </NIcon>
+          </NButton>
+          <!-- @vue-skip -->
+
           <NButton size="small">
             <NIcon :component="Refresh" @click="RefreshOutline"> </NIcon>
           </NButton>
@@ -37,9 +43,10 @@
             :pattern="pattern"
             :show-irrelevant-nodes="showIrrelevantNodes"
             :node-props="nodeProps"
+            :default-expand-all="expand_all"
             update
           >
-            <template #empty>...</template></n-tree
+            <template #empty><NSpace align="center" Justify="center"> 没有结果 </NSpace></template></n-tree
           >
         </div>
       </div>
@@ -48,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { FlashOutline, Refresh } from '@vicons/ionicons5'
+import { FlashOutline, Refresh, ChevronDown, ChevronUp } from '@vicons/ionicons5'
 import { TreeOption, useMessage } from 'naive-ui'
 import { monacoInitializedUtil } from '../../util/monacoUtil'
 import { SymbolKind } from './App'
@@ -63,6 +70,7 @@ const props = withDefaults(
     pagecode: null
   }
 )
+const expand_all = ref(false)
 
 tryOnUnmounted(() => {
   console.log('tryOnUnmounted')
@@ -99,6 +107,9 @@ const selectFilterOptions = reactive([
 const showIrrelevantNodes = ref(false)
 const treeData = ref<TreeOption[]>()
 const treeDataSearch = ref<TreeOption[]>()
+const openTree = () => {
+  expand_all.value = !expand_all.value
+}
 const pattern = ref('')
 const flyStore = useFlyStore()
 watch(
