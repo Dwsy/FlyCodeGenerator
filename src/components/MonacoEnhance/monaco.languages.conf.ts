@@ -41,6 +41,8 @@ export const applyCustomFlycode = () => {
   diagnosticCodesToIgnore.push(8013)
   diagnosticCodesToIgnore.push(1109)
   diagnosticCodesToIgnore.push(2568)
+  diagnosticCodesToIgnore.push(1135)
+  diagnosticCodesToIgnore.push(1128)
   monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
     diagnosticCodesToIgnore
     // noSuggestionDiagnostics: true,

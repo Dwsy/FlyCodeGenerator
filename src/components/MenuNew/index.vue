@@ -1,9 +1,8 @@
 <template>
   <div class="menu-container">
-    <div class="menu-trigger" style="height: 5%; width: 10%">
-    </div>
+    <div class="menu-trigger" style="height: 5%; width: 5%"></div>
 
-    <div class="menu" style="width:25%;padding: 20px">
+    <div class="menu" style="width: 25%; padding: 20px">
       <NText> {{ flyStore.codeGeneratorInitStatus ? '代码生成器已初始化' : '代码生成器未初始化' }}</NText>
       <NList style="background-color: var(--theme-content-background-color)">
         <NListItem>
@@ -24,38 +23,41 @@
           <NSpace justify="space-between">
             <span>{{ BracketPairColorizationMenuText }}</span>
             <NSwitch
-                @update-value=""
-                :value="bracketPairColorizationEnable"
-                @update:value="switchBracketPairColorization"
+              @update-value=""
+              :value="bracketPairColorizationEnable"
+              @update:value="switchBracketPairColorization"
             ></NSwitch>
           </NSpace>
         </NListItem>
 
         <NListItem>
           <NSpace justify="space-between"
-          >{{ SzzrxMenuText }}
+            >{{ SzzrxMenuText }}
             <NSwitch @update-value="switchSzzrx" :value="szzrx"></NSwitch>
           </NSpace>
+          <div v-if="szzrx">
+            <n-space vertical>
+              <n-slider v-model:value="opacity" :step="2" />
+              <n-input-number v-model:value="opacity" size="small" />
+            </n-space>
+          </div>
         </NListItem>
         <NListItem>
           <NSpace justify="space-between"
-          >{{ MacVideoMenuText }}
+            >{{ MacVideoMenuText }}
             <NSwitch @update-value="switchMacVideo" :value="macVideoEnbale"></NSwitch>
           </NSpace>
         </NListItem>
         <NListItem>
           <NSpace justify="end">
             <NButton @click="useSystemPicute" type="info" size="small">使用MAC工作区壁纸</NButton>
-          </NSpace
-          >
+          </NSpace>
         </NListItem>
         <NListItem>
           <NGrid cols="12">
             <NGi span="8">代码格式化:开启</NGi>
             <NGi span="2" offset="2">
-              <NButton size="small" type="info">
-                设置
-              </NButton>
+              <NButton size="small" type="info"> 设置 </NButton>
             </NGi>
           </NGrid>
         </NListItem>
@@ -68,16 +70,15 @@
             </NGi>
           </NGrid>
         </NListItem>
-
       </NList>
     </div>
   </div>
 </template>
 <script setup lang="tsx">
-import {NButton} from 'naive-ui'
-import {GM_getValue, GM_setValue} from '../../util'
-import {useFlyStore} from '../../store/flyStore'
-import {applyCustomFlycode} from '../MonacoEnhance/monaco.languages.conf'
+import { NButton } from 'naive-ui'
+import { GM_getValue, GM_setValue } from '../../util'
+import { useFlyStore } from '../../store/flyStore'
+import { applyCustomFlycode } from '../MonacoEnhance/monaco.languages.conf'
 
 const flyStore = useFlyStore()
 const trigger = ref<HTMLElement>()
@@ -183,6 +184,11 @@ const useSystemPicute = async () => {
     console.error(error)
   }
 }
+
+const opacity = useLocalStorage('window.document.body.style.opacity', 90)
+watch(opacity, (value) => {
+  window.document.body.style.opacity = `${value / 100}`
+})
 </script>
 
 <style>

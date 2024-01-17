@@ -3,6 +3,10 @@ onMounted(() => {
   const style = document.createElement('style')
   style.innerHTML = `
 
+  #app > div > div.content > div.router-container > div > div > div.tab-content.ant-tabs.ant-tabs-top.ant-tabs-line.ant-tabs-no-animation > div.ant-tabs-content.ant-tabs-content-no-animated.ant-tabs-top-content > div.ant-tabs-tabpane.ant-tabs-tabpane-active > div.ui-designer-container.cl > div.center-content > div.ui-canvas-parent > div.center-content-inner{
+    filter :invert(1) hue-rotate(180deg)
+  }
+
 .logic-edit-container > .left-side {
   background-color: #ffffff00 !important;
 }

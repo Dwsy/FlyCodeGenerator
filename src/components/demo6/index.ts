@@ -10,7 +10,7 @@ export const querySelectorPromise = (querySelector: string, w = 3000, i = 300): 
     const MAX_WAIT_TIME = w // 3 秒
     const INTERVAL_TIME = i
     let elapsed = 0
-
+    let intervalId
     const query = () => {
       const element = document.querySelector(querySelector)
       if (element !== null) {
@@ -24,7 +24,7 @@ export const querySelectorPromise = (querySelector: string, w = 3000, i = 300): 
 
     query() // 立即执行一次查询
 
-    const intervalId = setInterval(() => {
+    intervalId = setInterval(() => {
       elapsed += INTERVAL_TIME
       query()
     }, INTERVAL_TIME)

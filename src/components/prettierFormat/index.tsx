@@ -149,7 +149,9 @@ function removeStringWrapping(code: string, model: monaco.editor.ITextModel) {
   code = code.replaceAll('5213**/', '')
   // code = code.replaceAll('norule', 'NORULE')
   // code = code.replaceAll('paging', 'PAGING')
-  code = code.replace(/console.log/g, 'FLY.log')
+  if (getPageTypeIsModel()) {
+    code = code.replace(/console.log/g, 'FLY.log')
+  }
   if (GM_getValue('formatCodeAndFormatSQL', true)) {
     // setTimeout(() => {
 

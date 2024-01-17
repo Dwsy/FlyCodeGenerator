@@ -13,61 +13,27 @@ import { registerMenuCommand } from './util/handelMonkeyMenu'
 import { message } from './util/message'
 import { querySelectorPromise } from './components/demo6'
 import { getProtocol } from './dataRequest'
-const init = async () => {
-  if (window.location.href.indexOf('login') == -1) {
-    // getProtocol
-    await querySelectorPromise('#app > div > div.side-bar-container > div > div.menu-top > nav > div.active')
-    const pinia = createPinia()
-    // pinia.use(PiniaDevtools)
-    pinia.use(piniaPersist)
 
-    const app: HTMLElement = document.createElement('div')
-    app.className = 'queryGenerator'
-    document.body.append(app)
-    createApp(App).use(naive).use(pinia).mount(app)
+const pinia = createPinia()
+const app: HTMLElement = document.createElement('div')
+app.className = 'queryGenerator'
+document.body.append(app)
 
-    registerMenuCommand()
-    message.success('FG初始化成功')
-    return
-  }
+const Capp = createApp(App).use(naive).use(pinia)
+if (window.location.href.indexOf('login') == -1 && window.location.href.indexOf('tenant-env-list') == -1) {
+  Capp.mount(app)
+  registerMenuCommand()
+} else {
+  message.warning('当前未登录，请登录后进入IDE刷新页面，插件方可正常加载', {
+    duration: 99999999999
+  })
 }
-
-init() // Run the code once immediately
-
-const wait = setInterval(init, 1000) // Wait in a loop
-clearInterval(wait)
-// if (window.location.hash.indexOf('uipreview') != -1) {
-// } else {
-
-//   var handler = {
-//     get: function (target, prop, receiver) {
-//       var propValue = Reflect.get(target, prop, receiver)
-//       if (typeof propValue !== 'function') {
-//         console.log(`Get ${prop}`)
-//         return propValue
-//       }
-
-//       // 对函数做特别处理
-//       return function (...args) {
-//         console.log(`Execute ${prop}`)
-//         return propValue.apply(target, args)
-//       }
-//     },
-//     set: function (target, prop, value) {
-//       if (prop !== 'length' && typeof value !== 'function') {
-//         console.log(`Change ${prop} to ${value}`)
-//       }
-//       return Reflect.set(target, prop, value)
-//     }
+// const init = async () => {
+//   if (window.location.href.indexOf('login') == -1 || window.location.href.indexOf('tenant-env-list') == -1) {
+//     await querySelectorPromise('#app > div > div.side-bar-container > div > div.menu-top > nav > div.active', 999999)
+//     message.success('FG初始化成功')
+//     return
 //   }
-
-//   // window.sessionStorage = new Proxy(window.sessionStorage, handler)
-//   //@ts-ignore
-//   // Object.prototype.replace = function (searchValue, replaceValue) {
-//   //   // // 确保当前对象是字符串，否则返回原对象
-//   //   if (typeof this === 'string') {
-//   //     return this.split(searchValue).join(replaceValue)
-//   //   }
-//   //   return this
-//   // }
 // }
+
+// init() // Run the code once immediately

@@ -27,7 +27,7 @@ export const registerProviders = () => {
             suggestions: autoAsSqlCompletionRet.suggestions
           }
         }
-        const items = getSqlCompletionItems(model, position, context, token, checkInSqlRange.sqlRange)
+        const items = await getSqlCompletionItems(model, position, context, token, checkInSqlRange.sqlRange)
         // debugger
         // console.log(items)
         return items
@@ -152,7 +152,7 @@ export const registerProviders = () => {
       {
         label: 'throw',
         kind: monaco.languages.CompletionItemKind.Keyword,
-        insertText: 'throw new Error($1)',
+        insertText: 'throw new ERROR($1)',
         preselect: true,
         range: null,
         detail: '抛出异常',
