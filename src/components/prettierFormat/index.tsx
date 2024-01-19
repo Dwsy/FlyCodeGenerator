@@ -4,11 +4,13 @@ import './bable'
 import './estree'
 import './bable.min'
 import { Options } from 'prettier'
+import initSwc, { transformSync } from '@swc/wasm-web'
 // import {transform} from '@babel/standalone'
-import { GM_getValue, getPageTypeIsModel } from '../../util'
+import { GM_getValue, getPageCode, getPageTypeIsModel } from '../../util'
 import { formatEditotFqueryFunc, formatEditotFqueryFuncNew } from '../MonacoEnhance'
 import { TransformOptions } from './type.d'
 import { MessageRenderMessage, NAlert, NCard } from 'naive-ui'
+import { useFlyStore } from '../../store/flyStore'
 
 let sqlCount = 0
 // 格式化逻辑
@@ -64,6 +66,11 @@ async function spliceSemiAndDoubleQoute(code: string) {
         retainLines: true, // 通过设置retainLines选项来保留原始代码中的空格
         ast: false
       }
+
+      // if (GM_getValue('swc_format', true)) {
+      // console.log('使用swc格式化')
+      // code = transformSync(code, {}).code
+      // } else {
       // @ts-ignore
       code = Babel.transform(code, {
         presets: ['es2015'],
@@ -71,7 +78,9 @@ async function spliceSemiAndDoubleQoute(code: string) {
         retainLines: true, // 通过设置retainLines选项来保留原始代码中的空格
         ast: false
       }).code
+      // }
     }
+
     //@ts-ignore
     const formatCode = await prettier.format(code, config)
 
@@ -119,6 +128,37 @@ const renderMessage: MessageRenderMessage = (props) => {
 }
 
 export const formatProvider: monaco.languages.DocumentFormattingEditProvider = {
+  displayName: 'prettier-flycode',
+  async provideDocumentFormattingEdits(
+    model: monaco.editor.ITextModel,
+    options: monaco.languages.FormattingOptions,
+    token: monaco.CancellationToken
+  ): Promise<monaco.languages.TextEdit[]> {
+    // const flyStore = useFlyStore()
+    // const editor = flyStore.monacoEditorMap.get(getPageCode())
+    // const position = editor.getPosition()
+    let code = await spliceSemiAndDoubleQoute(model.getValue())
+    code = removeStringWrapping(code, model)
+
+    const modelRange = model.getFullModelRange()
+    const range = {
+      startLineNumber: modelRange.startLineNumber,
+      endLineNumber: modelRange.endLineNumber,
+      startColumn: 1,
+      endColumn: model.getLineMaxColumn(modelRange.endLineNumber)
+    }
+    const edit: monaco.languages.TextEdit = {
+      range,
+      text: code
+    }
+    setTimeout(() => {
+      // editor.setPosition(position)
+    }, 200)
+    return [edit]
+  }
+}
+
+export const SWC_formatProvider: monaco.languages.DocumentFormattingEditProvider = {
   displayName: 'prettier-flycode',
   async provideDocumentFormattingEdits(
     model: monaco.editor.ITextModel,

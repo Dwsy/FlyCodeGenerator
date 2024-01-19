@@ -16,6 +16,7 @@ export const registerProviders = () => {
         return []
       }
       const checkInSqlRange = checkInSqlRangeFn(model, position)
+      console.log(checkInSqlRange)
       // debugger
 
       if (checkInSqlRange.in) {

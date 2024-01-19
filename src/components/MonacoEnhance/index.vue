@@ -152,4 +152,7 @@ onMounted(() => {
   white-space: pre-wrap;
   word-wrap: break-word;
 }
+.n-alert-body__title {
+  color: red !important;
+}
 </style>

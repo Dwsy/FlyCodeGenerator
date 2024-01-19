@@ -205,7 +205,7 @@ export function getSqlCompletionItems(
       if (!tableData) {
         return []
       }
-      const completionItemsCache = tableDataSuggestionsCache.get(key)
+      let completionItemsCache = tableDataSuggestionsCache.get(key)
       const selectAllcompletionItemsCache = tableDataSelectAllSuggestionsCache.get(key)
       let selectAllLine: string[] = []
       if (completionItemsCache) {
@@ -234,7 +234,7 @@ export function getSqlCompletionItems(
         return completionItemsCache
       }
 
-      const completionItems = tableData.properties.map((property, index) => {
+      completionItemsCache = tableData.properties.map((property, index) => {
         const label = `${item.alias}.${property.columnname}(${property.propertyname})`
         let pure_insertText = `${item.alias}.${property.columnname} `
         let insertText = pure_insertText + `,//${property.propertyname}\n`
@@ -270,7 +270,8 @@ export function getSqlCompletionItems(
         selectAllCompletionItems.push(selectAllCompletionItem)
         tableDataSelectAllSuggestionsCache.set(key, selectAllCompletionItem)
       }
-      tableDataSuggestionsCache.set(key, completionItems)
+      tableDataSuggestionsCache.set(key, completionItemsCache)
+      return completionItemsCache
     })
     .flat()
   //   if (isAfterForm) {

@@ -394,6 +394,7 @@ const renderMessage: MessageRenderMessage = (props) => {
         closable={props.closable}
         onClose={props.onClose}
         title="格式化失败请检查代码"
+        
         type="warning"
       >
         <pre style={style2}>{props.content}</pre>

@@ -1,7 +1,6 @@
 export let protocol =
-    { "objs": [{ "objectcode": "1731585629294301244", "objectname": " 促销活动变动类促销（通用）", "tablename": "xxw_promotion_general", "objectmark": "xxw_promotion_general", "objecttypecode": "1", "objectdescr": "", "status": 1, "directorytypecode": "1727995518044475491", "publishstatus": 2, "marktype": "2", "objecttemplatecode": "", "objectcatgory": "2", "parentobjectcode": "", "properties": [{ "propertycode": "1731585629294301243", "propertyname": "id", "columnname": "id", "propertycategorycode": "1", "propertytypecode": "1", "seq": 1, "status": "1", "idxtype": "2", "publishstatus": "2", "marktype": "2", "propertydescr": "", "relationobjectcode": "", "ismaster": "", "candelete": true }], "diclayer": 0, "seq": 1, "datapattern": "1", "message": "{\"committype\":\"saverecord\",\"committypetext\":\"保存记录\",\"msgbody\":\"2023-12-04 16:58\"}", "confsource": 1 }], "offlines": [] }
-
-export let seq = "700"
+{"objs":[{"objectcode":"1747456136497467411","objectname":"IN_ZTSD00010","tablename":"sap_middle_in_ztsd","objectmark":"sap_middle_in_ztsd","objecttypecode":"1","objectdescr":"","status":1,"directorytypecode":"1715173109138591840","publishstatus":2,"marktype":"2","objecttemplatecode":"","objectcatgory":"2","parentobjectcode":"","properties":[{"propertycode":"1747456136497467410","propertyname":"主键","columnname":"id","propertycategorycode":"1","propertytypecode":"1","seq":1,"status":"1","idxtype":"2","publishstatus":"2","marktype":"2","propertydescr":"","relationobjectcode":"","ismaster":"","candelete":true}],"diclayer":0,"seq":1,"datapattern":"1","message":"{\"committype\":\"saverecord\",\"committypetext\":\"保存记录\",\"msgbody\":\"2024-01-17 14:51\"}","confsource":1}],"offlines":[]}
+export let seq = "11100"
 
 
 export const cxzy = `

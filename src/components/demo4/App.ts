@@ -1,3 +1,4 @@
+import { useFlyStore } from '../../store/flyStore'
 import { monacoInitializedUtil } from '../../util/monacoUtil'
 import { getRangeForText } from '../MonacoEnhance/sqlProvider'
 
@@ -189,15 +190,34 @@ export function getAllSqlSqlSymbol(model: monaco.editor.ITextModel): Array<any> 
     let subMatch
     const subRangeList: Array<any> = []
     let sum = 0
+    let cursor = 0
     while ((subMatch = subRegex.exec(match[0]))) {
-      let subStart = subMatch.index + start
+      let subStart = subMatch.index + start + cursor
 
       const subRange = {
         range: getRangeForTextByInSqlNew(text.slice(subStart, subStart + subMatch[0].length), model, sqlRange.range)
       }
       subRangeList.push({ ...subRange, name: subMatch[0] })
+
+      cursor += subMatch[0].length
     }
-    sqlRangeList.push({ ...sqlRange, name: 'Query:' + query_var, children: subRangeList })
+    sqlRangeList.push({
+      ...sqlRange,
+      name: 'Query:' + query_var + createSqlTableNameExtractor(match[0]),
+      children: subRangeList
+    })
+  }
+
+  function createSqlTableNameExtractor(sql) {
+    const regex = /\bFROM\s+([^\s,]+)/i
+    const match = regex.exec(sql)
+    const tableName = match ? match[1] : null
+    const flyStore = useFlyStore()
+    let zhName = flyStore.tableNameDataMap.get(tableName)?.objectname
+    if (!zhName) {
+      zhName = flyStore.dictNameDataMap.get(tableName)?.objectname
+    }
+    return '\n' + zhName
   }
 
   return sqlRangeList.map((r) => formatResultToTree(r, {}))

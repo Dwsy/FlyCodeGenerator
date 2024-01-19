@@ -108,7 +108,6 @@ FieldDatas.map((field) => {
 // console.log(Properties)
 
 preEntiy.objs[0].properties = [preEntiy.objs[0].properties[0]]
-const primaryKey = PropertyTypeCode.PrimaryKey.toString()
 //@ts-ignore
 preEntiy.objs[0].properties[0].publishstatus = '2'
 //@ts-ignore
@@ -124,7 +123,7 @@ fs.writeFile('./demo/CEntiy.json', JSON.stringify(preEntiy), (err) => {
   }
 })
 
-function getRelationobjectcode(coldef: Coldef): string {
+function getRelationobjectcode(coldef): string {
   if (coldef[1] == 'promotion_guide_id') return '1727127470760661091'
   if (coldef[1] == 'salearea_id') return '800000000000000000'
   if (coldef[1] == 'sales_target_id') return '1716626739553243221'
