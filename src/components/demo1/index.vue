@@ -174,7 +174,8 @@ const genSql = () => {
   console.log(sql)
   // copyToClipboard(sql)
   message.success('生成成功')
-  const editor = nowEditor
+  //@ts-ignore
+  const editor = noweditor
   const position = editor.getPosition()
 
   editor.executeEdits('source', [

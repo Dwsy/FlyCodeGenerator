@@ -20,13 +20,20 @@ app.className = 'queryGenerator'
 document.body.append(app)
 
 const Capp = createApp(App).use(naive).use(pinia)
-if (window.location.href.indexOf('login') == -1 && window.location.href.indexOf('tenant-env-list') == -1) {
+if (
+  window.location.href.indexOf('login') == -1 &&
+  window.location.href.indexOf('tenant-env-list') == -1 &&
+  window.location.href.indexOf('uipreview') == -1
+) {
   Capp.mount(app)
   registerMenuCommand()
 } else {
-  message.warning('当前未登录，请登录后进入IDE刷新页面，插件方可正常加载', {
-    duration: 99999999999
-  })
+  if (window.location.href.indexOf('uipreview') != -1) {
+  } else {
+    message.warning('当前未登录，请登录后进入IDE刷新页面，插件方可正常加载', {
+      duration: 99999999999
+    })
+  }
 }
 // const init = async () => {
 //   if (window.location.href.indexOf('login') == -1 || window.location.href.indexOf('tenant-env-list') == -1) {

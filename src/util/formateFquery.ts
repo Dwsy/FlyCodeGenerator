@@ -148,9 +148,15 @@ export function formatFquery(sql: string, start: string, onlyReturnSql: boolean 
     formatSQL = formatSQL
       .split('\n')
       .map((line) => {
-        if (line.trim() == `--split:if${index}` + bif) {
+        if (line.indexOf(`--split:if${index}` + bif) != -1) {
+          if (line.indexOf('//') != -1) {
+            return '//  ' + bif
+          }
           return bif
-        } else if (line.trim() == `--split:endif${index}` + bendif) {
+        } else if (line.indexOf(`--split:endif${index}` + bendif) != -1) {
+          if (line.indexOf('//') != -1) {
+            return '// ' + bendif
+          }
           return bendif
         }
         return line
