@@ -90,7 +90,6 @@ async function spliceSemiAndDoubleQoute(code: string) {
   } catch (e) {
     message.error(String(e), {
       render: renderMessage,
-      closable: true,
       keepAliveOnHover: true,
       duration: 3000
     })

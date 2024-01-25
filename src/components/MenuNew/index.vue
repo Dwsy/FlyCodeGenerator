@@ -1,6 +1,6 @@
 <template>
   <div class="menu-container">
-    <div class="menu-trigger" style="height: 5%; width: 5%"></div>
+    <div class="menu-trigger" style="height: 5%; width: 2%"></div>
 
     <div class="menu" style="width: 25%; padding: 20px">
       <NText> {{ flyStore.codeGeneratorInitStatus ? '代码生成器已初始化' : '代码生成器未初始化' }}</NText>

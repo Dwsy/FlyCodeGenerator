@@ -33,23 +33,7 @@ export const applyCustomFlycode = () => {
   //     })
   //   }
   // })
-  const diagnosticCodesToIgnore = []
-  diagnosticCodesToIgnore.push(8016)
-  diagnosticCodesToIgnore.push(1434)
-  diagnosticCodesToIgnore.push(1005)
-  diagnosticCodesToIgnore.push(1435)
-  diagnosticCodesToIgnore.push(8013)
-  diagnosticCodesToIgnore.push(1109)
-  diagnosticCodesToIgnore.push(2568)
-  diagnosticCodesToIgnore.push(1135)
-  diagnosticCodesToIgnore.push(1128)
-  monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
-    diagnosticCodesToIgnore
-    // noSuggestionDiagnostics: true,
-    // noSemanticValidation: true,
-    // noSyntaxValidation: true,
-    // onlyVisible: true
-  })
+
   return
   if (GM_getValue('MonacoTheme', null) == 'default') return
   console.log('apply MonarchTokensProvider and setLanguageConfiguration')
@@ -57,4 +41,31 @@ export const applyCustomFlycode = () => {
   // monaco.languages.setLanguageConfiguration('flycode', languageConfiguration)
   // monaco.editor.FontInfo
   // monaco.editor.re
+}
+
+export const enableJavaScriptDiagnostics = (enable: boolean) => {
+  console.log('enableJavaScriptDiagnostics', enable)
+  if (enable) {
+    const diagnosticCodesToIgnore = []
+    diagnosticCodesToIgnore.push(8016)
+    diagnosticCodesToIgnore.push(1434)
+    diagnosticCodesToIgnore.push(1005)
+    diagnosticCodesToIgnore.push(1435)
+    diagnosticCodesToIgnore.push(8013)
+    diagnosticCodesToIgnore.push(1109)
+    diagnosticCodesToIgnore.push(2568)
+    diagnosticCodesToIgnore.push(1135)
+    diagnosticCodesToIgnore.push(1128)
+    monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+      diagnosticCodesToIgnore
+      // noSuggestionDiagnostics: true,
+      // noSemanticValidation: true,
+      // noSyntaxValidation: true,
+      // onlyVisible: true
+    })
+  } else {
+    monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+      diagnosticCodesToIgnore: []
+    })
+  }
 }

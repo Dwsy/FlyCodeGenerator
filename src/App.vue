@@ -46,7 +46,7 @@ import { RefreshExtraLib } from './flycodeDts'
 import { getMonacoModel, monacoInitializedUtil } from './util/monacoUtil'
 import { getFqueryModel } from './flycodeDts/FQuery/test'
 import { GM_getValue } from './util'
-import { applyCustomFlycode } from './components/MonacoEnhance/monaco.languages.conf'
+import { applyCustomFlycode, enableJavaScriptDiagnostics } from './components/MonacoEnhance/monaco.languages.conf'
 import { useOptionsStore } from './store/OptionsStore'
 import { NConfigProvider } from 'naive-ui'
 const ide_theme = useLocalStorage('ide_theme', 'dark')

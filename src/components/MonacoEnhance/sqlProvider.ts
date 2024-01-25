@@ -392,10 +392,34 @@ const getSqlQueryTables = (sqlText: string): Array<SqlQueryTable> => {
     }
     return newText.join('\njoin ')
   }
+  // const removeOnClause = (sqlText: string): string => {
+  //   let splitText = sqlText.toLowerCase().split('join ')
+  //   return splitText.map((part) => part.split(' on ')[0]).join('\njoin ')
+  // }
   const removeOnClause = (sqlText: string): string => {
-    let splitText = sqlText.toLowerCase().split('join ')
-    return splitText.map((part) => part.split(' on ')[0]).join('\njoin ')
+    // 检查是否存在子查询
+    const subQueryStart = sqlText.indexOf('(')
+    if (subQueryStart !== -1) {
+      const subQueryEnd = sqlText.lastIndexOf(')')
+      const beforeSubQuery = sqlText.substring(0, subQueryStart)
+      const subQuery = sqlText.substring(subQueryStart + 1, subQueryEnd)
+      const afterSubQuery = sqlText.substring(subQueryEnd + 1)
+      // 检查子查询是否以 "select" 开头并且包含 "from"
+      const trimmedSubQuery = subQuery.trim().toLowerCase()
+      if (trimmedSubQuery.startsWith('select') && trimmedSubQuery.includes('from')) {
+        // 递归处理子查询
+        return removeOnClause(beforeSubQuery) + '(' + removeOnClause(subQuery) + ')' + removeOnClause(afterSubQuery)
+      } else {
+        // 如果不是子查询，就直接删除 ON 子句
+        return removeOnClause(beforeSubQuery) + '(' + subQuery + ')' + removeOnClause(afterSubQuery)
+      }
+    } else {
+      // 如果没有子查询，就删除 ON 子句
+      let splitText = sqlText.toLowerCase().split('join ')
+      return splitText.map((part) => part.split(' on ')[0]).join(' join ')
+    }
   }
+
   sqlText = removeOnClause(sqlText)
 
   const SqlQueryTables = new Array<SqlQueryTable>()

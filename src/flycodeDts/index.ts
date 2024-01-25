@@ -1,10 +1,9 @@
-
-import { useFlyStore } from "../store/flyStore";
-import { Protocol } from "../type/protocol";
-import { BoNewTemplate, BoTemplate, generateBONewDtsByProtocol, generateEntityInterfaceDtsByProtocol } from "./BoNew";
-import { generateFullEntityDtsByProtocol } from "./EntityDts/FullEntityDtsGenerator";
-import { generateInAndOutEntityDtsByProtocol } from "./EntityDts/InAndOutEntityDtsGenerator";
-
+import { enableJavaScriptDiagnostics } from '../components/MonacoEnhance/monaco.languages.conf'
+import { useFlyStore } from '../store/flyStore'
+import { Protocol } from '../type/protocol'
+import { BoNewTemplate, BoTemplate, generateBONewDtsByProtocol, generateEntityInterfaceDtsByProtocol } from './BoNew'
+import { generateFullEntityDtsByProtocol } from './EntityDts/FullEntityDtsGenerator'
+import { generateInAndOutEntityDtsByProtocol } from './EntityDts/InAndOutEntityDtsGenerator'
 
 let entityDts: string
 let inOutEntityDts: string
@@ -14,66 +13,63 @@ let tempBoNewDtsList = []
 let tempBoNewEntityInterfaceDtsList = []
 
 export function pushTempBoNewDtsList(boname) {
-    const tableNameDataMap = useFlyStore().tableNameDataMap
-    tempBoNewDtsList.push(BoNewTemplate.replaceAll("{{EntityName}}", boname))
-    console.log("tempBoNewDtsList", tempBoNewDtsList)
-    tempBoNewEntityInterfaceDtsList.push(generateEntityInterfaceDtsByProtocol([tableNameDataMap.get(boname)]))
-    RefreshExtraLib(false)
+  const tableNameDataMap = useFlyStore().tableNameDataMap
+  tempBoNewDtsList.push(BoNewTemplate.replaceAll('{{EntityName}}', boname))
+  console.log('tempBoNewDtsList', tempBoNewDtsList)
+  tempBoNewEntityInterfaceDtsList.push(generateEntityInterfaceDtsByProtocol([tableNameDataMap.get(boname)]))
+  RefreshExtraLib(false)
 }
 
 export function addTempDts(dts: string) {
-    tempBoNewEntityInterfaceDtsList.push(dts)
-    RefreshExtraLib(false)
+  tempBoNewEntityInterfaceDtsList.push(dts)
+  RefreshExtraLib(false)
 }
-
-
 
 export function RefreshExtraLib(onlyUIFlycode: boolean = false) {
-    const flyStore = useFlyStore()
-    const ExtraLibs = []
-    if (!flyStore.addDtsEnable) {
-        return
-    }
-    if (!init) {
-        init = true
-        entityDts = generateFullEntityDtsByProtocol(flyStore.tableDatas)
-    } else {
-        console.log(flyStore.protocol)
-        console.log("protocol")
-        if (flyStore.protocol != undefined) {
-            inOutEntityDts = generateInAndOutEntityDtsByProtocol(flyStore.protocol)
-            BONewDts = generateBONewDtsByProtocol(flyStore.protocol, flyStore.tableDataMap)
-            if (!BONewDts) {
-                BONewDts = BoTemplate.replace("{{BoNewList}}", "")
-            }
-        }
-    }
+  enableJavaScriptDiagnostics(!onlyUIFlycode)
 
-    if (onlyUIFlycode || window.location.href.indexOf("uiedit") != -1) {
-        ExtraLibs.push({ content: UIFlycodeDts })
-    } else {
-        if (inOutEntityDts != undefined) {
-            ExtraLibs.push({ content: inOutEntityDts })
-            ExtraLibs.push({ content: flycodeDts })
-            ExtraLibs.push({ content: testDts })
-            ExtraLibs.push({ content: entityDts })
-            ExtraLibs.push({ content: BONewDts.replaceAll("{{tempDtsList}}", `${tempBoNewDtsList.join("")}`) })
-            ExtraLibs.push({ content: tempBoNewEntityInterfaceDtsList.join("") })
-        }
+  const flyStore = useFlyStore()
+  const ExtraLibs = []
+  if (!flyStore.addDtsEnable) {
+    return
+  }
+  if (!init) {
+    init = true
+    entityDts = generateFullEntityDtsByProtocol(flyStore.tableDatas)
+  } else {
+    console.log(flyStore.protocol)
+    console.log('protocol')
+    if (flyStore.protocol != undefined) {
+      inOutEntityDts = generateInAndOutEntityDtsByProtocol(flyStore.protocol)
+      BONewDts = generateBONewDtsByProtocol(flyStore.protocol, flyStore.tableDataMap)
+      if (!BONewDts) {
+        BONewDts = BoTemplate.replace('{{BoNewList}}', '')
+      }
     }
+  }
 
+  if (onlyUIFlycode || window.location.href.indexOf('uiedit') != -1) {
+    ExtraLibs.push({ content: UIFlycodeDts })
+  } else {
+    if (inOutEntityDts != undefined) {
+      ExtraLibs.push({ content: inOutEntityDts })
+      ExtraLibs.push({ content: flycodeDts })
+      ExtraLibs.push({ content: testDts })
+      ExtraLibs.push({ content: entityDts })
+      ExtraLibs.push({ content: BONewDts.replaceAll('{{tempDtsList}}', `${tempBoNewDtsList.join('')}`) })
+      ExtraLibs.push({ content: tempBoNewEntityInterfaceDtsList.join('') })
+    }
+  }
 
-    // @ts-ignore
-    monaco.languages.typescript.javascriptDefaults.setExtraLibs(ExtraLibs)
-    console.log("RefreshExtraLib", ExtraLibs)
+  // @ts-ignore
+  monaco.languages.typescript.javascriptDefaults.setExtraLibs(ExtraLibs)
+  console.log('RefreshExtraLib', ExtraLibs)
 }
-
 
 const testDts = `
 var select:Array<string>
 var SELECT:Array<string>
 `
-
 
 const flycodeDts = `interface String {
     static myStaticMethod(): void;

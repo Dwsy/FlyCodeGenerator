@@ -1,6 +1,8 @@
-import { createDiscreteApi } from "naive-ui/es/discrete/src/discrete";
+import { createDiscreteApi } from 'naive-ui/es/discrete/src/discrete'
 
-
-export const { message } = createDiscreteApi(["message"])
-
-
+export const { message, notification, dialog, loadingBar } = createDiscreteApi([
+  'message',
+  'dialog',
+  'notification',
+  'loadingBar'
+])
