@@ -13,26 +13,16 @@
       <demo1></demo1>
       <!-- generateTemporaryCode -->
       <demo3></demo3>
-      <!-- <demo2></demo2> -->
-      <!--      <menu-old></menu-old>-->
       <menu-new></menu-new>
       <MacVideo v-if="macVideoEnbale"></MacVideo>
       <Otaku v-if="GM_getValue('szzrx', false)"></Otaku>
-      <!-- <div v-if="!isBrowserMode"> -->
-      <!--  -->
       <Demo5 v-if="ide_theme == 'dark'"></Demo5>
 
-      <!-- switchSplitEditor -->
       <Demo6></Demo6>
 
-      <!-- outline -->
-      <!-- <Demo4></Demo4> -->
-      <!-- outlineMulti -->
       <Demo7></Demo7>
-      <!-- <Demo4 v-for="i in "></Demo4> -->
 
       <PrettierFormat></PrettierFormat>
-      <!-- </div> -->
     </n-config-provider>
   </n-message-provider>
 </template>
