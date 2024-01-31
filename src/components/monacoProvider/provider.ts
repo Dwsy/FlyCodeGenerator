@@ -13,7 +13,7 @@ export const registerProviders = () => {
       token: monaco.CancellationToken
     ) {
       if (!getPageTypeIsModel()) {
-        return []
+        return
       }
       const checkInSqlRange = checkInSqlRangeFn(model, position)
       console.log(checkInSqlRange)
