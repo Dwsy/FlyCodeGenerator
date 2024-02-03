@@ -268,7 +268,7 @@ export class ConditionGenerator {
   }
 
   public generateEqualClause(): string {
-    return `${this.condition.tableShortName}.${this.condition.columnName} = ${this.condition.rightClause}`
+    return `${this.condition.tableShortName}.${this.condition.columnName} = {${this.condition.rightClause}}`
   }
 
   public generateNotEqualClause(): string {

@@ -57,15 +57,18 @@ export const enableJavaScriptDiagnostics = (enable: boolean) => {
     diagnosticCodesToIgnore.push(1135)
     diagnosticCodesToIgnore.push(1128)
     monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
-      diagnosticCodesToIgnore
-      // noSuggestionDiagnostics: true,
-      // noSemanticValidation: true,
-      // noSyntaxValidation: true,
+      // diagnosticCodesToIgnore,
+      noSuggestionDiagnostics: true,
+      noSemanticValidation: true,
+      noSyntaxValidation: true
       // onlyVisible: true
     })
   } else {
     monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
-      diagnosticCodesToIgnore: []
+      diagnosticCodesToIgnore: [],
+      noSuggestionDiagnostics: false,
+      noSemanticValidation: false,
+      noSyntaxValidation: false
     })
   }
 }
